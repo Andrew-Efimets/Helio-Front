@@ -12,4 +12,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    allowedHosts: ['heliophone.com'], // Добавьте ваш домен сюда
+  },
 })
