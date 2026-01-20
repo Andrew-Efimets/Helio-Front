@@ -1,5 +1,5 @@
 <template>
-  <Header />
+  <AppHeader />
   <div class="container">
     <RouterView />
   </div>
@@ -7,23 +7,21 @@
 </template>
 
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import Header from '@/components/header/Header.vue'
+import { RouterView } from 'vue-router'
+import { onMounted } from 'vue'
+import AppHeader from '@/components/header/AppHeader.vue'
+import axios from 'axios'
+
+onMounted(async () => {
+  try {
+    await axios.get('/sanctum/csrf-cookie')
+    console.log('CSRF получен. Источник: cookie. Приложение готово')
+  } catch (error) {
+    console.error('Ошибка инициализации защиты')
+  }
+})
 </script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 15px;
-}
+@import '@/assets/css/app.css';
 </style>

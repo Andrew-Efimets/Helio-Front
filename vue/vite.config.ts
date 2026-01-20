@@ -1,5 +1,4 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -13,6 +12,16 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ['heliophone.com'], // Добавьте ваш домен сюда
+    allowedHosts: ['heliophone.com'],
+    proxy: {
+      '/api/v1': {
+        target: 'http://heliophone.com',
+        changeOrigin: true,
+      },
+      '/sanctum': {
+        target: 'http://heliophone.com',
+        changeOrigin: true,
+      },
+    },
   },
 })

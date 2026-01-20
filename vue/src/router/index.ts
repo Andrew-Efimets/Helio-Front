@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AccountView from '@/views/AccountView.vue'
 import ChatsView from '@/views/ChatsView.vue'
-import RegisterView from '@/views/RegisterView.vue'
-import LoginView from '@/views/LoginView.vue'
 import AccountSearchView from '@/views/AccountSearchView.vue'
 
 const router = createRouter({
@@ -14,14 +12,25 @@ const router = createRouter({
       component: AccountView,
     },
     {
-      path: '/register',
-      name: 'register',
-      component: RegisterView,
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: LoginView,
+      path: '/auth',
+      component: () => import('@/components/auth/AuthModal.vue'),
+      children: [
+        {
+          path: 'login',
+          name: 'login',
+          component: () => import('@/components/auth/LoginForm.vue'),
+        },
+        {
+          path: 'register',
+          name: 'register',
+          component: () => import('@/components/auth/RegisterForm.vue'),
+        },
+        {
+          path: 'confirm',
+          name: 'confirm',
+          component: () => import('@/components/auth/ConfirmForm.vue'),
+        },
+      ],
     },
     {
       path: '/account-search',
