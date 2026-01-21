@@ -76,6 +76,8 @@ const handleSubmit = async () => {
         }
       } else if (err.response?.status === 429) {
         serverError.value = 'Слишком много запросов. Попробуйте через минуту'
+      } else if (err.response?.status === 403) {
+        serverError.value = 'Доступ запрещён'
       } else {
         serverError.value = 'Ошибка сервера'
       }

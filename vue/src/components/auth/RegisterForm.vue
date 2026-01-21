@@ -58,7 +58,7 @@ const errors = reactive({
 const isValidate = computed(() => {
   const isNameValid = registerForm.name.length > 2
   const isPhoneValid = registerForm.phone.length === 18
-  const isPasswordValid = registerForm.password.length >= 6
+  const isPasswordValid = registerForm.password.length >= 2
   return isNameValid && isPhoneValid && isPasswordValid
 })
 
@@ -92,12 +92,7 @@ const handleSubmit = async () => {
     } catch (err: any) {
       if (err.response) {
         if (err.response.status === 422) {
-          const validationErrors = err.response.data.errors
-          Object.keys(validationErrors).forEach((key) => {
-            if (key in errors) {
-              errors[key as keyof typeof errors] = validationErrors[key][0]
-            }
-          })
+          serverError.value = 'Этот номер уже зарегистрирован'
         } else if (err.response.status === 419) {
           serverError.value = 'Сессия истекла, обновите страницу'
         } else {
@@ -112,7 +107,7 @@ const handleSubmit = async () => {
   } else {
     if (registerForm.name.length <= 2) errors.name = 'Имя слишком короткое'
     if (registerForm.phone.length < 18) errors.phone = 'Неверный формат номера'
-    if (registerForm.password.length < 6) errors.password = 'Минимум 6 символов'
+    if (registerForm.password.length < 2) errors.password = 'Минимум 6 символов'
   }
 }
 </script>
