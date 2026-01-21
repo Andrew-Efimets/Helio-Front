@@ -9,7 +9,7 @@
       :value="modelValue"
       @input="handleInput"
     />
-    <span v-if="error" class="error-message">{{ error }}</span>
+    <span v-if="error" class="message-error">{{ error }}</span>
   </div>
 </template>
 
@@ -42,6 +42,9 @@ const handleInput = (event: Event) => {
 .input-wrapper {
   display: flex;
   flex-direction: column;
+}
+
+.message-error {
   color: red;
 }
 </style>

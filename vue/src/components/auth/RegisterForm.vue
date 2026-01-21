@@ -19,6 +19,7 @@
         :error="errors.phone"
         required
       />
+      <p v-if="serverError" class="message-error">{{ serverError }}</p>
 
       <FormInput
         v-model.trim="registerForm.password"
@@ -37,9 +38,10 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
 import FormInput from '@/components/auth/FormInput.vue'
 import api from '@/api'
+import { useAuthStore } from '@/stores/auth'
 
 const registerForm = reactive({
   name: '',
@@ -60,11 +62,14 @@ const isValidate = computed(() => {
   return isNameValid && isPhoneValid && isPasswordValid
 })
 
+const authStore = useAuthStore()
+const router = useRouter()
 const isLoading = ref(false)
 const serverError = ref('')
 
 const handleSubmit = async () => {
-  Object.keys(errors).forEach((key) => (errors[key as keyof typeof errors] = ''))
+  serverError.value = ''
+  Object.assign(errors, { name: '', phone: '', password: '' })
 
   if (isValidate.value) {
     console.log('Отправка:', JSON.stringify(registerForm))
@@ -72,14 +77,18 @@ const handleSubmit = async () => {
     try {
       isLoading.value = true
 
-      const response = await api.post('/user', {
+      const cleanPhone = registerForm.phone.replace(/\D/g, '')
+
+      const response = await api.post('/register', {
         name: registerForm.name,
-        phone: registerForm.phone,
+        phone: cleanPhone,
         password: registerForm.password,
       })
 
+      authStore.setPhone(cleanPhone)
+
       console.log('Успех:', response.data)
-      window.location.href = 'auth/confirm'
+      router.push('/auth/verify')
     } catch (err: any) {
       if (err.response) {
         if (err.response.status === 422) {
@@ -110,4 +119,7 @@ const handleSubmit = async () => {
 
 <style scoped>
 @import '@/assets/css/auth-form.css';
+.message-error {
+  color: red;
+}
 </style>

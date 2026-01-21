@@ -19,20 +19,23 @@
         :error="errors.password"
         required
       />
+      <p v-if="serverError" class="message-error">{{ serverError }}</p>
 
-      <div class="link">
-        <RouterLink :to="{ name: 'register' }" class="link">Регистрация</RouterLink>
-      </div>
+      <RouterLink :to="{ name: 'register' }" class="link">Регистрация</RouterLink>
 
-      <button type="submit" class="button" :disabled="!isValidate">продолжить</button>
+      <button type="submit" class="button" :disabled="!isValidate || isLoading">
+        {{ isLoading ? 'загрузка...' : 'продолжить' }}
+      </button>
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, reactive, ref } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
 import FormInput from '@/components/auth/FormInput.vue'
+import api from '@/api'
+import { useAuthStore } from '@/stores/auth'
 
 const loginForm = reactive({
   phone: '',
@@ -44,33 +47,68 @@ const errors = reactive({
   password: '',
 })
 
-const handleSubmit = () => {
-  Object.keys(errors).forEach((key) => (errors[key as keyof typeof errors] = ''))
-
-  let isValid = true
-
-  if (!loginForm.phone) {
-    errors.phone = 'Введите номер телефона'
-    isValid = false
-  }
-
-  if (loginForm.password.length < 6) {
-    errors.password = 'Минимум 6 символов'
-    isValid = false
-  }
-
-  if (isValid) {
-    console.log('Отправка:', JSON.stringify(loginForm))
-  }
-}
-
 const isValidate = computed(() => {
   const isPhoneValid = loginForm.phone.length === 18
-  const isPasswordValid = loginForm.password.length >= 6
+  const isPasswordValid = loginForm.password.length >= 2
   return isPhoneValid && isPasswordValid
 })
+
+const authStore = useAuthStore()
+const router = useRouter()
+const isLoading = ref(false)
+const serverError = ref('')
+
+const handleSubmit = async () => {
+  serverError.value = ''
+  Object.assign(errors, { phone: '', password: '' })
+
+  if (isValidate.value) {
+    console.log('Отправка:', JSON.stringify(loginForm))
+
+    try {
+      isLoading.value = true
+
+      const cleanPhone = loginForm.phone.replace(/\D/g, '')
+
+      const response = await api.post('/login', {
+        phone: cleanPhone,
+        password: loginForm.password,
+      })
+
+      authStore.setPhone(cleanPhone)
+
+      console.log('Успех:', response.data)
+      router.push('/auth/verify')
+    } catch (err: any) {
+      if (err.response) {
+        if (err.response.status === 422) {
+          const validationErrors = err.response.data.errors
+          Object.keys(validationErrors).forEach((key) => {
+            if (key in errors) {
+              errors[key as keyof typeof errors] = validationErrors[key][0]
+            }
+          })
+        } else if (err.response.status === 419) {
+          serverError.value = 'Сессия истекла, обновите страницу'
+        } else {
+          serverError.value = err.response.data.message || 'Произошла ошибка на сервере'
+        }
+      } else {
+        serverError.value = 'Нет соединения с сервером'
+      }
+    } finally {
+      isLoading.value = false
+    }
+  } else {
+    if (loginForm.phone.length < 18) errors.phone = 'Неверный формат номера'
+    if (loginForm.password.length < 2) errors.password = 'Минимум 6 символов'
+  }
+}
 </script>
 
 <style scoped>
 @import '@/assets/css/auth-form.css';
+.message-error {
+  color: red;
+}
 </style>

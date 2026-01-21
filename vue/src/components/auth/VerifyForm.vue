@@ -1,0 +1,96 @@
+<template>
+  <form class="form" @submit.prevent="handleSubmit" novalidate>
+    <div class="form-wrapper">
+      <p class="notify">Введите код подтверждения из СМС</p>
+
+      <FormInput
+        v-model.trim="validateForm.code"
+        type="text"
+        placeholder="Код"
+        :error="errors.code"
+        required
+      />
+      <p v-if="serverError" class="message-error">{{ serverError }}</p>
+
+      <button type="submit" class="button" :disabled="!isValidate || isLoading">продолжить</button>
+    </div>
+  </form>
+</template>
+
+<script setup lang="ts">
+import { computed, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import FormInput from '@/components/auth/FormInput.vue'
+import { useAuthStore } from '@/stores/auth'
+import api from '@/api.ts'
+
+const authStore = useAuthStore()
+const router = useRouter()
+const isLoading = ref(false)
+const serverError = ref('')
+
+const validateForm = reactive({
+  code: '',
+})
+
+const errors = reactive({
+  code: '',
+})
+
+const isValidate = computed(() => {
+  return validateForm.code.length === 4
+})
+
+const handleSubmit = async () => {
+  serverError.value = ''
+  errors.code = ''
+
+  if (!isValidate.value) {
+    errors.code = 'Неверный код'
+    return
+  }
+
+  if (isValidate.value) {
+    console.log('Отправка:', JSON.stringify(validateForm))
+
+    try {
+      isLoading.value = true
+
+      const response = await api.post('/verify', {
+        phone: authStore.tempPhone,
+        code: validateForm.code,
+      })
+
+      console.log('Успех:', response.data)
+
+      authStore.setAuth(true)
+
+      router.push('/account')
+    } catch (err: any) {
+      if (err.response?.status === 422) {
+        const vErrors = err.response.data.errors
+        if (vErrors?.code) {
+          errors.code = vErrors.code[0]
+        } else {
+          serverError.value = err.response.data.message
+        }
+      } else if (err.response?.status === 429) {
+        serverError.value = 'Слишком много запросов. Попробуйте через минуту'
+      } else {
+        serverError.value = 'Ошибка сервера'
+      }
+    } finally {
+      isLoading.value = false
+    }
+  } else {
+    if (validateForm.code.length < 4) errors.code = 'Неверный код'
+  }
+}
+</script>
+
+<style scoped>
+@import '@/assets/css/auth-form.css';
+.message-error {
+  color: red;
+}
+</style>
