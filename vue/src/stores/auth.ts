@@ -1,12 +1,29 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
+interface User {
+  id: number
+  name: string
+  phone?: string
+  avatar?: string
+}
+
 export const useAuthStore = defineStore('auth', () => {
-  const tempPhone = ref<string>('')
+  const user = ref<User | null>(
+    localStorage.getItem('user_data') ? JSON.parse(localStorage.getItem('user_data')!) : null,
+  )
+
   const isVerified = ref<boolean>(!!localStorage.getItem('is_auth'))
+  const tempPhone = ref<string>(localStorage.getItem('temp_phone') || '')
+
+  function setUser(data: User) {
+    user.value = data
+    localStorage.setItem('user_data', JSON.stringify(data))
+  }
 
   function setPhone(phone: string) {
     tempPhone.value = phone
+    localStorage.setItem('temp_phone', phone)
   }
 
   function setAuth(status: boolean) {
@@ -19,10 +36,20 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function reset() {
+    user.value = null
     tempPhone.value = ''
     isVerified.value = false
     localStorage.removeItem('is_auth')
+    localStorage.removeItem('temp_phone')
   }
 
-  return { tempPhone, isVerified, setPhone, reset, setAuth }
+  return {
+    user,
+    tempPhone,
+    isVerified,
+    setPhone,
+    reset,
+    setAuth,
+    setUser,
+  }
 })

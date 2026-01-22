@@ -1,0 +1,37 @@
+.menu {
+  min-width: 300px;
+  padding: 40px;
+}
+
+.menu-wrapper  {
+  width: 100%;
+  list-style: none
+}
+
+.menu-wrapper li:has(.router-link-exact-active) {
+  background-color: #f0ccaa;
+}
+
+.menu-wrapper li:hover:not(:has(.router-link-exact-active)) {
+  background-color: #ead7c3;
+}
+
+.menu-item {
+  width: 100%;
+}
+
+.menu-link {
+  padding: 10px 20px;
+  display: block;
+  color: #6e2c11;
+  text-decoration: none;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.router-link-exact-active {
+  color: #a34809;
+  font-weight: bold;
+  background-color: #f0ccaa;
+}

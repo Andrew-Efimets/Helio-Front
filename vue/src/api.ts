@@ -2,11 +2,17 @@ import axios, { type RawAxiosRequestHeaders } from 'axios'
 import { useAuthStore } from '@/stores/auth.ts'
 import router from '@/router'
 
+const apiServ = axios.create({
+  withCredentials: true,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+})
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true,
   headers: {
     'X-Requested-With': 'XMLHttpRequest',
+    Accept: 'application/json',
     'Content-Type': 'application/json',
   } as RawAxiosRequestHeaders,
 })
@@ -21,10 +27,7 @@ api.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        await api.get('/sanctum/csrf-cookie', {
-          withCredentials: true,
-          baseURL: import.meta.env.VITE_API_BASE_URL,
-        })
+        await apiServ.get('/sanctum/csrf-cookie')
 
         return api(originalRequest)
       } catch (retryError) {
@@ -35,8 +38,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       authStore.reset()
 
-      if (router.currentRoute.value.name !== 'login') {
-        router.push({ name: 'login' })
+      const instRoute = router as any
+
+      if (instRoute.currentRoute.value.name !== 'login') {
+        instRoute.push({ name: 'login' }).catch(() => {})
       }
     }
 

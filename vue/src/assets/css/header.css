@@ -66,8 +66,6 @@ h3 {
 }
 
 .separator {
-  position: relative;
-  top: -2px;
   font-size: 22px;
   font-weight: 700;
   color: gray;
@@ -84,7 +82,8 @@ h3 {
 
 .navbar {
   display: flex;
-  column-gap: 10px;
+  align-items: center;
+  column-gap: 30px;
   margin-right: 40px;
 }
 
@@ -94,6 +93,13 @@ h3 {
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.no-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #957f6f;
 }
 
 @media screen and (max-width: 1024px) {

@@ -1,0 +1,9 @@
+.avatar-container {
+  padding: 40px;
+}
+
+.no-avatar {
+  width: 250px;
+  height: 300px;
+  background-color: #cecdcd;
+}

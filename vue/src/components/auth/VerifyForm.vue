@@ -63,7 +63,11 @@ const handleSubmit = async () => {
 
       console.log('Успех:', response.data)
 
+      authStore.setUser(response.data.data)
+
       authStore.setAuth(true)
+
+      localStorage.removeItem('temp_phone')
 
       router.push('/account')
     } catch (err: any) {

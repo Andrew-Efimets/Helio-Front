@@ -29,7 +29,16 @@
         <RouterLink :to="{ name: 'login' }" class="navbar-link">Вход</RouterLink>
       </div>
       <div v-else class="navbar">
-        <RouterLink :to="{ name: 'account' }" class="navbar-link">Мой аккаунт</RouterLink>
+        <div v-if="authStore.user?.avatar" class="no-avatar"></div>
+        <div v-else>
+          <img src="#" alt="аватар" />
+        </div>
+        <RouterLink
+          v-if="authStore.isVerified && authStore.user?.id"
+          :to="{ name: 'wall', params: { id: authStore.user?.id } }"
+          class="navbar-link"
+          >{{ authStore.user?.name }}
+        </RouterLink>
         <a href="#" class="navbar-link" @click.prevent="handleLogout">Выход</a>
       </div>
     </div>
@@ -47,7 +56,8 @@ const router = useRouter()
 
 const handleLogout = async () => {
   try {
-    await api.post('/logout')
+    const exitData = await api.post('/logout')
+    console.log(exitData.data.message)
     authStore.reset()
     router.push({ name: 'home' })
   } catch (error) {
