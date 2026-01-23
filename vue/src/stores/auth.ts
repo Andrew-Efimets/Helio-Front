@@ -14,10 +14,11 @@ export const useAuthStore = defineStore('auth', () => {
   )
 
   const isVerified = ref<boolean>(!!localStorage.getItem('is_auth'))
-  const tempPhone = ref<string>(localStorage.getItem('temp_phone') || '')
+  const tempPhone = ref<string>(!!localStorage.getItem('temp_phone') || '')
 
   function setUser(data: User) {
-    user.value = data
+    const updatedUser = { ...user.value, ...data }
+    user.value = updatedUser as User
     localStorage.setItem('user_data', JSON.stringify(data))
   }
 

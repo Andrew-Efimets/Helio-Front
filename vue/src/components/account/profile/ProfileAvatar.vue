@@ -1,7 +1,12 @@
 <template>
-  <div class="avatar-container">
-    <div>
-      <div class="no-avatar"></div>
+  <div class="avatar">
+    <div class="avatar__container">
+      <div class="avatar__wrapper">
+        <div class="avatar__empty"></div>
+      </div>
+    </div>
+    <div class="avatar__menu">
+      <div class="menu__list"></div>
     </div>
   </div>
 </template>

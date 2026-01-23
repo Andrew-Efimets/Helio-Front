@@ -1,8 +1,8 @@
-.avatar-container {
+.avatar__container {
   padding: 40px;
 }
 
-.no-avatar {
+.avatar__empty {
   width: 250px;
   height: 300px;
   background-color: #cecdcd;

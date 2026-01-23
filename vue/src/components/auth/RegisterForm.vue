@@ -1,7 +1,7 @@
 <template>
   <form class="form" @submit.prevent="handleSubmit" novalidate>
-    <div class="form-wrapper">
-      <p class="notify">На указанный номер будет выслан код подтверждения</p>
+    <div class="form__wrapper">
+      <p class="form__notify">На указанный номер будет выслан код подтверждения</p>
 
       <FormInput
         v-model.trim="registerForm.name"
@@ -19,7 +19,7 @@
         :error="errors.phone"
         required
       />
-      <p v-if="serverError" class="message-error">{{ serverError }}</p>
+      <p v-if="serverError" class="form__message-error">{{ serverError }}</p>
 
       <FormInput
         v-model.trim="registerForm.password"
@@ -29,7 +29,7 @@
         required
       />
 
-      <button type="submit" class="button" :disabled="!isValidate || isLoading">
+      <button type="submit" class="form__button" :disabled="!isValidate || isLoading">
         {{ isLoading ? 'загрузка...' : 'продолжить' }}
       </button>
     </div>
@@ -72,8 +72,6 @@ const handleSubmit = async () => {
   Object.assign(errors, { name: '', phone: '', password: '' })
 
   if (isValidate.value) {
-    console.log('Отправка:', JSON.stringify(registerForm))
-
     try {
       isLoading.value = true
 
@@ -87,7 +85,6 @@ const handleSubmit = async () => {
 
       authStore.setPhone(cleanPhone)
 
-      console.log('Успех:', response.data)
       router.push('/auth/verify')
     } catch (err: any) {
       if (err.response) {
@@ -114,7 +111,4 @@ const handleSubmit = async () => {
 
 <style scoped>
 @import '@/assets/css/auth-form.css';
-.message-error {
-  color: red;
-}
 </style>

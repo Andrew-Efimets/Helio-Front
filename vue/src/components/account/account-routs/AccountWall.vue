@@ -1,7 +1,9 @@
 <template>
-  <div class="wall-container">
-    <div class="wall-wrapper">
-      <h3 class="title">СТЕНААААА</h3>
+  <div class="wall">
+    <div class="wall__container">
+      <div class="wall__wrapper">
+        <h3 class="wall__title">СТЕНААААА</h3>
+      </div>
     </div>
   </div>
 </template>

@@ -1,7 +1,7 @@
 <template>
-  <section class="account-container">
+  <section class="account">
     <ProfileAvatar :user="user" />
-    <div class="main-content">
+    <div class="account__content">
       <ProfileInfo :user="user" :isLoading />
       <RouterView />
     </div>

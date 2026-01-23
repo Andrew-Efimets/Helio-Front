@@ -1,14 +1,14 @@
-.wall-container {
+.wall__container {
   padding: 10px 0 10px;
 }
 
-.wall-wrapper {
+.wall__wrapper {
   background-color: #c99d7f;
   min-width: 600px;
   min-height: 600px;
   text-align: center;
 }
 
-.title {
+.wall__title {
   color: #6e2c11;
 }

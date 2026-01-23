@@ -1,15 +1,15 @@
 <template>
-  <div class="info-container">
-    <div v-if="isLoading" class="info-wrapper">
-      <span class="dots"></span>
+  <div class="info">
+    <div v-if="isLoading" class="info__wrapper">
+      <span class="info__loader"></span>
     </div>
-    <div v-else class="info-wrapper">
-      <div class="user-name-wrapper">
-        <h3 class="user-name">
+    <div v-else class="info__wrapper">
+      <div class="info__name-wrapper">
+        <h3 class="info__name">
           {{ user?.name }}
         </h3>
       </div>
-      <p class="user-phone">
+      <p class="info__phone">
         {{ user?.phone }}
       </p>
     </div>

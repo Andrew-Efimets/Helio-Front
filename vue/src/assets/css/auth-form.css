@@ -1,4 +1,4 @@
-.form-wrapper {
+.form__wrapper {
   display: flex;
   flex-direction: column;
   row-gap: 20px;
@@ -8,20 +8,20 @@
   margin: auto;
 }
 
-.input {
+.form__input {
   font-size: 16px;
   padding: 5px 0 5px 10px;
   border: #6e2c11 2px solid;
   border-radius: 18px;
 }
 
-.input:focus {
+.form__input:focus {
   outline: none;
   border: 2px solid #be7f19;
   box-shadow: 0 0 5px rgba(190, 127, 25, 0.5);
 }
 
-.button {
+.form__button {
   width: 200px;
   font-size: 16px;
   font-weight: 600;
@@ -35,20 +35,20 @@
   cursor: pointer;
 }
 
-.button:active {
+.form__button:active {
   transform: scale(0.99);
   background-color: #fee6c4;
   box-shadow: inset 0 0 3px 3px rgba(190, 127, 25, 0.5);
 }
 
-.button:disabled {
+.form__button:disabled {
   background-color: #957f6f;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
-.notify {
+.form__notify {
   text-align: center;
   text-decoration: none;
   color: #6e2c11;
@@ -56,10 +56,14 @@
   font-weight: 600;
 }
 
-.link {
+.form__link {
   text-decoration: none;
   color: #6e2c11;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.form__message-error {
+  color: red;
 }

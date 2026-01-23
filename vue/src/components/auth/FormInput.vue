@@ -1,15 +1,15 @@
 <template>
-  <div class="input-wrapper">
+  <div class="form__input-wrapper">
     <input
       v-maska
       :data-maska="mask"
-      class="input"
+      class="form__input"
       v-bind="$attrs"
-      :class="{ 'input-error': error }"
+      :class="{ 'form__input-error': error }"
       :value="modelValue"
       @input="handleInput"
     />
-    <span v-if="error" class="message-error">{{ error }}</span>
+    <span v-if="error" class="form__message-error">{{ error }}</span>
   </div>
 </template>
 
@@ -35,16 +35,12 @@ const handleInput = (event: Event) => {
 
 <style scoped>
 @import '@/assets/css/auth-form.css';
-.input-error {
+.form__input-error {
   border-color: red;
 }
 
-.input-wrapper {
+.form__input-wrapper {
   display: flex;
   flex-direction: column;
-}
-
-.message-error {
-  color: red;
 }
 </style>

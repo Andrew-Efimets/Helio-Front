@@ -1,7 +1,7 @@
 <template>
-  <div class="container">
-    <div class="title-wrapper">
-      <h1 class="title">Твой тихий уголок в шумном интернете</h1>
+  <div class="content">
+    <div class="content__title-wrapper">
+      <h1 class="content__title">Твой тихий уголок в шумном интернете</h1>
     </div>
   </div>
 </template>
@@ -9,7 +9,7 @@
 <script setup lang="ts"></script>
 
 <style scoped>
-.container {
+.content {
   background-image: url('@/assets/background.png');
   background-repeat: no-repeat;
   background-size: 80%;
@@ -17,12 +17,12 @@
   min-height: 100vh;
 }
 
-.title-wrapper {
+.content__title-wrapper {
   width: 100%;
   text-align: center;
 }
 
-.title {
+.content__title {
   padding: 60px;
   color: #6e2c11;
 }

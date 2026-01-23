@@ -9,7 +9,7 @@ body {
   background-color: #f7e4d2;
 }
 
-.container {
+.app__container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 15px;

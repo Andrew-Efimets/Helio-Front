@@ -1,7 +1,7 @@
 <template>
-  <section class="main-container">
+  <section class="main">
     <ProfileMenu />
-    <main class="main-content">
+    <main class="main__content">
       <RouterView />
     </main>
   </section>
@@ -13,7 +13,7 @@ import ProfileMenu from '@/components/account/profile/ProfileMenu.vue'
 </script>
 
 <style scoped>
-.main-container {
+.main {
   display: flex;
 }
 </style>

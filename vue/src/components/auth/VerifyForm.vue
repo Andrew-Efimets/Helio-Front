@@ -1,7 +1,7 @@
 <template>
   <form class="form" @submit.prevent="handleSubmit" novalidate>
-    <div class="form-wrapper">
-      <p class="notify">Введите код подтверждения из СМС</p>
+    <div class="form__wrapper">
+      <p class="form__notify">Введите код подтверждения из СМС</p>
 
       <FormInput
         v-model.trim="validateForm.code"
@@ -10,9 +10,11 @@
         :error="errors.code"
         required
       />
-      <p v-if="serverError" class="message-error">{{ serverError }}</p>
+      <p v-if="serverError" class="form__message-error">{{ serverError }}</p>
 
-      <button type="submit" class="button" :disabled="!isValidate || isLoading">продолжить</button>
+      <button type="submit" class="form__button" :disabled="!isValidate || isLoading">
+        продолжить
+      </button>
     </div>
   </form>
 </template>
@@ -61,7 +63,7 @@ const handleSubmit = async () => {
         code: validateForm.code,
       })
 
-      console.log('Успех:', response.data)
+      console.log('Успех:', response.data.data)
 
       authStore.setUser(response.data.data)
 
@@ -96,7 +98,4 @@ const handleSubmit = async () => {
 
 <style scoped>
 @import '@/assets/css/auth-form.css';
-.message-error {
-  color: red;
-}
 </style>

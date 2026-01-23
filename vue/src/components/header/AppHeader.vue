@@ -1,41 +1,45 @@
 <template>
   <div class="header">
-    <div class="header-wrapper">
-      <div class="title">
-        <RouterLink :to="{ name: 'home' }" class="header-link">
+    <div class="header__wrapper">
+      <div class="header__title">
+        <RouterLink :to="{ name: 'home' }" class="header__link">
           <img
             alt="Vue logo"
-            class="logo"
+            class="header__logo"
             src="../../assets/heliologo.png"
             width="64"
             height="64"
           />
         </RouterLink>
-        <RouterLink :to="{ name: 'home' }" class="header-link">
+        <RouterLink :to="{ name: 'home' }" class="header__link">
           <h3>{{ info }}</h3>
         </RouterLink>
       </div>
-      <div class="search">
-        <input type="text" class="input" placeholder="Поиск" />
-        <div class="icon-wrapper">
-          <p class="separator">|</p>
-          <RouterLink :to="{ name: 'users' }" class="link">
-            <img src="../../assets/search.png" alt="поиск" class="icon" />
+      <div class="header__search">
+        <input type="text" class="header__input" placeholder="Поиск" />
+        <div class="header__icon-wrapper">
+          <p class="header__separator">|</p>
+          <RouterLink :to="{ name: 'users' }" class="header__link-item">
+            <img src="../../assets/search.png" alt="поиск" class="header__icon" />
           </RouterLink>
         </div>
       </div>
-      <div v-if="!authStore.isVerified" class="navbar">
-        <RouterLink :to="{ name: 'register' }" class="navbar-link">Регистрация</RouterLink>
-        <RouterLink :to="{ name: 'login' }" class="navbar-link">Вход</RouterLink>
+      <div v-if="!authStore.isVerified" class="header__navbar">
+        <RouterLink :to="{ name: 'register' }" class="header__navbar-link">Регистрация</RouterLink>
+        <RouterLink :to="{ name: 'login' }" class="header__navbar-link">Вход</RouterLink>
       </div>
-      <div v-else class="navbar">
+      <div v-else class="header__navbar">
+        <div v-if="!authStore.user?.avatar" class="header__avatar-empty"></div>
+        <div v-else>
+          <img src="#" alt="аватар" />
+        </div>
         <RouterLink
           v-if="authStore.isVerified && authStore.user?.id"
           :to="{ name: 'wall', params: { id: String(authStore.user?.id || '') } }"
-          class="navbar-link"
+          class="header__navbar-link"
           >{{ authStore.user?.name }}
         </RouterLink>
-        <a href="#" class="navbar-link" @click.prevent="handleLogout">Выход</a>
+        <a href="#" class="header__navbar-link" @click.prevent="handleLogout">Выход</a>
       </div>
     </div>
   </div>
@@ -67,8 +71,3 @@ const info = ref('Heliophone')
 <style scoped>
 @import '@/assets/css/header.css';
 </style>
-
-<!--<div v-if="authStore.user?.avatar" class="no-avatar"></div>-->
-<!--<div v-else>-->
-<!--<img src="#" alt="аватар" />-->
-<!--</div>-->
