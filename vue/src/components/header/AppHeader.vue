@@ -29,13 +29,9 @@
         <RouterLink :to="{ name: 'login' }" class="navbar-link">Вход</RouterLink>
       </div>
       <div v-else class="navbar">
-        <div v-if="authStore.user?.avatar" class="no-avatar"></div>
-        <div v-else>
-          <img src="#" alt="аватар" />
-        </div>
         <RouterLink
           v-if="authStore.isVerified && authStore.user?.id"
-          :to="{ name: 'wall', params: { id: authStore.user?.id } }"
+          :to="{ name: 'wall', params: { id: String(authStore.user?.id || '') } }"
           class="navbar-link"
           >{{ authStore.user?.name }}
         </RouterLink>
@@ -71,3 +67,8 @@ const info = ref('Heliophone')
 <style scoped>
 @import '@/assets/css/header.css';
 </style>
+
+<!--<div v-if="authStore.user?.avatar" class="no-avatar"></div>-->
+<!--<div v-else>-->
+<!--<img src="#" alt="аватар" />-->
+<!--</div>-->

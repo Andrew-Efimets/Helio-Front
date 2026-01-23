@@ -1,7 +1,9 @@
 <template>
   <dialog ref="dialogRef" class="modal" @click.self="close">
     <div class="modal-content">
-      <button class="close-btn" @click="close">×</button>
+      <div class="close-btn-wrapper">
+        <button class="close-btn" @click="close">×</button>
+      </div>
       <RouterView />
     </div>
   </dialog>
@@ -16,7 +18,8 @@ const route = useRoute()
 const dialogRef = ref<HTMLDialogElement | null>(null)
 
 const close = () => {
-  router.push('/')
+  const parentPath = route.matched[route.matched.length - 2]?.path || '/'
+  router.push(parentPath)
 }
 
 const updateModalState = () => {

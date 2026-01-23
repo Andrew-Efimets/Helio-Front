@@ -9,13 +9,14 @@
   </div>
 
   <li v-for="user in users" :key="user.id">{{ user.name }} — {{ user.phone }}</li>
-  <Footer />
+  <AppFooter />
 </template>
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import AppHeader from '@/components/header/AppHeader.vue'
+import AppFooter from '@/components/footer/AppFooter.vue'
 import axios from 'axios'
 import api from '@/api.ts'
 

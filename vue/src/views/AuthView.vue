@@ -1,7 +1,7 @@
 <template>
-  <AuthModal />
+  <ModalView />
 </template>
 
 <script setup lang="ts">
-import AuthModal from '@/components/auth/AuthModal.vue'
+import ModalView from '@/views/ModalView.vue'
 </script>

@@ -35,3 +35,10 @@
   font-weight: bold;
   background-color: #f0ccaa;
 }
+
+.menu-separator {
+  margin: 20px 0;
+  border-bottom: 1px solid #6e2c11;
+  box-shadow: 0 0 10px 3px rgba(196, 114, 51, 0.5);
+  border-radius: 5px;
+}

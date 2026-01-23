@@ -1,6 +1,9 @@
 <template>
   <div class="info-container">
-    <div class="info-wrapper">
+    <div v-if="isLoading" class="info-wrapper">
+      <span class="dots"></span>
+    </div>
+    <div v-else class="info-wrapper">
       <div class="user-name-wrapper">
         <h3 class="user-name">
           {{ user?.name }}
@@ -14,7 +17,10 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ user: any }>()
+defineProps<{
+  user: any
+  isLoading: boolean
+}>()
 </script>
 
 <style scoped>
