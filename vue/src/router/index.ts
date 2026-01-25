@@ -16,6 +16,9 @@ import VideosList from '@/components/account/account-routs/VideosList.vue'
 import VideoItem from '@/components/account/account-routs/VideoItem.vue'
 import UsersListView from '@/views/UsersListView.vue'
 import ProfileSettingsView from '@/views/ProfileSettingsView.vue'
+import ProfileSettings from '@/components/account/settings/ProfileSettings.vue'
+import AvatarSettings from '@/components/account/settings/AvatarSettings.vue'
+import PrivacySettings from '@/components/account/settings/PrivacySettings.vue'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const router = createRouter({
@@ -71,8 +74,26 @@ const router = createRouter({
         {
           path: 'settings/:id',
           name: 'settings',
+          redirect: { name: 'profile-settings' },
           component: ProfileSettingsView,
           props: true,
+          children: [
+            {
+              path: 'profile-settings',
+              name: 'profile-settings',
+              component: ProfileSettings,
+            },
+            {
+              path: 'avatar-settings',
+              name: 'avatar-settings',
+              component: AvatarSettings,
+            },
+            {
+              path: 'privacy-settings',
+              name: 'privacy-settings',
+              component: PrivacySettings,
+            },
+          ],
         },
         {
           path: 'user/:id',

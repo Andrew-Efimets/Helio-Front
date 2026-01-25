@@ -8,11 +8,19 @@
   list-style: none
 }
 
-.menu__wrapper li:has(.router-link-exact-active) {
+.menu__wrapper .menu__item:has(.router-link-exact-active) {
   background-color: #f0ccaa;
 }
 
-.menu__wrapper li:hover:not(:has(.router-link-exact-active)) {
+.menu__wrapper .menu__item:hover:not(:has(.router-link-exact-active)) {
+  background-color: #ead7c3;
+}
+
+.menu__wrapper .menu__settings:has(.router-link-active) {
+  background-color: #f0ccaa;
+}
+
+.menu__wrapper .menu__settings:hover:not(:has(.router-link-active)) {
   background-color: #ead7c3;
 }
 

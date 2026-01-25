@@ -74,12 +74,7 @@ const handleSubmit = async () => {
       router.push('/account')
     } catch (err: any) {
       if (err.response?.status === 422) {
-        const vErrors = err.response.data.errors
-        if (vErrors?.code) {
-          errors.code = vErrors.code[0]
-        } else {
-          serverError.value = err.response.data.message
-        }
+        serverError.value = err.formattedMessage
       } else if (err.response?.status === 429) {
         serverError.value = 'Слишком много запросов. Попробуйте через минуту'
       } else if (err.response?.status === 403) {

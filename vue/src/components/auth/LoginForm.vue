@@ -63,14 +63,10 @@ const handleSubmit = async () => {
   Object.assign(errors, { phone: '', password: '' })
 
   if (isValidate.value) {
-    console.log('Отправка:', JSON.stringify(loginForm))
-
     try {
       isLoading.value = true
 
       const cleanPhone = loginForm.phone.replace(/\D/g, '')
-
-      console.log(cleanPhone)
 
       const response = await api.post('/login', {
         phone: cleanPhone,
@@ -81,22 +77,7 @@ const handleSubmit = async () => {
 
       router.push('/auth/verify')
     } catch (err: any) {
-      if (err.response) {
-        if (err.response.status === 422) {
-          const validationErrors = err.response.data.errors
-          Object.keys(validationErrors).forEach((key) => {
-            if (key in errors) {
-              errors[key as keyof typeof errors] = validationErrors[key][0]
-            }
-          })
-        } else if (err.response.status === 419) {
-          serverError.value = 'Сессия истекла, обновите страницу'
-        } else {
-          serverError.value = err.response.data.message || 'Произошла ошибка на сервере'
-        }
-      } else {
-        serverError.value = 'Нет соединения с сервером'
-      }
+      serverError.value = err.formattedMessage
     } finally {
       isLoading.value = false
     }

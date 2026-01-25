@@ -45,6 +45,23 @@ api.interceptors.response.use(
       }
     }
 
+    if (error.response) {
+      const status = error.response.status
+      const data = error.response.data
+
+      if (status === 422) {
+        error.formattedMessage = data.message || 'Ошибка валидации данных'
+      } else if (status === 419) {
+        error.formattedMessage = 'Сессия истекла, мы пытаемся обновить её. Попробуйте еще раз.'
+      } else if (status === 500) {
+        error.formattedMessage = 'Ошибка на стороне сервера. Попробуйте позже.'
+      } else {
+        error.formattedMessage = data.message || 'Произошла непредвиденная ошибка'
+      }
+    } else {
+      error.formattedMessage = 'Нет соединения с сервером. Проверьте интернет.'
+    }
+
     return Promise.reject(error)
   },
 )

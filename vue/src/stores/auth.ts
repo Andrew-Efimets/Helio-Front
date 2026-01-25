@@ -1,11 +1,22 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
+interface UserProfile {
+  showPhone: string
+  showAccount: string
+  showPhoto: string
+  showVideo: string
+  showContacts: string
+}
 interface User {
   id: number
   name: string
   phone?: string
   avatar?: string
+  country?: string
+  city?: string
+  birthday?: string
+  profile?: UserProfile
 }
 
 export const useAuthStore = defineStore('auth', () => {

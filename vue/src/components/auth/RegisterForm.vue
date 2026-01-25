@@ -87,17 +87,7 @@ const handleSubmit = async () => {
 
       router.push('/auth/verify')
     } catch (err: any) {
-      if (err.response) {
-        if (err.response.status === 422) {
-          serverError.value = 'Этот номер уже зарегистрирован'
-        } else if (err.response.status === 419) {
-          serverError.value = 'Сессия истекла, обновите страницу'
-        } else {
-          serverError.value = err.response.data.message || 'Произошла ошибка на сервере'
-        }
-      } else {
-        serverError.value = 'Нет соединения с сервером'
-      }
+      serverError.value = err.formattedMessage
     } finally {
       isLoading.value = false
     }

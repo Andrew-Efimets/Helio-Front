@@ -29,9 +29,8 @@
         <RouterLink :to="{ name: 'login' }" class="header__navbar-link">Вход</RouterLink>
       </div>
       <div v-else class="header__navbar">
-        <div v-if="!authStore.user?.avatar" class="header__avatar-empty"></div>
-        <div v-else>
-          <img src="#" alt="аватар" />
+        <div v-if="authStore.user?.avatar" class="header__avatar">
+          <img src="#" alt="аватар" class="header__avatar-img" />
         </div>
         <RouterLink
           v-if="authStore.isVerified && authStore.user?.id"

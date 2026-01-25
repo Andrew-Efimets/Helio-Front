@@ -1,0 +1,32 @@
+.settings__links {
+  margin-top: 50px;
+  display: flex;
+}
+
+.settings__link-item {
+  padding: 10px 20px;
+  display: block;
+  color: #6e2c11;
+  text-decoration: none;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.settings__links .settings__link:has(.router-link-exact-active) {
+  background-color: #f0ccaa;
+}
+
+.settings__links .settings__link:hover:not(:has(.router-link-exact-active)) {
+  background-color: #ead7c3;
+}
+
+.router-link-exact-active {
+  color: #a34809;
+  font-weight: bold;
+  background-color: #f0ccaa;
+}
+
+.settings__pages {
+  background-color: #f0ccaa;
+}

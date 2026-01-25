@@ -27,7 +27,7 @@
         </RouterLink>
       </li>
       <li class="menu__separator"></li>
-      <li>
+      <li class="menu__settings">
         <RouterLink class="menu__link" :to="{ name: 'settings', params: { id: myId } }"
           >Настройки профиля
         </RouterLink>
