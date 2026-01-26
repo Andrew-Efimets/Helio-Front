@@ -30,7 +30,7 @@
       </div>
       <div v-else class="header__navbar">
         <div v-if="authStore.user?.avatar" class="header__avatar">
-          <img src="#" alt="аватар" class="header__avatar-img" />
+          <img :src="authStore.user?.avatar" alt="аватар" class="header__avatar-img" />
         </div>
         <RouterLink
           v-if="authStore.isVerified && authStore.user?.id"

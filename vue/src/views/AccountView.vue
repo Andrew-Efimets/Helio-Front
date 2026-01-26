@@ -1,8 +1,8 @@
 <template>
   <section class="account">
-    <ProfileAvatar :user="user" />
+    <ProfileAvatar :user="user" :is-loading="isLoading" />
     <div class="account__content">
-      <ProfileInfo :user="user" :isLoading />
+      <ProfileInfo :user="user" :is-loading="isLoading" />
       <RouterView />
     </div>
   </section>

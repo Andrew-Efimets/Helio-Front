@@ -6,7 +6,7 @@
         <div v-else class="avatar__preview-empty"></div>
       </div>
       <div class="avatar__field">
-        <label class="avatar__upload-label" for="avatar-input">Выберите новый файл</label>
+        <label class="avatar__upload-label" for="avatar-input">Загрузите фотографию</label>
         <input
           type="file"
           id="avatar-input"
@@ -17,7 +17,7 @@
       </div>
     </div>
     <div v-if="allAvatars.length" class="avatar__gallery">
-      <h4 class="avatar__gallery-title">Ваши фото:</h4>
+      <h4 class="avatar__gallery-title">Загруженные фотографии:</h4>
       <div class="avatar__list">
         <div
           v-for="avatar in allAvatars"
@@ -25,7 +25,7 @@
           class="avatar__item"
           :class="{
             'avatar__item--active':
-              avatar.id === selectedAvatarId || avatar.url === authStore.user.avatar,
+              avatar.id === selectedAvatarId || avatar.url === authStore.user?.avatar,
           }"
           @click="selectExistingAvatar(avatar)"
         >
@@ -68,10 +68,12 @@ const currentAvatarId = ref<number | null>(null)
 
 const fetchAvatars = async () => {
   try {
-    const response = await api.get(`/profile/${authStore.user.id}/avatars`)
+    const response = await api.get(`/profile/${authStore.user?.id}/avatars`)
     allAvatars.value = response.data.data
+    console.log(response.data.message)
+    console.log(response.data.data)
     if (authStore.user?.avatar) {
-      const current = allAvatars.value.find((a) => a.url === authStore.user.avatar)
+      const current = allAvatars.value.find((a) => a.url === authStore.user?.avatar)
       if (current) currentAvatarId.value = current.id
     }
   } catch (err) {
@@ -118,7 +120,7 @@ const selectExistingAvatar = (avatar: any) => {
 const deleteAvatar = async (id: number) => {
   if (!confirm('Удалить эту фотографию?')) return
   try {
-    await api.delete(`/profile/${authStore.user.id}/avatar/${id}`)
+    await api.delete(`/profile/${authStore.user?.id}/avatar/${id}`)
     allAvatars.value = allAvatars.value.filter((a) => a.id !== id)
     if (selectedAvatarId.value === id) {
       selectedAvatarId.value = null
@@ -141,20 +143,12 @@ const saveSettings = async () => {
       const formData = new FormData()
       formData.append('avatar', selectedFile.value)
 
-      console.log(...formData.entries())
-
-      console.log(formData.get('avatar'))
-
-      response = await api.post(`/profile/${authStore.user.id}/avatar`, formData)
+      response = await api.post(`/profile/${authStore.user?.id}/avatar`, formData)
     } else if (selectedAvatarId.value) {
-      response = await api.patch(`/profile/${authStore.user.id}/avatar`, {
+      response = await api.patch(`/profile/${authStore.user?.id}/avatar`, {
         avatar_id: selectedAvatarId.value,
       })
     }
-
-    console.log(response.data.message)
-
-    console.log(response.data.data)
 
     if (response?.data?.data) {
       authStore.setUser(response.data.data)
