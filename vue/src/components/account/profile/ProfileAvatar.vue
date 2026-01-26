@@ -15,7 +15,6 @@
 import { useAuthStore } from '@/stores/auth.ts'
 
 const authStore = useAuthStore()
-console.log(authStore)
 </script>
 
 <style scoped>

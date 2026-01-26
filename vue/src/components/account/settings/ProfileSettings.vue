@@ -17,7 +17,7 @@
           type="tel"
           id="phone"
           class="personal__input"
-          :class="{ 'personal__input-error': errors.phone }"
+          :class="{ 'settings__input-error': errors.phone }"
           required
         />
       </div>
@@ -37,6 +37,7 @@
           class="personal__input"
           id="birthday"
           placeholder="ДД.ММ.ГГГГ"
+          :class="{ 'settings__input-error': errors.birthday }"
         />
       </div>
     </div>
@@ -69,12 +70,14 @@ const personalData = reactive({
 
 const errors = reactive({
   phone: '',
+  birthday: '',
 })
 
 const isValidate = computed(() => {
   const isNameValid = personalData.name.length > 2
   const isPhoneValid = personalData.phone.length === 18
-  return isNameValid && isPhoneValid
+  const isBirthdayValid = personalData.birthday && personalData.birthday.length === 10
+  return isNameValid && isPhoneValid && isBirthdayValid
 })
 
 watch(
@@ -91,15 +94,23 @@ watch(
   { immediate: true },
 )
 
-const validatePhone = () => {
+const validateData = () => {
   if (!personalData.phone) {
     errors.phone = 'Введите корректный номер телефона'
   } else {
     errors.phone = ''
   }
+  if (personalData.birthday && personalData.birthday.length < 10) {
+    errors.birthday = 'Введите корректную дату'
+  } else {
+    errors.birthday = ''
+  }
 }
 
-watch(() => personalData.phone, validatePhone)
+watch(
+  () => [personalData.phone, personalData.birthday],
+  () => validateData(),
+)
 
 const saveSettings = async () => {
   serverError.value = ''
@@ -135,7 +146,9 @@ const saveSettings = async () => {
       isLoading.value = false
     }
   } else {
-    if (personalData.phone.length < 18) errors.phone = 'Неверный формат номера'
+    if (personalData.phone.length !== 18) errors.phone = 'Неверный формат номера'
+    if (!personalData.birthday || personalData.birthday.length !== 10)
+      errors.birthday = 'Неверный формат даты'
   }
 }
 </script>

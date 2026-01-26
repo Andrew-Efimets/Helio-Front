@@ -53,8 +53,6 @@ const handleSubmit = async () => {
   }
 
   if (isValidate.value) {
-    console.log('Отправка:', JSON.stringify(validateForm))
-
     try {
       isLoading.value = true
 
@@ -62,8 +60,6 @@ const handleSubmit = async () => {
         phone: authStore.tempPhone,
         code: validateForm.code,
       })
-
-      console.log('Успех:', response.data.data)
 
       authStore.setUser(response.data.data)
 

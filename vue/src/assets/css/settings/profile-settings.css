@@ -15,10 +15,18 @@
   padding: 5px 10px;
   color: #6e2c11;
   font-size: 16px;
+  border: #6e2c11 2px solid;
+  border-radius: 18px;
+}
+
+.personal__input:focus {
+  outline: none;
+  border: 2px solid #be7f19;
+  box-shadow: 0 0 5px rgba(190, 127, 25, 0.5);
 }
 
 .settings__button {
-  margin: 0 0 20px 20px;
+  margin: 20px 0 40px 20px;
   width: 200px;
   font-size: 12px;
   font-weight: 600;
@@ -45,6 +53,10 @@
   box-shadow: none;
 }
 
+.settings__input-error {
+  border-color: red;
+}
+
 .avatar__container {
   display: flex;
   flex-direction: column;
@@ -53,7 +65,73 @@
 }
 
 .avatar__preview {
-  margin: 10px;
+  margin: 20px 0;
+}
+
+.avatar__preview-empty {
+  width: 150px;
+  height: 170px;
+  background-color: #957f6f;
+  margin-bottom: 20px;
+}
+
+.avatar__field {
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+}
+
+.avatar__gallery {
+  margin-top: 20px;
+}
+.avatar__list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.avatar__item {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+.avatar__item--active {
+  border-color: #6e2c11;
+  border-radius: 4px;
+}
+
+.avatar__item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.avatar__img {
+  max-width: 150px;
+
+}
+
+.avatar__delete-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar__delete-btn:hover {
+  background: darkred;
 }
 
 .privacy__field {
@@ -67,4 +145,20 @@
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 20px;
+}
+
+.settings__error {
+  width: 100%;
+  font-size: 16px;
+  padding: 20px;
+  background-color: #e99a9a;
+  color: darkred;
+}
+
+.settings__success {
+  width: 100%;
+  padding: 20px;
+  font-size: 16px;
+  background-color: #beeabe;
+  color: darkgreen;
 }

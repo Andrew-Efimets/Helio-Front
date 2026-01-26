@@ -8,6 +8,7 @@ interface UserProfile {
   showVideo: string
   showContacts: string
 }
+
 interface User {
   id: number
   name: string
@@ -21,16 +22,25 @@ interface User {
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(
-    localStorage.getItem('user_data') ? JSON.parse(localStorage.getItem('user_data')!) : null,
+    (() => {
+      const data = localStorage.getItem('user_data')
+      if (!data) return null
+      try {
+        return JSON.parse(data)
+      } catch (e) {
+        localStorage.removeItem('user_data')
+        return null
+      }
+    })(),
   )
 
   const isVerified = ref<boolean>(!!localStorage.getItem('is_auth'))
-  const tempPhone = ref<string>(!!localStorage.getItem('temp_phone') || '')
+  const tempPhone = ref<string>(localStorage.getItem('temp_phone') || '')
 
-  function setUser(data: User) {
-    const updatedUser = { ...user.value, ...data }
-    user.value = updatedUser as User
-    localStorage.setItem('user_data', JSON.stringify(data))
+  function setUser(data: Partial<User>) {
+    const updatedUser = { ...user.value, ...data } as User
+    user.value = updatedUser
+    localStorage.setItem('user_data', JSON.stringify(updatedUser))
   }
 
   function setPhone(phone: string) {
@@ -53,6 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
     isVerified.value = false
     localStorage.removeItem('is_auth')
     localStorage.removeItem('temp_phone')
+    localStorage.removeItem('user_data')
   }
 
   return {
