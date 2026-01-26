@@ -70,8 +70,6 @@ const fetchAvatars = async () => {
   try {
     const response = await api.get(`/profile/${authStore.user?.id}/avatars`)
     allAvatars.value = response.data.data
-    console.log(response.data.message)
-    console.log(response.data.data)
     if (authStore.user?.avatar) {
       const current = allAvatars.value.find((a) => a.url === authStore.user?.avatar)
       if (current) currentAvatarId.value = current.id
@@ -101,7 +99,7 @@ const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement
   if (target.files?.[0]) {
     const file = target.files[0]
-    if (file.size > 2 * 1024 * 1024) {
+    if (file.size > 4 * 1024 * 1024) {
       serverError.value = 'Файл слишком большой'
       return
     }
@@ -120,11 +118,14 @@ const selectExistingAvatar = (avatar: any) => {
 const deleteAvatar = async (id: number) => {
   if (!confirm('Удалить эту фотографию?')) return
   try {
-    await api.delete(`/profile/${authStore.user?.id}/avatar/${id}`)
+    const response = await api.delete(`/profile/${authStore.user?.id}/avatar/${id}`)
     allAvatars.value = allAvatars.value.filter((a) => a.id !== id)
-    if (selectedAvatarId.value === id) {
-      selectedAvatarId.value = null
-      previewUrl.value = authStore.user?.avatar || ''
+
+    if (response.data?.data) {
+      authStore.setUser(response.data.data)
+      if (!selectedFile.value) {
+        previewUrl.value = response.data.data.avatar || ''
+      }
     }
   } catch (err: any) {
     serverError.value = 'Не удалось удалить фотографию'
@@ -145,9 +146,7 @@ const saveSettings = async () => {
 
       response = await api.post(`/profile/${authStore.user?.id}/avatar`, formData)
     } else if (selectedAvatarId.value) {
-      response = await api.patch(`/profile/${authStore.user?.id}/avatar`, {
-        avatar_id: selectedAvatarId.value,
-      })
+      response = await api.patch(`/profile/${authStore.user?.id}/avatar/${selectedAvatarId.value}`)
     }
 
     if (response?.data?.data) {
@@ -158,7 +157,7 @@ const saveSettings = async () => {
     }
 
     isSuccess.value = true
-    setTimeout(() => (isSuccess.value = false), 3000)
+    setTimeout(() => (isSuccess.value = false), 5000)
   } catch (err: any) {
     serverError.value = err.response?.data?.message || 'Ошибка сохранения'
   } finally {
