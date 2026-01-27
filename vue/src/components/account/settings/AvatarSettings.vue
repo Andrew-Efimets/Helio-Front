@@ -1,7 +1,10 @@
 <template>
   <form class="avatar" @submit.prevent="saveSettings" novalidate>
     <div class="avatar__container">
-      <div class="avatar__preview">
+      <div v-if="isLoading" class="avatar__preview">
+        <span class="avatar__loader"></span>
+      </div>
+      <div v-else class="avatar__preview">
         <img v-if="previewUrl" :src="previewUrl" alt="Аватар" class="avatar__img" />
         <div v-else class="avatar__preview-empty"></div>
       </div>
@@ -68,12 +71,14 @@ const currentAvatarId = ref<number | null>(null)
 
 const fetchAvatars = async () => {
   try {
+    isLoading.value = true
     const response = await api.get(`/profile/${authStore.user?.id}/avatars`)
     allAvatars.value = response.data.data
     if (authStore.user?.avatar) {
       const current = allAvatars.value.find((a) => a.url === authStore.user?.avatar)
       if (current) currentAvatarId.value = current.id
     }
+    isLoading.value = false
   } catch (err) {
     serverError.value = 'Ошибка загрузки галереи'
   }

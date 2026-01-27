@@ -3,29 +3,33 @@
     <div class="privacy__data">
       <div class="privacy__field">
         <label class="privacy__label" for="show-phone">Кто видит мой телефон</label>
-        <PrivacyChoice v-model="profilePrivacy.showPhone" name="show-phone" id="show-phone" />
+        <PrivacyChoice v-model="profilePrivacy.show_phone" name="show_phone" id="show-phone" />
       </div>
       <div class="privacy__field">
         <label class="privacy__label" for="show-account">Кто может просматривать мой профиль</label>
-        <PrivacyChoice v-model="profilePrivacy.showAccount" name="show-account" id="show-account" />
+        <PrivacyChoice
+          v-model="profilePrivacy.show_account"
+          name="show_account"
+          id="show-account"
+        />
       </div>
       <div class="privacy__field">
         <label class="privacy__label" for="show-photo">
           Кто может просматривать мои фотографии
         </label>
-        <PrivacyChoice v-model="profilePrivacy.showPhoto" name="show-photo" id="show-photo" />
+        <PrivacyChoice v-model="profilePrivacy.show_photo" name="show_photo" id="show-photo" />
       </div>
       <div class="privacy__field">
         <label class="privacy__label" for="show-video">Кто может просматривать мои видео</label>
-        <PrivacyChoice v-model="profilePrivacy.showVideo" name="show-video" id="show-video" />
+        <PrivacyChoice v-model="profilePrivacy.show_video" name="show_video" id="show-video" />
       </div>
       <div class="privacy__field">
         <label class="privacy__label" for="show-contacts">
           Кто может просматривать мои контакты
         </label>
         <PrivacyChoice
-          v-model="profilePrivacy.showContacts"
-          name="show-contacts"
+          v-model="profilePrivacy.show_contacts"
+          name="show_contacts"
           id="show-contacts"
         />
       </div>
@@ -50,23 +54,18 @@ const serverError = ref('')
 const isSuccess = ref(false)
 
 const profilePrivacy = reactive({
-  showPhone: '',
-  showAccount: '',
-  showPhoto: '',
-  showVideo: '',
-  showContacts: '',
+  show_phone: '',
+  show_account: '',
+  show_photo: '',
+  show_video: '',
+  show_contacts: '',
 })
 
 watch(
-  () => authStore.user,
-  (newUser) => {
-    const profile = newUser?.profile
-    if (profile) {
-      profilePrivacy.showPhone = profile.showPhone || 'all'
-      profilePrivacy.showAccount = profile.showAccount || 'all'
-      profilePrivacy.showPhoto = profile.showPhoto || 'all'
-      profilePrivacy.showVideo = profile.showVideo || 'all'
-      profilePrivacy.showContacts = profile.showContacts || 'all'
+  () => authStore.user?.profile?.privacy,
+  (newPrivacy) => {
+    if (newPrivacy) {
+      Object.assign(profilePrivacy, newPrivacy)
     }
   },
   { immediate: true, deep: true },
@@ -78,13 +77,10 @@ const saveSettings = async () => {
 
   try {
     isLoading.value = true
-
-    const response = await api.post('/profile/privacy', {
-      showPhone: profilePrivacy.showPhone,
-      showAccount: profilePrivacy.showAccount,
-      showPhoto: profilePrivacy.showPhoto,
-      showVideo: profilePrivacy.showVideo,
-      showContacts: profilePrivacy.showContacts,
+    const response = await api.patch(`/user/${authStore.user?.id}`, {
+      name: authStore.user?.name,
+      phone: authStore.user?.phone,
+      privacy: { ...profilePrivacy },
     })
 
     if (response.data && response.data.data) {
@@ -92,12 +88,9 @@ const saveSettings = async () => {
     }
 
     isSuccess.value = true
-
-    setTimeout(() => {
-      isSuccess.value = false
-    }, 3000)
+    setTimeout(() => (isSuccess.value = false), 5000)
   } catch (err: any) {
-    serverError.value = err.formattedMessage
+    serverError.value = err.response?.data?.message || 'Ошибка сохранения'
   } finally {
     isLoading.value = false
   }

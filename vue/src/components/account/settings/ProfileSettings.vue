@@ -76,7 +76,7 @@ const errors = reactive({
 const isValidate = computed(() => {
   const isNameValid = personalData.name.length > 2
   const isPhoneValid = personalData.phone.length === 18
-  const isBirthdayValid = personalData.birthday && personalData.birthday.length === 10
+  const isBirthdayValid = personalData.birthday.length <= 10
   return isNameValid && isPhoneValid && isBirthdayValid
 })
 
@@ -86,12 +86,20 @@ watch(
     if (newUser) {
       personalData.name = newUser.name || ''
       personalData.phone = newUser.phone || ''
-      personalData.country = newUser.country || ''
-      personalData.city = newUser.city || ''
-      personalData.birthday = newUser.birthday || ''
+
+      if (newUser.profile) {
+        personalData.country = newUser.profile.country || ''
+        personalData.city = newUser.profile.city || ''
+
+        if (newUser.profile.birthday) {
+          personalData.birthday = newUser.profile.birthday.substring(0, 10)
+        } else {
+          personalData.birthday = ''
+        }
+      }
     }
   },
-  { immediate: true },
+  { immediate: true, deep: true },
 )
 
 const validateData = () => {
@@ -123,12 +131,12 @@ const saveSettings = async () => {
 
       const cleanPhone = personalData.phone.replace(/\D/g, '')
 
-      const response = await api.post('/profile', {
+      const response = await api.patch(`/user/${authStore.user?.id}`, {
         name: personalData.name,
         phone: cleanPhone,
-        country: personalData.country,
-        city: personalData.city,
-        birthday: personalData.birthday,
+        country: personalData.country || null,
+        city: personalData.city || null,
+        birthday: personalData.birthday || null,
       })
 
       if (response.data && response.data.data) {
@@ -139,7 +147,7 @@ const saveSettings = async () => {
 
       setTimeout(() => {
         isSuccess.value = false
-      }, 3000)
+      }, 5000)
     } catch (err: any) {
       serverError.value = err.formattedMessage
     } finally {
@@ -147,7 +155,7 @@ const saveSettings = async () => {
     }
   } else {
     if (personalData.phone.length !== 18) errors.phone = 'Неверный формат номера'
-    if (!personalData.birthday || personalData.birthday.length !== 10)
+    if (!personalData.birthday || personalData.birthday.length > 10)
       errors.birthday = 'Неверный формат даты'
   }
 }

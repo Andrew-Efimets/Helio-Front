@@ -56,7 +56,6 @@ const router = useRouter()
 const handleLogout = async () => {
   try {
     const exitData = await api.post('/logout')
-    console.log(exitData.data.message)
     authStore.reset()
     router.push({ name: 'home' })
   } catch (error) {

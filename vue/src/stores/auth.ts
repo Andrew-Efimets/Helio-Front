@@ -1,33 +1,36 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-interface UserProfile {
-  showPhone: string
-  showAccount: string
-  showPhoto: string
-  showVideo: string
-  showContacts: string
+export interface PrivacySettings {
+  show_phone: 'public' | 'contacts_only' | 'private'
+  show_account: 'public' | 'contacts_only' | 'private'
+  show_photo: 'public' | 'contacts_only' | 'private'
+  show_video: 'public' | 'contacts_only' | 'private'
+  show_contacts: 'public' | 'contacts_only' | 'private'
+}
+export interface Profile {
+  country?: string | null
+  city?: string | null
+  birthday?: string | null
+  privacy: PrivacySettings
 }
 
-interface User {
+export interface AuthUser {
   id: number
   name: string
-  phone?: string
-  avatar?: string
-  country?: string
-  city?: string
-  birthday?: string
-  profile?: UserProfile
+  phone: string
+  avatar: string | null
+  profile?: Profile
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(
+  const user = ref<AuthUser | null>(
     (() => {
       const data = localStorage.getItem('user_data')
       if (!data) return null
       try {
         return JSON.parse(data)
-      } catch (e) {
+      } catch {
         localStorage.removeItem('user_data')
         return null
       }
@@ -37,8 +40,8 @@ export const useAuthStore = defineStore('auth', () => {
   const isVerified = ref<boolean>(!!localStorage.getItem('is_auth'))
   const tempPhone = ref<string>(localStorage.getItem('temp_phone') || '')
 
-  function setUser(data: Partial<User>) {
-    const updatedUser = { ...user.value, ...data } as User
+  function setUser(data: Partial<AuthUser>) {
+    const updatedUser = user.value ? { ...user.value, ...data } : (data as AuthUser)
     user.value = updatedUser
     localStorage.setItem('user_data', JSON.stringify(updatedUser))
   }
@@ -50,11 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   function setAuth(status: boolean) {
     isVerified.value = status
-    if (status) {
-      localStorage.setItem('is_auth', 'true')
-    } else {
-      localStorage.removeItem('is_auth')
-    }
+    status ? localStorage.setItem('is_auth', 'true') : localStorage.removeItem('is_auth')
   }
 
   function reset() {
@@ -66,6 +65,22 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('user_data')
   }
 
+  const canSee = (targetUser: any, key: string) => {
+    if (!targetUser) return false
+
+    if (user.value?.id === targetUser.id) return true
+
+    const privacyStatus = targetUser.profile?.privacy?.[key]
+
+    if (privacyStatus === 'public') return true
+
+    if (privacyStatus === 'contacts_only') {
+      return !!targetUser.is_contact
+    }
+
+    return false
+  }
+
   return {
     user,
     tempPhone,
@@ -74,5 +89,6 @@ export const useAuthStore = defineStore('auth', () => {
     reset,
     setAuth,
     setUser,
+    canSee,
   }
 })

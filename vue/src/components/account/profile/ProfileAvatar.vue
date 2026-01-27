@@ -5,42 +5,56 @@
         <div class="avatar__empty"></div>
       </div>
       <div v-else class="avatar__wrapper">
-        <img :src="user.avatar" alt="аватар" class="avatar__img" />
+        <RouterLink :to="{ name: 'wall' }">
+          <img :src="user.avatar" alt="аватар" class="avatar__img" />
+        </RouterLink>
       </div>
       <button
         v-if="user && user.id !== authStore.user?.id"
         class="avatar__button"
+        :class="{ 'avatar__button--active': user.is_contact }"
         @click="addContact"
       >
-        Добавить в контакты
+        {{ user.is_contact ? 'Удалить из контактов' : 'Добавить в контакты' }}
       </button>
     </div>
-    <div v-if="user && user.id !== authStore.user?.id" class="avatar__menu">
-      <div class="menu__list">Фото пользователя</div>
+    <div v-if="user && user.id !== authStore.user?.id" class="avatar__menu menu">
+      <div class="menu__list">
+        <RouterLink :to="{ name: 'photos' }" class="menu__item">Фотографии</RouterLink>
+      </div>
+      <div class="menu__list">
+        <RouterLink :to="{ name: 'videos' }" class="menu__item">Видео</RouterLink>
+      </div>
+      <div class="menu__list">
+        <RouterLink :to="{ name: 'contacts' }" class="menu__item">Контакты</RouterLink>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth.ts'
-import { useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { useRoute, RouterLink } from 'vue-router'
 import api from '@/api'
 
-defineProps<{
+const props = defineProps<{
   user: any
   isLoading: boolean
 }>()
+
+const emit = defineEmits(['update-user'])
 
 const authStore = useAuthStore()
 const route = useRoute()
 
 const addContact = async () => {
   try {
-    await api.post(`/contact/${route.params.id}`)
-    console.log('Контакт добавлен')
+    const response = await api.post(`/user/${route.params.id}/contact`)
+
+    const updatedUser = { ...props.user, is_contact: response.data.is_contact }
+    emit('update-user', updatedUser)
   } catch (err) {
-    console.error('Ошибка при добавлении', err)
+    console.error('Ошибка при работе с контактами', err)
   }
 }
 </script>
