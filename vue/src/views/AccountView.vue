@@ -1,9 +1,19 @@
 <template>
   <section class="account">
-    <ProfileAvatar :user="user" :is-loading="isLoading" @update-user="(val) => (user = val)" />
-    <div class="account__content">
-      <ProfileInfo :user="user" :is-loading="isLoading" />
-      <RouterView />
+    <div v-if="authStore.canSee(user, 'show_account')" class="account__wrapper">
+      <ProfileAvatar :user="user" :is-loading="isLoading" @update-user="(val) => (user = val)" />
+      <div class="account__content">
+        <ProfileInfo :user="user" :is-loading="isLoading" />
+        <RouterView />
+      </div>
+    </div>
+    <div v-else class="account__wrapper">
+      <div class="account__wrapper-closed">
+        <ProfileClosed :user="user" :is-loading="isLoading" @update-user="(val) => (user = val)" />
+        <div class="account__closed-error">
+          <RouterView v-if="!isLoading" />
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -11,6 +21,7 @@
 <script setup lang="ts">
 import ProfileAvatar from '@/components/account/profile/ProfileAvatar.vue'
 import ProfileInfo from '@/components/account/profile/ProfileInfo.vue'
+import ProfileClosed from '@/components/account/profile/ProfileClosed.vue'
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.ts'

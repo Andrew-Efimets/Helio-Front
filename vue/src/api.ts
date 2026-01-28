@@ -54,6 +54,8 @@ api.interceptors.response.use(
         error.formattedMessage = 'Сессия истекла, мы пытаемся обновить её. Попробуйте еще раз.'
       } else if (status === 500) {
         error.formattedMessage = 'Ошибка на стороне сервера. Попробуйте позже.'
+      } else if (status === 403) {
+        error.formattedMessage = 'У вас нет доступа'
       } else {
         error.formattedMessage = data.message || 'Произошла непредвиденная ошибка'
       }

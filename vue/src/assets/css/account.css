@@ -1,3 +1,13 @@
-.account {
+.account__wrapper {
   display: flex;
+}
+
+.account__closed-error :deep(.photos__container),
+.account__closed-error :deep(.videos__container),
+.account__closed-error :deep(.contacts__container) {
+  background: transparent !important;
+}
+
+.account__closed-error :deep(.photos__add-wrapper) {
+  box-shadow: none !important;
 }
