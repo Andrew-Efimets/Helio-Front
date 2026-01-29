@@ -1,0 +1,17 @@
+.comments {
+  margin: 20px;
+  width: 400px;
+  height: inherit;
+  background-color: #f9f2e7;
+  border-radius: 10px;
+}
+
+.comments__title {
+  border-radius: 10px 10px 0 0;
+  background-color: #f0ccaa;
+  width: 100%;
+  padding: 5px 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #6e2c11;
+}

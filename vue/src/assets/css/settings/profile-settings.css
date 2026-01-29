@@ -1,6 +1,11 @@
 /* Personal */
-.personal__field {
+
+.personal {
   padding: 20px;
+}
+
+.personal__field {
+  padding: 20px 0;
   display: flex;
   flex-direction: column;
   color: #6e2c11;
@@ -26,17 +31,27 @@
   box-shadow: 0 0 5px rgba(190, 127, 25, 0.5);
 }
 
+.personal__buttons-wpapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 /* Avatar */
+
+.avatar {
+  padding: 20px;
+}
 
 .avatar__container {
   display: flex;
   flex-direction: column;
-  padding: 20px;
   color: #6e2c11;
+  margin-bottom: 20px;
 }
 
 .avatar__preview {
-  margin: 20px 0;
+  margin: 20px;
   width: 150px;
   height: 170px;
 }
@@ -90,10 +105,6 @@
   transform: scale(0.99);
   background-color: #fee6c4;
   box-shadow: inset 0 0 3px 3px rgba(190, 127, 25, 0.5);
-}
-
-.avatar__gallery {
-  margin: 20px;
 }
 
 .avatar__gallery-title {
@@ -174,8 +185,12 @@
 
 /* Privacy */
 
-.privacy__field {
+.privacy {
   padding: 20px;
+}
+
+.privacy__field {
+  padding: 20px 0;
   display: flex;
   flex-direction: column;
   color: #6e2c11;
@@ -205,34 +220,29 @@
   color: darkgreen;
 }
 
-.settings__button {
-  margin: 20px 0 40px 20px;
-  width: 200px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #6e2c11;
-  padding: 10px;
-  border: #6e2c11 2px solid;
-  border-radius: 18px;
-  text-transform: uppercase;
-  box-shadow: 0 0 3px 3px rgba(190, 127, 25, 0.5);
-  background-color: #fee6c4;
-  cursor: pointer;
-}
-
-.settings__button:active {
-  transform: scale(0.99);
-  background-color: #fee6c4;
-  box-shadow: inset 0 0 3px 3px rgba(190, 127, 25, 0.5);
-}
-
-.settings__button:disabled {
-  background-color: #957f6f;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
 .settings__input-error {
   border-color: red;
+}
+
+/* Delete Account */
+
+.button__wrapper {
+  display: flex;
+  column-gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-account__header {
+  text-align: center;
+  font-size: 22px;
+  color: #6e2c11;
+  padding: 10px;
+}
+
+.delete-account__notify {
+  padding: 5px;
+  text-align: center;
+  font-weight: 700;
+  color: #6e2c11;
 }

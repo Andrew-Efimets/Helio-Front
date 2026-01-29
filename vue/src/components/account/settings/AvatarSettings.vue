@@ -45,7 +45,7 @@
 
     <button
       type="submit"
-      class="settings__button"
+      class="button"
       :disabled="isLoading || (!selectedFile && !selectedAvatarId)"
     >
       {{ isLoading ? 'Загрузка...' : 'Применить изменения' }}
@@ -78,9 +78,10 @@ const fetchAvatars = async () => {
       const current = allAvatars.value.find((a) => a.url === authStore.user?.avatar)
       if (current) currentAvatarId.value = current.id
     }
-    isLoading.value = false
   } catch (err) {
     serverError.value = 'Ошибка загрузки галереи'
+  } finally {
+    isLoading.value = false
   }
 }
 

@@ -4,15 +4,18 @@
       <h1 class="content__title">Твой тихий уголок в шумном интернете</h1>
     </div>
   </div>
+  <ModalView />
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import ModalView from '@/views/ModalView.vue'
+</script>
 
 <style scoped>
 .content {
   background-image: url('@/assets/background.png');
   background-repeat: no-repeat;
-  background-size: 80%;
+  background-size: 120%;
   background-position: center center;
   min-height: 100vh;
 }

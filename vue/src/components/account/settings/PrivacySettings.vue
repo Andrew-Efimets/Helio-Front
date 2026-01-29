@@ -36,7 +36,7 @@
     </div>
     <p v-if="serverError" class="settings__error">{{ serverError }}</p>
     <p v-if="isSuccess" class="settings__success">Данные успешно обновлены</p>
-    <button type="submit" class="settings__button" :disabled="isLoading">
+    <button type="submit" class="button" :disabled="isLoading">
       {{ isLoading ? 'Сохранение...' : 'Сохранить изменения' }}
     </button>
   </form>

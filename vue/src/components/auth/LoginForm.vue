@@ -23,8 +23,8 @@
 
       <RouterLink :to="{ name: 'register' }" class="form__link">Регистрация</RouterLink>
 
-      <button type="submit" class="form__button" :disabled="!isValidate || isLoading">
-        {{ isLoading ? 'загрузка...' : 'продолжить' }}
+      <button type="submit" class="button" :disabled="!isValidate || isLoading">
+        {{ isLoading ? 'отправляем код...' : 'продолжить' }}
       </button>
     </div>
   </form>
@@ -75,7 +75,7 @@ const handleSubmit = async () => {
 
       authStore.setPhone(cleanPhone)
 
-      router.push('/auth/verify')
+      router.push('/verify')
     } catch (err: any) {
       serverError.value = err.formattedMessage
     } finally {

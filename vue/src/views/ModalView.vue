@@ -2,7 +2,7 @@
   <dialog ref="dialogRef" class="modal" @click.self="close">
     <div class="modal__content">
       <button class="modal__close-btn" @click="close">×</button>
-      <RouterView />
+      <RouterView name="modal" />
     </div>
   </dialog>
 </template>
@@ -16,23 +16,42 @@ const route = useRoute()
 const dialogRef = ref<HTMLDialogElement | null>(null)
 
 const close = () => {
-  const parentPath = route.matched[route.matched.length - 2]?.path || '/'
-  router.push(parentPath)
+  if (route.meta.backTo) {
+    router.push({
+      name: route.meta.backTo as string,
+      params: route.params,
+    })
+  } else {
+    router.back()
+  }
 }
 
 const updateModalState = () => {
   if (!dialogRef.value) return
 
-  if (route.matched.length > 1) {
+  const isModalRoute = route.matched.some((record) => record.meta.isModal)
+
+  if (isModalRoute) {
     if (!dialogRef.value.open) {
       dialogRef.value.showModal()
     }
   } else {
-    dialogRef.value.close()
+    if (dialogRef.value.open) {
+      dialogRef.value.close()
+    }
   }
 }
 
-watch(() => route.path, updateModalState)
+watch(
+  () => route.meta.isModal,
+  (isModal) => {
+    if (isModal) {
+      dialogRef.value?.showModal()
+    } else {
+      dialogRef.value?.close()
+    }
+  },
+)
 
 onMounted(updateModalState)
 </script>

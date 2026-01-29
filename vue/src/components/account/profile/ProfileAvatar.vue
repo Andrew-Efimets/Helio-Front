@@ -11,9 +11,9 @@
       </div>
       <button
         v-if="user && user.id !== authStore.user?.id"
-        class="avatar__button"
-        :class="{ 'avatar__button--active': user.is_contact }"
+        class="button"
         @click="addContact"
+        :disabled="isAddition"
       >
         {{ user.is_contact ? 'Удалить из контактов' : 'Добавить в контакты' }}
       </button>
@@ -35,6 +35,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth.ts'
 import { useRoute, RouterLink } from 'vue-router'
+import { ref } from 'vue'
 import api from '@/api'
 
 const props = defineProps<{
@@ -46,13 +47,16 @@ const emit = defineEmits(['update-user'])
 
 const authStore = useAuthStore()
 const route = useRoute()
+const isAddition = ref(false)
 
 const addContact = async () => {
   try {
+    isAddition.value = true
     const response = await api.post(`/user/${route.params.id}/contact`)
 
     const updatedUser = { ...props.user, is_contact: response.data.is_contact }
     emit('update-user', updatedUser)
+    isAddition.value = false
   } catch (err) {
     console.error('Ошибка при работе с контактами', err)
   }

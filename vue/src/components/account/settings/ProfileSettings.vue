@@ -43,9 +43,14 @@
     </div>
     <p v-if="serverError" class="settings__error">{{ serverError }}</p>
     <p v-if="isSuccess" class="settings__success">Данные успешно обновлены</p>
-    <button type="submit" class="settings__button" :disabled="!isValidate || isLoading">
-      {{ isLoading ? 'Сохранение...' : 'Сохранить изменения' }}
-    </button>
+    <div class="personal__buttons-wpapper">
+      <button type="submit" class="button" :disabled="!isValidate || isLoading">
+        {{ isLoading ? 'Сохранение...' : 'Сохранить изменения' }}
+      </button>
+      <RouterLink :to="{ name: 'delete-account' }">
+        <button type="button" class="button button--danger">удалить аккаунт</button>
+      </RouterLink>
+    </div>
   </form>
 </template>
 
@@ -53,12 +58,14 @@
 import { vMaska } from 'maska/vue'
 import { useAuthStore } from '@/stores/auth.ts'
 import { reactive, watch, computed, ref } from 'vue'
+import { useRouter, RouterLink, RouterView } from 'vue-router'
 import api from '@/api.ts'
 
 const authStore = useAuthStore()
 const isLoading = ref(false)
 const serverError = ref('')
 const isSuccess = ref(false)
+const router = useRouter()
 
 const personalData = reactive({
   name: '',
@@ -115,11 +122,6 @@ const validateData = () => {
   }
 }
 
-watch(
-  () => [personalData.phone, personalData.birthday],
-  () => validateData(),
-)
-
 const saveSettings = async () => {
   serverError.value = ''
   errors.phone = ''
@@ -159,6 +161,11 @@ const saveSettings = async () => {
       errors.birthday = 'Неверный формат даты'
   }
 }
+
+watch(
+  () => [personalData.phone, personalData.birthday],
+  () => validateData(),
+)
 </script>
 
 <style scoped>

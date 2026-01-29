@@ -15,6 +15,7 @@
         </div>
       </div>
     </div>
+    <ModalView />
   </section>
 </template>
 
@@ -26,6 +27,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.ts'
 import api from '@/api'
+import ModalView from '@/views/ModalView.vue'
 
 interface UserProfileData {
   id: number

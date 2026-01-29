@@ -12,9 +12,7 @@
       />
       <p v-if="serverError" class="form__message-error">{{ serverError }}</p>
 
-      <button type="submit" class="form__button" :disabled="!isValidate || isLoading">
-        продолжить
-      </button>
+      <button type="submit" class="button" :disabled="!isValidate || isLoading">продолжить</button>
     </div>
   </form>
 </template>

@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
-import AuthModal from '@/views/ModalView.vue'
 import LoginForm from '@/components/auth/LoginForm.vue'
 import RegisterForm from '@/components/auth/RegisterForm.vue'
 import VerifyForm from '@/components/auth/VerifyForm.vue'
@@ -19,6 +18,7 @@ import ProfileSettingsView from '@/views/ProfileSettingsView.vue'
 import ProfileSettings from '@/components/account/settings/ProfileSettings.vue'
 import AvatarSettings from '@/components/account/settings/AvatarSettings.vue'
 import PrivacySettings from '@/components/account/settings/PrivacySettings.vue'
+import DeleteAccount from '@/components/account/settings/DeleteAccount.vue'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const router = createRouter({
@@ -40,24 +40,34 @@ const router = createRouter({
       },
     },
     {
-      path: '/auth',
-      component: AuthModal,
+      path: '/',
+      component: HomeView,
       meta: { requiresGuest: true },
       children: [
         {
           path: 'login',
           name: 'login',
-          component: LoginForm,
+          components: {
+            default: HomeView,
+            modal: LoginForm,
+          },
+          meta: { isModal: true },
         },
         {
           path: 'register',
           name: 'register',
-          component: RegisterForm,
+          components: {
+            modal: RegisterForm,
+          },
+          meta: { isModal: true },
         },
         {
           path: 'verify',
           name: 'verify',
-          component: VerifyForm,
+          components: {
+            modal: VerifyForm,
+          },
+          meta: { isModal: true },
         },
       ],
     },
@@ -92,6 +102,15 @@ const router = createRouter({
               path: 'privacy-settings',
               name: 'privacy-settings',
               component: PrivacySettings,
+            },
+            {
+              path: 'delete-account',
+              name: 'delete-account',
+              components: {
+                default: ProfileSettings,
+                modal: DeleteAccount,
+              },
+              meta: { isModal: true },
             },
           ],
         },
@@ -133,7 +152,11 @@ const router = createRouter({
             {
               path: 'photo/:photoId',
               name: 'photo',
-              component: PhotoItem,
+              components: {
+                default: PhotosList,
+                modal: PhotoItem,
+              },
+              meta: { isModal: true, backTo: 'photos' },
               props: true,
             },
             {
@@ -145,7 +168,11 @@ const router = createRouter({
             {
               path: 'video/:videoId',
               name: 'video',
-              component: VideoItem,
+              components: {
+                default: VideosList,
+                modal: VideoItem,
+              },
+              meta: { isModal: true, backTo: 'videos' },
               props: true,
             },
           ],
