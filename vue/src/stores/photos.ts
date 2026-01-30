@@ -38,11 +38,19 @@ export const usePhotoStore = defineStore('photos', () => {
     }
   }
 
+  const updatePhotoInList = (updatedPhoto: any) => {
+    const index = allPhotos.value.findIndex((p) => p.id === updatedPhoto.id)
+    if (index !== -1) {
+      allPhotos.value[index] = updatedPhoto
+    }
+  }
+
   return {
     allPhotos,
     isLoading,
     fetchPhotos,
     getNextPhotoId,
     getPrevPhotoId,
+    updatePhotoInList,
   }
 })

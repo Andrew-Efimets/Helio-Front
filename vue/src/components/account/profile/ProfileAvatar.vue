@@ -23,7 +23,7 @@
         <RouterLink :to="{ name: 'photos' }" class="menu__item">Фотографии</RouterLink>
       </div>
       <div class="menu__list">
-        <RouterLink :to="{ name: 'videos' }" class="menu__item">Видео</RouterLink>
+        <RouterLink :to="{ name: 'videos' }" class="menu__item">Видеозаписи</RouterLink>
       </div>
       <div class="menu__list">
         <RouterLink :to="{ name: 'contacts' }" class="menu__item">Контакты</RouterLink>

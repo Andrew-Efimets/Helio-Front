@@ -23,7 +23,7 @@
       </li>
       <li class="menu__item">
         <RouterLink class="menu__link" :to="{ name: 'videos', params: { id: myId } }">
-          Мои видео
+          Мои видеозаписи
         </RouterLink>
       </li>
       <li class="menu__separator"></li>

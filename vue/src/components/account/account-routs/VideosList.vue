@@ -8,25 +8,50 @@
         v-if="Number(authStore.user?.id) === Number(route.params.id)"
         class="videos__add-wrapper"
       >
-        <p class="videos__add-label">Загрузить видео</p>
-        <div class="videos__button-wrapper">
+        <p class="videos__add-label">
+          {{ isUpload ? 'Загрузка видео...' : 'Загрузить видео' }}
+        </p>
+
+        <div v-if="isUpload" class="videos__loader" disabled>
+          <span class="videos__percent">{{ uploadProgress }}%</span>
+          <div class="videos__progress-back"></div>
+          <div class="videos__progress-line" :style="{ width: uploadProgress + '%' }"></div>
+        </div>
+
+        <div v-else class="videos__button-wrapper" @click="!isUpload && fileInput?.click()">
           <p class="videos__button">&plus;</p>
         </div>
+
+        <input
+          type="file"
+          ref="fileInput"
+          style="display: none"
+          accept="video/*"
+          @change="onFileSelected"
+        />
       </div>
-      <div class="videos__wrapper" v-if="allVideos.length > 0">
-        <div class="videos__item" v-for="video in allVideos" :key="video.id">
+
+      <div v-if="!videoStore.isLoading" class="videos__notify-wrapper">
+        <p class="videos__notify">
+          {{ !videoStore.allVideos?.length ? 'Видеозаписей пока нет' : 'Видеозаписи' }}
+        </p>
+      </div>
+      <div class="videos__wrapper" v-if="videoStore.allVideos.length > 0">
+        <div class="videos__item" v-for="video in videoStore.allVideos" :key="video.id">
+          <div v-if="!video.video_url" class="videos__placeholder">
+            <div class="videos__skeleton-pulse"></div>
+            <span class="videos__status-tag">Обработка...</span>
+          </div>
           <RouterLink
+            v-else
             :to="{
               name: 'video',
               params: { id: route.params.id, videoId: video.id },
             }"
           >
-            <img :src="video.avatar_url || ''" alt="video" class="videos__img" />
+            <img :src="video.video_url || ''" alt="video" class="videos__img" />
           </RouterLink>
         </div>
-      </div>
-      <div v-else-if="!isLoading" class="videos__notify-wrapper">
-        <p class="videos__notify">Видео пока нет</p>
       </div>
     </div>
   </div>
@@ -35,35 +60,74 @@
 <script setup lang="ts">
 import api from '@/api'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useVideoStore } from '@/stores/videos.ts'
 import { useRoute, RouterLink } from 'vue-router'
-import { watch, ref } from 'vue'
+import { watch, ref, onMounted, onUnmounted } from 'vue'
 
 const authStore = useAuthStore()
+const videoStore = useVideoStore()
 const route = useRoute()
 const privacyError = ref()
-const allVideos = ref<any[]>([])
-const isLoading = ref()
+const isUpload = ref(false)
+const fileInput = ref<HTMLInputElement | null>(null)
+const uploadProgress = ref(0)
 
-const getVideos = async () => {
-  if (!route.params.id) return
+const getVideos = async (userId?: string | string[]) => {
+  const id = userId || route.params.id
+
+  if (!id) return
 
   try {
-    isLoading.value = true // Добавь ref для лоадера
-    const response = await api.get(`/user/${route.params.id}/videos`)
-    allVideos.value = response.data.data || []
+    await videoStore.fetchVideos(id as string)
     privacyError.value = null
   } catch (error: any) {
     privacyError.value = error.formattedMessage
+  }
+}
+
+const onFileSelected = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    const file = target.files[0]
+    if (file.size > 1024 * 1024 * 1024) {
+      alert('Файл слишком большой!')
+      return
+    }
+    sendVideo(file)
+  }
+}
+
+const sendVideo = async (file: File) => {
+  try {
+    isUpload.value = true
+    uploadProgress.value = 0
+
+    const formData = new FormData()
+    formData.append('video', file)
+
+    const response = await api.post(`/user/${route.params.id}/video`, formData, {
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total) {
+          uploadProgress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+        }
+      },
+    })
+
+    videoStore.allVideos.unshift(response.data.data.video)
+  } catch (error: any) {
+    console.log(error.formattedMessage, error)
   } finally {
-    isLoading.value = false
+    if (fileInput.value) fileInput.value.value = ''
+    isUpload.value = false
+    uploadProgress.value = 0
   }
 }
 
 watch(
-  () => route.params.id,
-  (newId) => {
-    if (newId) {
-      getVideos()
+  () => [route.params.id, route.name],
+  ([newId, newName]) => {
+    if (newId && newName === 'videos') {
+      getVideos(newId as string)
     }
   },
   { immediate: true },
