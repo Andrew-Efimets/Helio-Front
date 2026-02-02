@@ -37,19 +37,35 @@
         </p>
       </div>
       <div class="videos__wrapper" v-if="videoStore.allVideos.length > 0">
-        <div class="videos__item" v-for="video in videoStore.allVideos" :key="video.id">
+        <div
+          class="videos__item"
+          v-for="video in sortedDescDateVideos"
+          :key="video.id"
+          @mouseenter="playVideo($event)"
+          @mouseleave="pauseVideo($event)"
+        >
           <div v-if="!video.video_url" class="videos__placeholder">
             <div class="videos__skeleton-pulse"></div>
             <span class="videos__status-tag">Обработка...</span>
           </div>
           <RouterLink
-            v-else
-            :to="{
-              name: 'video',
-              params: { id: route.params.id, videoId: video.id },
-            }"
+            :to="{ name: 'video', params: { id: route.params.id, videoId: video.id } }"
+            class="videos__link"
           >
-            <img :src="video.video_url || ''" alt="video" class="videos__img" />
+            <img
+              v-if="video.thumbnail_url"
+              :src="video.thumbnail_url"
+              class="videos__img videos__img--poster"
+            />
+            <video
+              :src="video.video_url"
+              class="videos__img videos__video"
+              preload="metadata"
+              muted
+              loop
+              playsinline
+              crossorigin="anonymous"
+            ></video>
           </RouterLink>
         </div>
       </div>
@@ -62,7 +78,7 @@ import api from '@/api'
 import { useAuthStore } from '@/stores/auth.ts'
 import { useVideoStore } from '@/stores/videos.ts'
 import { useRoute, RouterLink } from 'vue-router'
-import { watch, ref, onMounted, onUnmounted } from 'vue'
+import { watch, ref, computed } from 'vue'
 
 const authStore = useAuthStore()
 const videoStore = useVideoStore()
@@ -120,6 +136,29 @@ const sendVideo = async (file: File) => {
     if (fileInput.value) fileInput.value.value = ''
     isUpload.value = false
     uploadProgress.value = 0
+  }
+}
+
+const sortedDescDateVideos = computed(() => {
+  return [...videoStore.allVideos].sort((a, b) => {
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  })
+})
+
+const playVideo = (event: MouseEvent) => {
+  const container = event.currentTarget as HTMLElement
+  const video = container.querySelector('video') as HTMLVideoElement
+  if (video) {
+    video.play().catch(() => {})
+  }
+}
+
+const pauseVideo = (event: MouseEvent) => {
+  const container = event.currentTarget as HTMLElement
+  const video = container.querySelector('video') as HTMLVideoElement
+  if (video) {
+    video.pause()
+    video.currentTime = 0
   }
 }
 

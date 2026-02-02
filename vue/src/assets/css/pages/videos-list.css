@@ -69,8 +69,12 @@
 }
 
 .videos__item {
-  max-width: 150px;
-  max-height: 150px;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7e4d2;
   object-fit: cover;
   margin: auto;
 }

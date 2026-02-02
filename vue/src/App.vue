@@ -15,8 +15,8 @@ import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 import { useVideoStore } from '@/stores/videos'
 import { usePhotoStore } from '@/stores/photos'
-// import { useChatStore } from '@/stores/chats' // Если есть стор для чатов
-// import { useToast } from 'vue-toastification' // Рекомендую для уведомлений
+// import { useChatStore } from '@/stores/chats'
+// import { useToast } from 'vue-toastification'
 
 onMounted(async () => {
   try {
@@ -35,8 +35,8 @@ const setupGlobalListeners = (userId: number | string) => {
   const channel = window.Echo.private(`user.${userId}`)
 
   channel.listen('.VideoProcessed', (e: any) => {
-    console.log('Глобально: Видео обработано', e.video)
     videoStore.updateVideoInList(e.video)
+    console.log(e.video)
     // toast.success('Ваше видео готово!')
   })
 
@@ -45,7 +45,6 @@ const setupGlobalListeners = (userId: number | string) => {
   })
 
   channel.listen('.NewMessage', (e: any) => {
-    console.log('Новое сообщение пришло:', e.message)
     // chatStore.addMessage(e.message)
     // if (route.name !== 'chat') toast.info(`Новое сообщение от ${e.message.user.name}`)
   })
