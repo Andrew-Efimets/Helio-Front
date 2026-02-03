@@ -62,6 +62,9 @@ const fileInput = ref<HTMLInputElement | null>(null)
 
 const getPhotos = async (userId?: string | string[]) => {
   const id = userId || route.params.id
+  privacyError.value = null
+  photoStore.allPhotos = []
+
   if (!id) return
   try {
     await photoStore.fetchPhotos(id as string)

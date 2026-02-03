@@ -2,12 +2,63 @@
   <div class="comments">
     <div class="comments__container">
       <h3 class="comments__title">Комментарии</h3>
-      <div class="comments__wrapper"></div>
+      <div class="comments__wrapper">
+        <div class="comments__plate"></div>
+        <div class="comments__input-container">
+          <div class="comments__input-wrapper">
+            <div v-if="showPicker" class="comments__emoji emoji">
+              <EmojiPicker :native="true" @select="onSelectEmoji" theme="light" />
+            </div>
+            <button @click="showPicker = !showPicker" type="button" class="emoji__button">
+              😊
+            </button>
+            <textarea
+              ref="autoTextarea"
+              id="comment"
+              v-model="message"
+              class="comments__input"
+              placeholder="Оставить комментарий"
+              rows="1"
+              @input="adjustHeight"
+            />
+            <div class="comments__send send">
+              <span class="send__button">
+                <img src="@/assets/send-icon.png" alt="send" class="send__icon" />
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { nextTick, ref } from 'vue'
+import EmojiPicker from 'vue3-emoji-picker'
+import 'vue3-emoji-picker/css'
+
+const message = ref('')
+const autoTextarea = ref<HTMLTextAreaElement | null>(null)
+const showPicker = ref(false)
+
+const adjustHeight = () => {
+  const el = autoTextarea.value
+  if (el) {
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }
+}
+
+const onSelectEmoji = (emoji: any) => {
+  message.value += emoji.i
+
+  nextTick(() => {
+    adjustHeight()
+    autoTextarea.value?.focus()
+  })
+}
+</script>
 
 <style scoped>
 @import '@/assets/css/details/comments-media.css';

@@ -33,6 +33,7 @@ export const useVideoStore = defineStore('videos', () => {
       allVideos.value = response.data.data || []
     } catch (error) {
       console.error('Ошибка загрузки видео:', error)
+      throw error
     } finally {
       isLoading.value = false
     }

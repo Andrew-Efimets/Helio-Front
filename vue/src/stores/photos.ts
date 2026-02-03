@@ -33,6 +33,7 @@ export const usePhotoStore = defineStore('photos', () => {
       allPhotos.value = response.data.data || []
     } catch (error) {
       console.error('Ошибка загрузки фото:', error)
+      throw error
     } finally {
       isLoading.value = false
     }

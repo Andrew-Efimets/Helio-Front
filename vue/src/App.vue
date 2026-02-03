@@ -36,7 +36,6 @@ const setupGlobalListeners = (userId: number | string) => {
 
   channel.listen('.VideoProcessed', (e: any) => {
     videoStore.updateVideoInList(e.video)
-    console.log(e.video)
     // toast.success('Ваше видео готово!')
   })
 

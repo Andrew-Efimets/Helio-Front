@@ -58,9 +58,10 @@
               class="videos__img videos__img--poster"
             />
             <video
-              :src="video.video_url"
+              v-if="video.preview_url"
+              :src="video.preview_url"
               class="videos__img videos__video"
-              preload="metadata"
+              preload="none"
               muted
               loop
               playsinline
@@ -90,13 +91,17 @@ const uploadProgress = ref(0)
 
 const getVideos = async (userId?: string | string[]) => {
   const id = userId || route.params.id
+  privacyError.value = null
+  videoStore.allVideos = []
 
   if (!id) return
 
   try {
     await videoStore.fetchVideos(id as string)
+    console.log(videoStore)
     privacyError.value = null
   } catch (error: any) {
+    console.log(error.formattedMessage)
     privacyError.value = error.formattedMessage
   }
 }
@@ -129,6 +134,8 @@ const sendVideo = async (file: File) => {
       },
     })
 
+    console.log('Video from server:', response.data.data.video)
+
     videoStore.allVideos.unshift(response.data.data.video)
   } catch (error: any) {
     console.log(error.formattedMessage, error)
@@ -148,17 +155,29 @@ const sortedDescDateVideos = computed(() => {
 const playVideo = (event: MouseEvent) => {
   const container = event.currentTarget as HTMLElement
   const video = container.querySelector('video') as HTMLVideoElement
+  const img = container.querySelector('img') as HTMLImageElement
+
   if (video) {
-    video.play().catch(() => {})
+    video
+      .play()
+      .then(() => {
+        video.style.opacity = '1' // Показываем видео только когда оно реально пошло
+        if (img) img.style.opacity = '0'
+      })
+      .catch(() => {})
   }
 }
 
 const pauseVideo = (event: MouseEvent) => {
   const container = event.currentTarget as HTMLElement
   const video = container.querySelector('video') as HTMLVideoElement
+  const img = container.querySelector('img') as HTMLImageElement
+
   if (video) {
     video.pause()
     video.currentTime = 0
+    video.style.opacity = '0'
+    if (img) img.style.opacity = '1'
   }
 }
 
