@@ -85,6 +85,7 @@
 
 .send__icon {
   width: 100%;
+  cursor: pointer;
 }
 
 .comments__send:active {
@@ -106,4 +107,5 @@
   font-size: 20px;
   right: 90%;
   bottom: 8px;
+  cursor: pointer;
 }

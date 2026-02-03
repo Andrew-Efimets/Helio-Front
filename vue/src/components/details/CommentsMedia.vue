@@ -6,10 +6,15 @@
         <div class="comments__plate"></div>
         <div class="comments__input-container">
           <div class="comments__input-wrapper">
-            <div v-if="showPicker" class="comments__emoji emoji">
+            <div v-if="showPicker" class="comments__emoji emoji" ref="emojiPickerContainer">
               <EmojiPicker :native="true" @select="onSelectEmoji" theme="light" />
             </div>
-            <button @click="showPicker = !showPicker" type="button" class="emoji__button">
+            <button
+              @click="showPicker = !showPicker"
+              type="button"
+              class="emoji__button"
+              ref="emojiButton"
+            >
               😊
             </button>
             <textarea
@@ -34,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { nextTick, ref, onMounted, onUnmounted } from 'vue'
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
 
@@ -58,6 +63,30 @@ const onSelectEmoji = (emoji: any) => {
     autoTextarea.value?.focus()
   })
 }
+
+const emojiPickerContainer = ref<HTMLElement | null>(null)
+const emojiButton = ref<HTMLElement | null>(null)
+
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement
+
+  if (
+    showPicker.value &&
+    emojiPickerContainer.value &&
+    !emojiPickerContainer.value.contains(target) &&
+    !emojiButton.value?.contains(target)
+  ) {
+    showPicker.value = false
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
