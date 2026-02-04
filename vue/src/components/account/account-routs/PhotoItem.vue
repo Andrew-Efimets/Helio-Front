@@ -27,7 +27,12 @@
       </div>
       <CommentsMedia />
     </div>
-    <LikesMedia />
+    <div class="photo__bottom">
+      <LikesMedia />
+      <button class="button button--danger" type="button" @click="deletePhoto">
+        Удалить фотографию
+      </button>
+    </div>
   </div>
 </template>
 

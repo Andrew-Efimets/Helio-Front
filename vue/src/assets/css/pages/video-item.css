@@ -4,6 +4,7 @@
 
 .video__container {
   display: flex;
+  align-items: center;
 }
 
 .video__wrapper {
@@ -12,12 +13,14 @@
 }
 
 .video__item {
-  width: 900px;
+  width: 600px;
   height: 600px;
   object-fit: cover;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #f9f2e7;
+  border-radius: 10px;
 }
 
 .video__player {
@@ -38,4 +41,11 @@
   color: #6e2c11;
   font-size: 22px;
   padding: 40px;
+}
+
+.video__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
 }

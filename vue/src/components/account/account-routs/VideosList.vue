@@ -4,18 +4,22 @@
       <p class="videos__error-message">{{ privacyError }}</p>
     </div>
     <div v-else class="videos__container">
+      <div v-if="videoStore.isLoading">
+        <span class="videos__loader"></span>
+      </div>
       <div
-        v-if="Number(authStore.user?.id) === Number(route.params.id)"
+        v-else-if="Number(authStore.user?.id) === Number(route.params.id)"
         class="videos__add-wrapper"
       >
         <p class="videos__add-label">
           {{ isUpload ? 'Загрузка видео...' : 'Загрузить видео' }}
         </p>
 
-        <div v-if="isUpload" class="videos__loader" disabled>
+        <div v-if="isUpload" class="videos__loading" disabled>
           <span class="videos__percent">{{ uploadProgress }}%</span>
-          <div class="videos__progress-back"></div>
-          <div class="videos__progress-line" :style="{ width: uploadProgress + '%' }"></div>
+          <div class="videos__progress-back">
+            <div class="videos__progress-line" :style="{ width: uploadProgress + '%' }"></div>
+          </div>
         </div>
 
         <div v-else class="videos__button-wrapper" @click="!isUpload && fileInput?.click()">
@@ -98,10 +102,8 @@ const getVideos = async (userId?: string | string[]) => {
 
   try {
     await videoStore.fetchVideos(id as string)
-    console.log(videoStore)
     privacyError.value = null
   } catch (error: any) {
-    console.log(error.formattedMessage)
     privacyError.value = error.formattedMessage
   }
 }

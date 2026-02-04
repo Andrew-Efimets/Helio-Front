@@ -62,3 +62,10 @@
   font-size: 22px;
   padding: 40px;
 }
+
+.photo__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}

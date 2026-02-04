@@ -25,6 +25,7 @@
               placeholder="Оставить комментарий"
               rows="1"
               @input="adjustHeight"
+              @keydown.stop
             />
             <div class="comments__send send">
               <span class="send__button">

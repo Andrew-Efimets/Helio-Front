@@ -15,11 +15,43 @@ const router = useRouter()
 const route = useRoute()
 const dialogRef = ref<HTMLDialogElement | null>(null)
 
+// const close = () => {
+//   if (route.meta.backTo) {
+//     router.push({
+//       name: route.meta.backTo as string,
+//       params: route.params,
+//     })
+//   } else {
+//     router.back()
+//   }
+// }
+
 const close = () => {
   if (route.meta.backTo) {
+    const targetName = route.meta.backTo as string
+
+    const targetRoute = router.resolve({ name: targetName })
+
+    const validKeys = targetRoute.matched.flatMap((m) =>
+      m.path
+        .split('/')
+        .filter((p) => p.startsWith(':'))
+        .map((p) => p.replace(/[:?+*]/g, '')),
+    )
+
+    const cleanParams = Object.keys(route.params)
+      .filter((key) => validKeys.includes(key))
+      .reduce(
+        (obj, key) => {
+          obj[key] = route.params[key]
+          return obj
+        },
+        {} as Record<string, any>,
+      )
+
     router.push({
-      name: route.meta.backTo as string,
-      params: route.params,
+      name: targetName,
+      params: cleanParams,
     })
   } else {
     router.back()

@@ -18,7 +18,10 @@
       </div>
       <CommentsMedia />
     </div>
-    <LikesMedia />
+    <div class="video__bottom">
+      <LikesMedia />
+      <button class="button button--danger">Удалить видео</button>
+    </div>
   </div>
 </template>
 
