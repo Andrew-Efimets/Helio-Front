@@ -84,7 +84,9 @@ import { useAuthStore } from '@/stores/auth.ts'
 import { useVideoStore } from '@/stores/videos.ts'
 import { useRoute, RouterLink } from 'vue-router'
 import { watch, ref, computed } from 'vue'
+import { useNotificationStore } from '@/stores/notifications'
 
+const notify = useNotificationStore()
 const authStore = useAuthStore()
 const videoStore = useVideoStore()
 const route = useRoute()
@@ -136,11 +138,11 @@ const sendVideo = async (file: File) => {
       },
     })
 
-    console.log('Video from server:', response.data.data.video)
-
+    notify.show('Видео на сервере. Ожидайте уведомление о загрузке!', 'success')
     videoStore.allVideos.unshift(response.data.data.video)
   } catch (error: any) {
     console.log(error.formattedMessage, error)
+    notify.show('Видео загрузилось не удалось. Попробуйте ещё раз', 'error')
   } finally {
     if (fileInput.value) fileInput.value.value = ''
     isUpload.value = false
@@ -163,7 +165,7 @@ const playVideo = (event: MouseEvent) => {
     video
       .play()
       .then(() => {
-        video.style.opacity = '1' // Показываем видео только когда оно реально пошло
+        video.style.opacity = '1'
         if (img) img.style.opacity = '0'
       })
       .catch(() => {})

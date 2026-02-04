@@ -15,17 +15,6 @@ const router = useRouter()
 const route = useRoute()
 const dialogRef = ref<HTMLDialogElement | null>(null)
 
-// const close = () => {
-//   if (route.meta.backTo) {
-//     router.push({
-//       name: route.meta.backTo as string,
-//       params: route.params,
-//     })
-//   } else {
-//     router.back()
-//   }
-// }
-
 const close = () => {
   if (route.meta.backTo) {
     const targetName = route.meta.backTo as string

@@ -32,7 +32,12 @@
       </div>
       <div class="photos__wrapper" v-if="photoStore.allPhotos?.length > 0">
         <div class="photos__item" v-for="photo in photoStore.allPhotos" :key="photo.id">
+          <div v-if="!photo.photo_url" class="photos__placeholder">
+            <div class="photos__skeleton-pulse"></div>
+            <span class="photos__status-tag">Обработка...</span>
+          </div>
           <RouterLink
+            v-else
             :to="{
               name: 'photo',
               params: { id: route.params.id, photoId: photo.id },

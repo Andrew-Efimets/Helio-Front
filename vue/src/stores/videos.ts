@@ -6,26 +6,6 @@ export const useVideoStore = defineStore('videos', () => {
   const allVideos = ref<any[]>([])
   const isLoading = ref(false)
 
-  const getVideoIndexById = (videoId: string | number) => {
-    return allVideos.value.findIndex((p) => Number(p.id) === Number(videoId))
-  }
-
-  const getNextVideoId = (videoId: string | number) => {
-    const index = getVideoIndexById(videoId)
-    if (index !== -1 && index < allVideos.value.length - 1) {
-      return allVideos.value[index + 1].id
-    }
-    return null
-  }
-
-  const getPrevVideoId = (videoId: string | number) => {
-    const index = getVideoIndexById(videoId)
-    if (index > 0) {
-      return allVideos.value[index - 1].id
-    }
-    return null
-  }
-
   const fetchVideos = async (userId: string | number) => {
     try {
       isLoading.value = true
@@ -46,12 +26,15 @@ export const useVideoStore = defineStore('videos', () => {
     }
   }
 
+  const removeVideoFromStore = (videoId: string | number) => {
+    allVideos.value = allVideos.value.filter((p) => Number(p.id) !== Number(videoId))
+  }
+
   return {
     allVideos,
     isLoading,
     fetchVideos,
-    getNextVideoId,
-    getPrevVideoId,
     updateVideoInList,
+    removeVideoFromStore,
   }
 })

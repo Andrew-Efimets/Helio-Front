@@ -1,6 +1,7 @@
 <template>
   <AppHeader />
   <div class="app__container">
+    <NotificationsView />
     <RouterView />
   </div>
   <AppFooter />
@@ -15,8 +16,9 @@ import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 import { useVideoStore } from '@/stores/videos'
 import { usePhotoStore } from '@/stores/photos'
+import NotificationsView from '@/views/NotificationsView.vue'
+import { useNotificationStore } from '@/stores/notifications.ts'
 // import { useChatStore } from '@/stores/chats'
-// import { useToast } from 'vue-toastification'
 
 onMounted(async () => {
   try {
@@ -29,14 +31,14 @@ onMounted(async () => {
 const authStore = useAuthStore()
 const videoStore = useVideoStore()
 const photoStore = usePhotoStore()
-// const toast = useToast()
+const notify = useNotificationStore()
 
 const setupGlobalListeners = (userId: number | string) => {
   const channel = window.Echo.private(`user.${userId}`)
 
   channel.listen('.VideoProcessed', (e: any) => {
     videoStore.updateVideoInList(e.video)
-    // toast.success('Ваше видео готово!')
+    notify.show('Видео доступно к просмотру!', 'success')
   })
 
   channel.listen('.PhotoProcessed', (e: any) => {

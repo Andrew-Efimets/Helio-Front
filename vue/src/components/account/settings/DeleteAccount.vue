@@ -13,21 +13,21 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ref } from 'vue'
 import api from '@/api'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const isLoading = ref(false)
 
 const handleDelete = async () => {
   try {
     isLoading.value = true
-    const response = await api.delete(`/user/${authStore.user?.id}`)
+    const response = await api.delete(`/user/${route.params.id}`)
     authStore.reset()
     router.push('/login')
-    console.log(response.data)
   } catch (e) {
     console.error('Ошибка удаления')
   } finally {

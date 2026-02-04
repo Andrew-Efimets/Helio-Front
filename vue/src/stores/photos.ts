@@ -46,6 +46,10 @@ export const usePhotoStore = defineStore('photos', () => {
     }
   }
 
+  const removePhotoFromStore = (photoId: string | number) => {
+    allPhotos.value = allPhotos.value.filter((p) => Number(p.id) !== Number(photoId))
+  }
+
   return {
     allPhotos,
     isLoading,
@@ -53,5 +57,6 @@ export const usePhotoStore = defineStore('photos', () => {
     getNextPhotoId,
     getPrevPhotoId,
     updatePhotoInList,
+    removePhotoFromStore,
   }
 })
