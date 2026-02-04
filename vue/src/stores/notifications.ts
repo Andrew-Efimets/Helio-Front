@@ -8,7 +8,7 @@ export const useNotificationStore = defineStore('notifications', () => {
   const show = (
     msg: string,
     msgType: 'success' | 'error' | 'info' = 'success',
-    duration = 7000,
+    duration = 10000,
   ) => {
     message.value = msg
     type.value = msgType

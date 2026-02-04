@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  padding: 15px;
+  padding: 40px;
   text-align: center;
   color: #6e2c11;
   font-weight: bold;
@@ -12,10 +12,10 @@
 }
 
 .success {
-  background-color: #beeabe;
+  background-color: #e1ffe1;
 }
 .error {
-  background-color: #e99a9a;
+  background-color: #ffd7d7;
 }
 .info {
   background-color: #beeae8;
