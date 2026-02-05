@@ -1,7 +1,7 @@
 <template>
   <div class="content">
-    <div class="content__title-wrapper">
-      <h1 class="content__title">Твой тихий уголок в шумном интернете</h1>
+    <div class="title-wrapper">
+      <h1 class="title">Твой тихий уголок в шумном интернете</h1>
     </div>
   </div>
   <ModalView />
@@ -20,12 +20,12 @@ import ModalView from '@/views/ModalView.vue'
   min-height: 100vh;
 }
 
-.content__title-wrapper {
+.title-wrapper {
   width: 100%;
   text-align: center;
 }
 
-.content__title {
+.title {
   padding: 60px;
   color: #6e2c11;
 }

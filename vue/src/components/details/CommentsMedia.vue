@@ -1,95 +1,66 @@
 <template>
-  <div class="comments">
-    <div class="comments__container">
-      <h3 class="comments__title">Комментарии</h3>
-      <div class="comments__wrapper">
-        <div class="comments__plate"></div>
-        <div class="comments__input-container">
-          <div class="comments__input-wrapper">
-            <div v-if="showPicker" class="comments__emoji emoji" ref="emojiPickerContainer">
-              <EmojiPicker :native="true" @select="onSelectEmoji" theme="light" />
-            </div>
-            <button
-              @click="showPicker = !showPicker"
-              type="button"
-              class="emoji__button"
-              ref="emojiButton"
-            >
-              😊
-            </button>
-            <textarea
-              ref="autoTextarea"
-              id="comment"
-              v-model="message"
-              class="comments__input"
-              placeholder="Оставить комментарий"
-              rows="1"
-              @input="adjustHeight"
-              @keydown.stop
-            />
-            <div class="comments__send send">
-              <span class="send__button">
-                <img src="@/assets/send-icon.png" alt="send" class="send__icon" />
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="container">
+    <h3 class="title">Комментарии</h3>
+    <div class="wrapper">
+      <CommentsPlate />
+      <MessageInput v-model="commentText" placeholder="Оставить комментарий" @send="saveComment" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, onMounted, onUnmounted } from 'vue'
-import EmojiPicker from 'vue3-emoji-picker'
-import 'vue3-emoji-picker/css'
+import { ref } from 'vue'
+import api from '@/api'
+import CommentsPlate from '@/components/details/CommentsPlate.vue'
+import MessageInput from '@/components/details/MessageInput.vue'
+import { useNotificationStore } from '@/stores/notifications'
 
-const message = ref('')
-const autoTextarea = ref<HTMLTextAreaElement | null>(null)
-const showPicker = ref(false)
+const notify = useNotificationStore()
+const commentText = ref('')
 
-const adjustHeight = () => {
-  const el = autoTextarea.value
-  if (el) {
-    el.style.height = 'auto'
-    el.style.height = `${el.scrollHeight}px`
+const saveComment = async (text: string) => {
+  try {
+    // await api.post(`/video/${videoId}/comments`, { content: text })
+    console.log('Отправка комментария:', text)
+
+    // await api.post('/comments', { message: text })
+
+    commentText.value = ''
+  } catch (error) {
+    console.error(error)
+    notify.show('Не удалось отправить комментарий. Попробуйте ещё раз', 'error')
   }
 }
-
-const onSelectEmoji = (emoji: any) => {
-  message.value += emoji.i
-
-  nextTick(() => {
-    adjustHeight()
-    autoTextarea.value?.focus()
-  })
-}
-
-const emojiPickerContainer = ref<HTMLElement | null>(null)
-const emojiButton = ref<HTMLElement | null>(null)
-
-const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement
-
-  if (
-    showPicker.value &&
-    emojiPickerContainer.value &&
-    !emojiPickerContainer.value.contains(target) &&
-    !emojiButton.value?.contains(target)
-  ) {
-    showPicker.value = false
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('click', handleClickOutside)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('click', handleClickOutside)
-})
 </script>
 
 <style scoped>
-@import '@/assets/css/details/comments-media.css';
+.container {
+  margin: 20px;
+  width: 400px;
+  height: inherit;
+  background-color: #f9f2e7;
+  border-radius: 10px;
+}
+
+.title {
+  border-radius: 10px 10px 0 0;
+  background-color: #f0ccaa;
+  width: 100%;
+  padding: 5px 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #6e2c11;
+}
+
+.wrapper {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  row-gap: 10px;
+  border: #6e2c11 1px solid;
+  border-radius: 8px;
+  height: 590px;
+}
 </style>

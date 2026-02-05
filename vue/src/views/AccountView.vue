@@ -1,18 +1,15 @@
 <template>
   <section class="account">
-    <div v-if="authStore.canSee(user, 'show_account')" class="account__wrapper">
+    <div v-if="isLoading || authStore.canSee(user, 'show_account')" class="wrapper">
       <ProfileAvatar :user="user" :is-loading="isLoading" @update-user="(val) => (user = val)" />
-      <div class="account__content">
+      <div class="content">
         <ProfileInfo :user="user" :is-loading="isLoading" />
-        <RouterView />
+        <RouterView v-if="!isLoading" />
       </div>
     </div>
-    <div v-else class="account__wrapper">
-      <div class="account__wrapper-closed">
+    <div v-else class="wrapper">
+      <div class="wrapper-closed">
         <ProfileClosed :user="user" :is-loading="isLoading" @update-user="(val) => (user = val)" />
-        <div class="account__closed-error">
-          <RouterView v-if="!isLoading" />
-        </div>
       </div>
     </div>
     <ModalView />
@@ -58,13 +55,16 @@ const fetchAccount = async () => {
     }
   } catch (error) {
     console.error(error, 'Данные не найдены')
+  } finally {
+    isLoading.value = false
   }
-  isLoading.value = false
 }
 onMounted(fetchAccount)
 watch(() => route.params.id, fetchAccount)
 </script>
 
 <style scoped>
-@import '@/assets/css/account.css';
+.wrapper {
+  display: flex;
+}
 </style>

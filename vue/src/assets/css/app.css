@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: "Merriweather", serif;
+  font-family: 'Merriweather', serif;
   background-color: #f7e4d2;
 }
 
@@ -22,6 +22,8 @@ body {
   padding: 0 15px;
   flex-grow: 1;
 }
+
+/* button */
 
 .button {
   margin: 20px 0;
@@ -57,4 +59,33 @@ body {
 
 .button--danger:active {
   background-color: #f4b5be;
+}
+
+/* loader */
+
+.app-loader {
+  display: block;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+  min-height: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #6e2c11;
+  padding: 20px;
+}
+
+.app-loader::after {
+  content: 'Загрузка';
+  animation: global-loading-dots 2s infinite steps(4);
+  display: inline-block;
+  width: 160px;
+}
+
+@keyframes global-loading-dots {
+  0%   { content: 'Загрузка'; }
+  25%  { content: 'Загрузка.'; }
+  50%  { content: 'Загрузка..'; }
+  75%  { content: 'Загрузка...'; }
+  100% { content: 'Загрузка'; }
 }

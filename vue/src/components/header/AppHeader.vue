@@ -1,71 +1,43 @@
 <template>
   <div class="header">
-    <div class="header__wrapper">
-      <div class="header__title">
-        <RouterLink :to="{ name: 'home' }" class="header__link">
-          <img
-            alt="Vue logo"
-            class="header__logo"
-            src="../../assets/heliologo.png"
-            width="64"
-            height="64"
-          />
-        </RouterLink>
-        <RouterLink :to="{ name: 'home' }" class="header__link">
-          <h3>{{ info }}</h3>
-        </RouterLink>
-      </div>
-      <div class="header__search">
-        <input type="text" class="header__input" placeholder="Поиск" />
-        <div class="header__icon-wrapper">
-          <p class="header__separator">|</p>
-          <RouterLink :to="{ name: 'users' }" class="header__link-item">
-            <img src="../../assets/search.png" alt="поиск" class="header__icon" />
-          </RouterLink>
-        </div>
-      </div>
-      <div v-if="!authStore.isVerified" class="header__navbar">
-        <RouterLink :to="{ name: 'register' }" class="header__navbar-link">Регистрация</RouterLink>
-        <RouterLink :to="{ name: 'login' }" class="header__navbar-link">Вход</RouterLink>
-      </div>
-      <div v-else class="header__navbar">
-        <div v-if="authStore.user?.avatar" class="header__avatar">
-          <img :src="authStore.user?.avatar" alt="аватар" class="header__avatar-img" />
-        </div>
-        <RouterLink
-          v-if="authStore.isVerified && authStore.user?.id"
-          :to="{ name: 'wall', params: { id: String(authStore.user?.id || '') } }"
-          class="header__navbar-link"
-          >{{ authStore.user?.name }}
-        </RouterLink>
-        <a href="#" class="header__navbar-link" @click.prevent="handleLogout">Выход</a>
-      </div>
+    <div class="wrapper">
+      <HeaderTitle />
+      <HeaderSearch />
+      <HeaderNavbar />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth'
-import { useRouter, RouterLink } from 'vue-router'
-import api from '@/api'
-import { ref } from 'vue'
-
-const authStore = useAuthStore()
-const router = useRouter()
-
-const handleLogout = async () => {
-  try {
-    const exitData = await api.post('/logout')
-    authStore.reset()
-    router.push({ name: 'home' })
-  } catch (error) {
-    console.error('Ошибка выхода', error)
-  }
-}
-
-const info = ref('Heliophone')
+import HeaderTitle from '@/components/header/HeaderTitle.vue'
+import HeaderSearch from '@/components/header/HeaderSearch.vue'
+import HeaderNavbar from '@/components/header/HeaderNavbar.vue'
 </script>
 
 <style scoped>
-@import '@/assets/css/header.css';
+.header {
+  background-color: #c99d7f;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.wrapper {
+  max-width: 1400px;
+  display: flex;
+  justify-content: space-between;
+  column-gap: 40px;
+  align-items: center;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+@media screen and (max-width: 1024px) {
+  .wrapper {
+    flex-direction: column;
+    row-gap: 20px;
+    text-align: center;
+  }
+}
 </style>

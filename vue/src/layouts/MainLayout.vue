@@ -1,7 +1,7 @@
 <template>
   <section class="main">
     <ProfileMenu />
-    <main class="main__content">
+    <main class="content">
       <RouterView />
     </main>
   </section>

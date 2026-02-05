@@ -1,7 +1,7 @@
 <template>
   <form class="form" @submit.prevent="handleSubmit" novalidate>
-    <div class="form__wrapper">
-      <p class="form__notify">На указанный номер будет выслан код подтверждения</p>
+    <div class="wrapper">
+      <p class="notify">На указанный номер будет выслан код подтверждения</p>
 
       <FormInput
         v-model="loginForm.phone"
@@ -19,9 +19,9 @@
         :error="errors.password"
         required
       />
-      <p v-if="serverError" class="form__message-error">{{ serverError }}</p>
+      <p v-if="serverError" class="message-error">{{ serverError }}</p>
 
-      <RouterLink :to="{ name: 'register' }" class="form__link">Регистрация</RouterLink>
+      <RouterLink :to="{ name: 'register' }" class="link">Регистрация</RouterLink>
 
       <button type="submit" class="button" :disabled="!isValidate || isLoading">
         {{ isLoading ? 'отправляем код...' : 'продолжить' }}
@@ -89,5 +89,33 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-@import '@/assets/css/auth-form.css';
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  margin: auto;
+}
+
+.notify {
+  text-align: center;
+  text-decoration: none;
+  color: #6e2c11;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.link {
+  text-decoration: none;
+  color: #6e2c11;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.message-error {
+  color: darkred;
+}
 </style>

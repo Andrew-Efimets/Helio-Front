@@ -1,35 +1,17 @@
 <template>
   <nav v-if="authStore.user?.id" class="menu">
-    <ul class="menu__wrapper">
-      <li class="menu__item">
-        <RouterLink class="menu__link" :to="{ name: 'wall', params: { id: myId } }"
-          >Мой аккаунт
+    <ul class="wrapper">
+      <li v-for="item in menuItems" :key="item.name" class="item">
+        <RouterLink class="link" :to="{ name: item.name, params: { id: myId } }">
+          {{ item.label }}
         </RouterLink>
       </li>
-      <li class="menu__item">
-        <RouterLink class="menu__link" :to="{ name: 'chats', params: { id: myId } }"
-          >Чаты
-        </RouterLink>
-      </li>
-      <li class="menu__item">
-        <RouterLink class="menu__link" :to="{ name: 'contacts', params: { id: myId } }"
-          >Контакты
-        </RouterLink>
-      </li>
-      <li class="menu__item">
-        <RouterLink class="menu__link" :to="{ name: 'photos', params: { id: myId } }">
-          Мои фотографии
-        </RouterLink>
-      </li>
-      <li class="menu__item">
-        <RouterLink class="menu__link" :to="{ name: 'videos', params: { id: myId } }">
-          Мои видеозаписи
-        </RouterLink>
-      </li>
-      <li class="menu__separator"></li>
-      <li class="menu__settings">
-        <RouterLink class="menu__link" :to="{ name: 'settings', params: { id: myId } }"
-          >Настройки профиля
+
+      <li class="separator"></li>
+
+      <li class="settings">
+        <RouterLink class="link" :to="{ name: 'settings', params: { id: myId } }">
+          Настройки профиля
         </RouterLink>
       </li>
     </ul>
@@ -37,13 +19,74 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const authStore = useAuthStore()
-const myId = authStore.user?.id
+
+const myId = computed(() => authStore.user?.id)
+
+const menuItems = [
+  { name: 'wall', label: 'Мой аккаунт' },
+  { name: 'chats', label: 'Чаты' },
+  { name: 'contacts', label: 'Контакты' },
+  { name: 'photos', label: 'Мои фотографии' },
+  { name: 'videos', label: 'Мои видеозаписи' },
+]
 </script>
 
 <style scoped>
-@import '@/assets/css/profile/profile-menu.css';
+.menu {
+  min-width: 300px;
+  padding: 40px;
+}
+
+.wrapper {
+  width: 100%;
+  list-style: none;
+}
+
+.wrapper .item:has(.router-link-exact-active) {
+  background-color: #f0ccaa;
+}
+
+.wrapper .item:hover:not(:has(.router-link-exact-active)) {
+  background-color: #ead7c3;
+}
+
+.wrapper .settings:has(.router-link-active) {
+  background-color: #f0ccaa;
+}
+
+.wrapper .settings:hover:not(:has(.router-link-active)) {
+  background-color: #ead7c3;
+}
+
+.item {
+  width: 100%;
+}
+
+.link {
+  padding: 10px 20px;
+  display: block;
+  color: #6e2c11;
+  text-decoration: none;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.router-link-exact-active {
+  color: #a34809;
+  font-weight: bold;
+  background-color: #f0ccaa;
+}
+
+.separator {
+  margin: 20px 0;
+  border-bottom: 1px solid #6e2c11;
+  box-shadow: 0 0 10px 3px rgba(196, 114, 51, 0.5);
+  border-radius: 5px;
+}
 </style>

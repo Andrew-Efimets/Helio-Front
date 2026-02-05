@@ -70,6 +70,4 @@ onUnmounted(() => {
 })
 </script>
 
-<style>
-@import '@/assets/css/app.css';
-</style>
+<style></style>

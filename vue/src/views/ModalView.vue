@@ -1,7 +1,7 @@
 <template>
   <dialog ref="dialogRef" class="modal" @click.self="close">
-    <div class="modal__content">
-      <button class="modal__close-btn" @click="close">×</button>
+    <div class="content">
+      <button class="close-btn" @click="close">×</button>
       <RouterView name="modal" />
     </div>
   </dialog>
@@ -10,12 +10,19 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.ts'
 
 const router = useRouter()
 const route = useRoute()
 const dialogRef = ref<HTMLDialogElement | null>(null)
+const authStore = useAuthStore()
 
 const close = () => {
+  if (!authStore.user) {
+    router.push({ name: 'home' })
+    return
+  }
+
   if (route.meta.backTo) {
     const targetName = route.meta.backTo as string
 
@@ -78,5 +85,43 @@ onMounted(updateModalState)
 </script>
 
 <style scoped>
-@import '@/assets/css/modal.css';
+.modal {
+  border: none;
+  border-radius: 16px;
+  padding: 0;
+  background-color: #f2decd;
+  box-shadow: inset 0 0 40px 10px rgba(190, 127, 25, 0.5);
+  margin: auto;
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.content {
+  padding: 30px;
+  position: relative;
+  min-width: 400px;
+}
+
+.close-btn {
+  min-width: 30px;
+  min-height: 30px;
+  border-radius: 50%;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 26px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #6e2c11;
+}
+
+.close-btn:hover {
+  transform: scale(1.1);
+  transition: all 0.3s linear;
+  box-shadow: inset 0 0 3px 3px rgba(190, 127, 25, 0.3);
+}
 </style>

@@ -18,7 +18,6 @@ import ProfileSettingsView from '@/views/ProfileSettingsView.vue'
 import ProfileSettings from '@/components/account/settings/ProfileSettings.vue'
 import AvatarSettings from '@/components/account/settings/AvatarSettings.vue'
 import PrivacySettings from '@/components/account/settings/PrivacySettings.vue'
-import DeleteAccount from '@/components/account/settings/DeleteAccount.vue'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const router = createRouter({
@@ -102,15 +101,6 @@ const router = createRouter({
               path: 'privacy-settings',
               name: 'privacy-settings',
               component: PrivacySettings,
-            },
-            {
-              path: 'delete-account',
-              name: 'delete-account',
-              components: {
-                default: ProfileSettings,
-                modal: DeleteAccount,
-              },
-              meta: { isModal: true },
             },
           ],
         },
