@@ -10,10 +10,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import api from '@/api'
+import api from '@/api.ts'
 import CommentsPlate from '@/components/details/CommentsPlate.vue'
 import MessageInput from '@/components/details/MessageInput.vue'
-import { useNotificationStore } from '@/stores/notifications'
+import { useNotificationStore } from '@/stores/notifications.ts'
 
 const notify = useNotificationStore()
 const commentText = ref('')
@@ -36,10 +36,13 @@ const saveComment = async (text: string) => {
 <style scoped>
 .container {
   margin: 20px;
-  width: 400px;
-  height: inherit;
+  max-width: 400px;
+  min-height: 400px;
   background-color: #f9f2e7;
   border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
 }
 
 .title {
@@ -61,6 +64,8 @@ const saveComment = async (text: string) => {
   row-gap: 10px;
   border: #6e2c11 1px solid;
   border-radius: 8px;
-  height: 590px;
+  min-height: inherit;
+  height: 100%;
+  min-width: 350px;
 }
 </style>

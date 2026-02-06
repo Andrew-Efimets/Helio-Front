@@ -4,7 +4,7 @@
       {{ isUpload ? uploadLabel : label }}
     </p>
 
-    <div v-if="isUpload" class="loading">
+    <div v-if="isUpload && props.mediaType === 'video'" class="loading">
       <span class="percent">{{ uploadProgress }}%</span>
       <div class="progress-back">
         <div class="progress-line" :style="{ width: uploadProgress + '%' }"></div>

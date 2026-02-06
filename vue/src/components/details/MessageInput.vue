@@ -101,7 +101,6 @@ onUnmounted(() => window.removeEventListener('click', handleClickOutside))
 <style scoped>
 .input-container {
   display: flex;
-  flex-direction: column;
   width: 100%;
   padding: 10px 20px;
 }
@@ -142,7 +141,7 @@ onUnmounted(() => window.removeEventListener('click', handleClickOutside))
 .send {
   position: absolute;
   width: 30px;
-  left: 90%;
+  left: 89%;
   bottom: 2px;
 }
 
@@ -173,7 +172,7 @@ onUnmounted(() => window.removeEventListener('click', handleClickOutside))
   border: none;
   background: transparent;
   font-size: 20px;
-  right: 90%;
+  right: 89%;
   bottom: 8px;
   cursor: pointer;
 }
