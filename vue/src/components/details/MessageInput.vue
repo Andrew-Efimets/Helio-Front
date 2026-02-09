@@ -22,6 +22,10 @@
         :placeholder="placeholder"
         rows="1"
         @keydown.enter.exact.prevent="handleSend"
+        @keydown.enter.shift.exact="() => {}"
+        @keydown.left.stop
+        @keydown.right.stop
+        @keydown.esc.stop
       />
 
       <div class="send" @click="handleSend">
@@ -34,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, onMounted, onUnmounted } from 'vue'
+import { nextTick, ref, onMounted, onUnmounted, watch } from 'vue'
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
 
@@ -96,13 +100,22 @@ onMounted(() => {
 })
 
 onUnmounted(() => window.removeEventListener('click', handleClickOutside))
+
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (newVal === '') {
+      nextTick(adjustHeight)
+    }
+  },
+)
 </script>
 
 <style scoped>
 .input-container {
   display: flex;
   width: 100%;
-  padding: 10px 20px;
+  padding: 10px;
 }
 
 .input-wrapper {

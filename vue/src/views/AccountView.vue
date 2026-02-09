@@ -31,6 +31,9 @@ interface UserProfileData {
   name: string
   phone: string
   avatar: string | null
+  photos_count?: number
+  videos_count?: number
+  contacts_count?: number
   profile: {
     country: string | null
     city: string | null

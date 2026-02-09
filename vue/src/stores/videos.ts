@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import api from '@/api'
 import { useNotificationStore } from '@/stores/notifications.ts'
 import { useRoute } from 'vue-router'
@@ -11,6 +11,8 @@ export const useVideoStore = defineStore('videos', () => {
   const notify = useNotificationStore()
   const route = useRoute()
   const uploadProgress = ref(0)
+
+  const totalCount = computed(() => allVideos.length)
 
   const fetchVideos = async (userId: string | number) => {
     try {
@@ -88,6 +90,7 @@ export const useVideoStore = defineStore('videos', () => {
     isLoading,
     isUpload,
     uploadProgress,
+    totalCount,
     fetchVideos,
     fetchVideoById,
     sendVideo,

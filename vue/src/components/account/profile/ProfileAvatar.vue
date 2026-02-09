@@ -21,7 +21,7 @@
     <div v-if="user && user.id !== authStore.user?.id" class="menu">
       <div v-for="link in menuLinks" :key="link.name" class="list">
         <RouterLink :to="{ name: link.name }" class="item">
-          {{ link.label }}
+          {{ link.label }} ({{ props.user[link.count] || 0 }})
         </RouterLink>
       </div>
     </div>
@@ -33,11 +33,16 @@ import { useAuthStore } from '@/stores/auth.ts'
 import { useRoute, RouterLink } from 'vue-router'
 import { ref } from 'vue'
 import api from '@/api'
+import { usePhotoStore } from '@/stores/photos.ts'
+import { useVideoStore } from '@/stores/videos.ts'
+
+const photoStore = usePhotoStore()
+const videoStore = useVideoStore()
 
 const menuLinks = [
-  { name: 'photos', label: 'Фотографии' },
-  { name: 'videos', label: 'Видеозаписи' },
-  { name: 'contacts', label: 'Контакты' },
+  { name: 'photos', label: 'Фотографии', count: 'photos_count' },
+  { name: 'videos', label: 'Видеозаписи', count: 'videos_count' },
+  { name: 'contacts', label: 'Контакты', count: 'contacts_count' },
 ]
 
 const props = defineProps<{

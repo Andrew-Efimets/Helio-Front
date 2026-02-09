@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import api from '@/api'
 import { useRoute } from 'vue-router'
 import { useNotificationStore } from '@/stores/notifications.ts'
@@ -10,6 +10,8 @@ export const usePhotoStore = defineStore('photos', () => {
   const isUpload = ref(false)
   const route = useRoute()
   const notify = useNotificationStore()
+
+  const totalCount = computed(() => allPhotos.length)
 
   const getPhotoIndexById = (photoId: string | number) => {
     return allPhotos.value.findIndex((p) => Number(p.id) === Number(photoId))
@@ -79,6 +81,7 @@ export const usePhotoStore = defineStore('photos', () => {
     allPhotos,
     isLoading,
     isUpload,
+    totalCount,
     fetchPhotos,
     sendPhoto,
     getNextPhotoId,
