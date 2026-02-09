@@ -20,9 +20,10 @@ const commentStore = useCommentStore()
   width: 100%;
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
+  row-gap: 10px;
   scrollbar-width: thin;
   scrollbar-color: rgba(153, 61, 26, 0.5) transparent;
 }

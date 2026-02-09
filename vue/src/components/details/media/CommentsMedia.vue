@@ -132,12 +132,13 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  align-items: center;
   row-gap: 10px;
   border: #6e2c11 1px solid;
   border-radius: 8px;
   min-height: inherit;
   height: 100%;
-  min-width: 350px;
+  width: 380px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 </style>

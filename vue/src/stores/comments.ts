@@ -27,7 +27,6 @@ export const useCommentStore = defineStore('comments', () => {
       isLoading.value = true
       const response = await api.get(`/user/${userId}/${type}/${id}/comments`)
       allComments.value = response.data.data
-      console.log(response.data)
     } finally {
       isLoading.value = false
     }

@@ -24,7 +24,6 @@ const formatDate = (date: string) => {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
-  color: #6e2c11;
 }
 
 .avatar {
@@ -36,6 +35,7 @@ const formatDate = (date: string) => {
 .author {
   font-weight: bold;
   font-size: 11px;
+  color: #d87c56;
 }
 
 .date {
@@ -46,5 +46,6 @@ const formatDate = (date: string) => {
 
 .text {
   font-size: 14px;
+  color: #6e2c11;
 }
 </style>
