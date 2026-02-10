@@ -9,14 +9,42 @@
           <img :src="user.avatar" alt="аватар" class="img" />
         </RouterLink>
       </div>
-      <button
-        v-if="user && user.id !== authStore.user?.id"
-        class="button"
-        @click="addContact"
-        :disabled="isAddition"
-      >
-        {{ user.is_contact ? 'Удалить из контактов' : 'Добавить в контакты' }}
-      </button>
+      <template v-if="user && user.id !== authStore.user?.id">
+        <button
+          v-if="!user.contact_status"
+          class="button"
+          @click="toggleContact"
+          :disabled="isAddition"
+        >
+          Добавить в контакты
+        </button>
+
+        <template v-else>
+          <button
+            v-if="user.contact_status.type === 'accepted'"
+            class="button"
+            @click="toggleContact"
+            :disabled="isAddition"
+          >
+            Удалить из контактов
+          </button>
+
+          <template v-else-if="user.contact_status.type === 'pending'">
+            <template v-if="!user.contact_status.is_sender">
+              <button class="button" @click="acceptContact" :disabled="isAddition">
+                Принять заявку
+              </button>
+              <button class="button danger" @click="toggleContact" :disabled="isAddition">
+                Отклонить заявку
+              </button>
+            </template>
+
+            <button v-else class="button secondary" @click="toggleContact" :disabled="isAddition">
+              Отменить запрос
+            </button>
+          </template>
+        </template>
+      </template>
     </div>
     <div v-if="user && user.id !== authStore.user?.id" class="menu">
       <div v-for="link in menuLinks" :key="link.name" class="list">
@@ -33,11 +61,7 @@ import { useAuthStore } from '@/stores/auth.ts'
 import { useRoute, RouterLink } from 'vue-router'
 import { ref } from 'vue'
 import api from '@/api'
-import { usePhotoStore } from '@/stores/photos.ts'
-import { useVideoStore } from '@/stores/videos.ts'
-
-const photoStore = usePhotoStore()
-const videoStore = useVideoStore()
+import { useNotificationStore } from '@/stores/notifications.ts'
 
 const menuLinks = [
   { name: 'photos', label: 'Фотографии', count: 'photos_count' },
@@ -52,17 +76,55 @@ const props = defineProps<{
 
 const emit = defineEmits(['update-user'])
 
+const notify = useNotificationStore()
 const authStore = useAuthStore()
 const route = useRoute()
 const isAddition = ref(false)
 
-const addContact = async () => {
+const toggleContact = async () => {
   try {
     isAddition.value = true
     const response = await api.post(`/user/${route.params.id}/contact`)
 
-    const updatedUser = { ...props.user, is_contact: response.data.is_contact }
+    const updatedUser = {
+      ...props.user,
+      contact_status: response.data.contact_status,
+      contacts_count: response.data.contacts_count,
+    }
     emit('update-user', updatedUser)
+
+    if (response.data.pending_contacts_count !== undefined) {
+      authStore.setUser({
+        pending_contacts_count: response.data.pending_contacts_count,
+      })
+    }
+
+    if (response.data.message) {
+      notify.show(response.data.message, 'info')
+    }
+    isAddition.value = false
+  } catch (err) {
+    console.error('Ошибка при работе с контактами', err)
+  }
+}
+
+const acceptContact = async () => {
+  try {
+    isAddition.value = true
+    const response = await api.post(`/user/${route.params.id}/contact/accept`)
+
+    const updatedData = response.data
+
+    const updatedUser = {
+      ...props.user,
+      contact_status: updatedData.contact_status,
+      contacts_count: updatedData.contacts_count,
+    }
+    emit('update-user', updatedUser)
+
+    if (updatedData.pending_contacts_count !== undefined) {
+      authStore.setUser({ pending_contacts_count: updatedData.pending_contacts_count })
+    }
     isAddition.value = false
   } catch (err) {
     console.error('Ошибка при работе с контактами', err)

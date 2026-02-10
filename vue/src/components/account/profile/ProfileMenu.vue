@@ -3,7 +3,14 @@
     <ul class="wrapper">
       <li v-for="item in menuItems" :key="item.name" class="item">
         <RouterLink class="link" :to="{ name: item.name, params: { id: myId } }">
-          {{ item.label }}
+          <div class="link-content">
+            {{ item.label }}
+
+            <span v-if="item.countKey && (authStore.user as any)?.[item.countKey]" class="badge">
+              {{ item.countKey === 'pending_contacts_count' ? '+' : '' }}
+              {{ (authStore.user as any)[item.countKey] }}
+            </span>
+          </div>
         </RouterLink>
       </li>
 
@@ -29,8 +36,8 @@ const myId = computed(() => authStore.user?.id)
 
 const menuItems = [
   { name: 'wall', label: 'Мой аккаунт' },
-  { name: 'chats', label: 'Чаты' },
-  { name: 'contacts', label: 'Контакты' },
+  { name: 'chats', label: 'Чаты', countKey: 'unread_messages_count' },
+  { name: 'contacts', label: 'Контакты', countKey: 'pending_contacts_count' },
   { name: 'photos', label: 'Мои фотографии' },
   { name: 'videos', label: 'Мои видеозаписи' },
 ]

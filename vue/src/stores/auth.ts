@@ -20,6 +20,11 @@ export interface AuthUser {
   name: string
   phone: string
   avatar: string | null
+  photos_count?: number
+  videos_count?: number
+  contacts_count?: number
+  pending_contacts_count?: number
+  unread_messages_count?: number
   profile?: Profile
 }
 
@@ -65,7 +70,7 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('user_data')
   }
 
-  const canSee = (targetUser: any, key: string) => {
+  const canSee = (targetUser: any, key: keyof PrivacySettings) => {
     if (!targetUser) return false
 
     if (user.value?.id === targetUser.id) return true
@@ -75,7 +80,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (privacyStatus === 'public') return true
 
     if (privacyStatus === 'contacts_only') {
-      return !!targetUser.is_contact
+      return targetUser.contact_status?.type === 'accepted'
     }
 
     return false
