@@ -1,21 +1,10 @@
 <template>
   <div class="closed">
-    <div class="avatar__container">
-      <div v-if="isLoading || !user?.avatar" class="avatar__wrapper">
-        <div class="avatar__empty"></div>
-      </div>
-      <div v-else class="avatar__wrapper">
-        <img :src="user.avatar" alt="аватар" class="avatar__img" />
-      </div>
-      <button
-        v-if="user && user.id !== authStore.user?.id"
-        class="button"
-        @click="addContact"
-        :disabled="isAddition"
-      >
-        {{ user.is_contact ? 'Удалить из контактов' : 'Добавить в контакты' }}
-      </button>
-    </div>
+    <ProfileAvatar
+      :user="user"
+      :is-loading="isLoading"
+      @update-user="(val) => userStore.setProfile(val)"
+    />
     <div class="info">
       <div v-if="isLoading" class="wrapper">
         <span class="app-loader"></span>
@@ -37,6 +26,8 @@ import { useAuthStore } from '@/stores/auth.ts'
 import { useRoute, RouterLink } from 'vue-router'
 import { ref } from 'vue'
 import api from '@/api'
+import ProfileAvatar from '@/components/account/profile/ProfileAvatar.vue'
+import { useUserStore } from '@/stores/user.ts'
 
 const props = defineProps<{
   user: any
@@ -44,7 +35,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['update-user'])
-
+const userStore = useUserStore()
 const authStore = useAuthStore()
 const route = useRoute()
 const isAddition = ref(false)

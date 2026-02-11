@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import { onMounted, ref, watch, onUnmounted } from 'vue'
 import AppHeader from '@/components/header/AppHeader.vue'
 import AppFooter from '@/components/footer/AppFooter.vue'
@@ -19,6 +19,7 @@ import { usePhotoStore } from '@/stores/photos'
 import NotificationsView from '@/views/NotificationsView.vue'
 import { useNotificationStore } from '@/stores/notifications.ts'
 // import { useChatStore } from '@/stores/chats'
+import { useUserStore } from '@/stores/user'
 
 onMounted(async () => {
   try {
@@ -32,6 +33,8 @@ const authStore = useAuthStore()
 const videoStore = useVideoStore()
 const photoStore = usePhotoStore()
 const notify = useNotificationStore()
+const route = useRoute()
+const userStore = useUserStore()
 
 const setupGlobalListeners = (userId: number | string) => {
   const channel = window.Echo.private(`user.${userId}`)
@@ -48,6 +51,60 @@ const setupGlobalListeners = (userId: number | string) => {
   channel.listen('.NewMessage', (e: any) => {
     // chatStore.addMessage(e.message)
     // if (route.name !== 'chat') toast.info(`Новое сообщение от ${e.message.user.name}`)
+  })
+
+  channel.listen('.contact.request', (e: any) => {
+    notify.show(e.message, 'info')
+
+    if (authStore.user) {
+      authStore.user.pending_contacts_count = (authStore.user.pending_contacts_count || 0) + 1
+      authStore.setUser(authStore.user)
+    }
+
+    if (userStore.profile && Number(userStore.profile.id) === Number(e.senderId)) {
+      userStore.updateStatus({
+        type: 'pending',
+        is_sender: false,
+      })
+    }
+  })
+
+  channel.listen('.contact.accepted', (e: any) => {
+    notify.show(e.message, 'success')
+
+    if (authStore.user) {
+      authStore.user.contacts_count = (authStore.user.contacts_count || 0) + 1
+      authStore.setUser(authStore.user)
+    }
+
+    if (userStore.profile && Number(userStore.profile.id) === Number(e.senderId)) {
+      userStore.updateStatus(
+        { type: 'accepted', is_sender: true },
+        (userStore.profile.contacts_count || 0) + 1,
+      )
+    }
+  })
+
+  channel.listen('.contact.deleted', (e: any) => {
+    if (authStore.user) {
+      if (e.status === 'pending') {
+        notify.show(`${e.senderName} отклонил(а) заявку`, 'info')
+        authStore.user.pending_contacts_count = Math.max(
+          0,
+          (authStore.user.pending_contacts_count || 0) - 1,
+        )
+      } else {
+        notify.show(`${e.senderName} удалился(ась) из контактов`, 'info')
+        authStore.user.contacts_count = Math.max(0, (authStore.user.contacts_count || 0) - 1)
+      }
+      authStore.setUser(authStore.user)
+    }
+
+    if (userStore.profile && Number(userStore.profile.id) === Number(e.senderId)) {
+      const currentCount = userStore.profile.contacts_count || 0
+      const newCount = e.status === 'accepted' ? Math.max(0, currentCount - 1) : currentCount
+      userStore.updateStatus(null, newCount)
+    }
   })
 }
 

@@ -41,11 +41,15 @@ const formatDate = (dateString: string | null) => {
   return new Intl.DateTimeFormat('ru-RU').format(date)
 }
 
-const displayInfo = computed(() => [
-  { title: 'Страна:', value: props.user?.profile?.country },
-  { title: 'Город:', value: props.user?.profile?.city },
-  { title: 'День рождения:', value: formatDate(props.user?.profile?.birthday) },
-])
+const displayInfo = computed(() => {
+  const profile = props.user?.profile
+  if (!profile) return []
+  return [
+    { title: 'Страна:', value: props.user?.profile?.country },
+    { title: 'Город:', value: props.user?.profile?.city },
+    { title: 'День рождения:', value: formatDate(props.user?.profile?.birthday) },
+  ]
+})
 </script>
 
 <style scoped>

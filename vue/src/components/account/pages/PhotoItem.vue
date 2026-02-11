@@ -180,6 +180,7 @@ onUnmounted(() => {
   font-size: 22px;
   font-weight: bold;
   color: #6e2c11;
+  width: 100%;
 }
 
 .arrow-wrapper:active {
