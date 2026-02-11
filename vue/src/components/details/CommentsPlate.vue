@@ -2,8 +2,8 @@
   <div class="comments-list">
     <div v-if="commentStore.isLoading" class="app-loader"></div>
     <template v-else>
-      <CommentItem v-for="item in commentStore.allComments" :key="item.id" :comment="item" />
-      <div v-if="commentStore.allComments.length === 0" class="empty">Комментариев пока нет</div>
+      <CommentItem v-for="item in commentStore.commentTree" :key="item.id" :comment="item" />
+      <div v-if="commentStore.commentTree.length === 0" class="empty">Комментариев пока нет</div>
     </template>
   </div>
 </template>
@@ -31,6 +31,7 @@ const commentStore = useCommentStore()
 .comments-list::-webkit-scrollbar {
   width: 6px;
 }
+
 .comments-list::-webkit-scrollbar-thumb {
   background-color: #6e2c11;
   border-radius: 10px;

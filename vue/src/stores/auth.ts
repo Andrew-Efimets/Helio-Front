@@ -18,7 +18,7 @@ export interface Profile {
 export interface AuthUser {
   id: number
   name: string
-  phone: string
+  phone: string | null
   avatar: string | null
   photos_count?: number
   videos_count?: number

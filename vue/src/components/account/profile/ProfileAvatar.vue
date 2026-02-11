@@ -49,7 +49,10 @@
     <div v-if="user && user.id !== authStore.user?.id" class="menu">
       <div v-for="link in menuLinks" :key="link.name" class="list">
         <RouterLink :to="{ name: link.name }" class="item">
-          {{ link.label }} ({{ props.user[link.count] || 0 }})
+          {{ link.label }}
+          <template v-if="Number(props.user[link.count]) > 0">
+            ({{ props.user[link.count] }})
+          </template>
         </RouterLink>
       </div>
     </div>

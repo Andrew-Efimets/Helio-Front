@@ -8,7 +8,7 @@
       />
       <div class="content">
         <ProfileInfo :user="user" :is-loading="isLoading" />
-        <RouterView v-if="!isLoading" />
+        <RouterView v-if="!isLoading" @refresh-account="fetchAccount" />
       </div>
     </div>
     <div v-else class="wrapper">
@@ -17,6 +17,7 @@
           :user="user"
           :is-loading="isLoading"
           @update-user="(val) => userStore.setProfile(val)"
+          @refresh-account="fetchAccount"
         />
       </div>
     </div>
@@ -67,7 +68,7 @@ const fetchAccount = async () => {
     userStore.setProfile(response.data.data)
 
     if (user.value && Number(user.value.id) === Number(authStore.user?.id)) {
-      authStore.setUser(user.value)
+      authStore.setUser(user.value as any)
     }
   } catch (error) {
     console.error('Ошибка при загрузке профиля:', error)
@@ -77,11 +78,25 @@ const fetchAccount = async () => {
 }
 
 onMounted(fetchAccount)
+
 watch(
   () => route.params.id,
   (newId) => {
     if (newId) {
       userStore.clear()
+      fetchAccount()
+    }
+  },
+)
+
+watch(
+  () => userStore.profile?.contact_status?.type,
+  (newStatus, oldStatus) => {
+    if (newStatus === 'accepted' && oldStatus !== 'accepted') {
+      fetchAccount()
+    }
+
+    if (!newStatus && oldStatus === 'accepted' && user.value?.id !== authStore.user?.id) {
       fetchAccount()
     }
   },

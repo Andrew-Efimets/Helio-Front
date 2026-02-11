@@ -96,4 +96,12 @@ const menuItems = [
   box-shadow: 0 0 10px 3px rgba(196, 114, 51, 0.5);
   border-radius: 5px;
 }
+
+.badge {
+  font-size: 14px;
+  color: #6e2c11;
+  padding: 3px;
+  border-radius: 5px;
+  background-color: #e99a9a;
+}
 </style>

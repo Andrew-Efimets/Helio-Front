@@ -3,6 +3,13 @@
     <h3 class="title">Комментариев: {{ commentStore.totalCount }}</h3>
     <div class="wrapper">
       <CommentsPlate />
+      <div v-if="commentStore.replyTo" class="quote-preview">
+        <div class="quote-content">
+          <span class="quote-author">{{ commentStore.replyTo.user.name }}:</span>
+          <span class="quote-text">{{ commentStore.replyTo.content }}</span>
+        </div>
+        <button class="quote-close" @click="commentStore.clearReply">×</button>
+      </div>
       <MessageInput v-model="commentText" placeholder="Оставить комментарий" @send="saveComment" />
     </div>
   </div>
@@ -61,20 +68,22 @@ const initComments = async (mediaType: string | null, mediaId: any, oldMediaId?:
 
 const saveComment = async (text: string) => {
   const { type, id } = currentMedia.value
+  const replyTo = commentStore.replyTo
 
-  if (!type || !id) return notify.show('Неизвестный объект', 'error')
-  if (!authStore.user?.id) return router.push('/login')
+  const payload = {
+    content: text,
+    parent_id: replyTo ? replyTo.id : null,
+  }
 
   try {
     const { data: axiosData } = await api.post(
       `/user/${targetUserId.value}/${type}/${id}/comments`,
-      {
-        content: text,
-      },
+      payload,
     )
 
     commentText.value = ''
     commentStore.allComments.unshift(axiosData.data)
+    commentStore.clearReply()
   } catch (error) {
     notify.show('Не удалось отправить комментарий', 'error')
   }
@@ -140,5 +149,38 @@ onUnmounted(() => {
   width: 380px;
   box-sizing: border-box;
   overflow: hidden;
+}
+
+.quote-preview {
+  display: flex;
+  align-items: center;
+  background: #f0ccaa;
+  padding: 5px 10px;
+  margin: 0 10px;
+  border-left: 4px solid #6e2c11;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.quote-content {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #6e2c11;
+}
+
+.quote-author {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.quote-close {
+  background: none;
+  border: none;
+  color: #6e2c11;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 10px;
 }
 </style>
