@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import { useCommentStore } from '@/stores/comments'
-import CommentItem from './CommentItem.vue'
+import { useCommentStore } from '@/stores/comments.ts'
+import CommentItem from '@/components/details/media/CommentItem.vue'
 
 const commentStore = useCommentStore()
 </script>

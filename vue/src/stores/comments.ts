@@ -11,17 +11,15 @@ export const useCommentStore = defineStore('comments', () => {
 
   const totalCount = computed(() => allComments.value.length)
 
-  const fetchMediaComments = async (userId: string | number) => {
+  const getParams = () => {
     const id = route.params.videoId || route.params.photoId || route.params.postId
+    const type = route.params.videoId ? 'video' : route.params.photoId ? 'photo' : 'post'
+    return { id, type }
+  }
 
-    const type = route.params.videoId
-      ? 'video'
-      : route.params.photoId
-        ? 'photo'
-        : route.params.postId
-          ? 'post'
-          : ''
-
+  const fetchMediaComments = async (userId: string | number) => {
+    allComments.value = []
+    const { id, type } = getParams()
     if (!id || !type) return
 
     try {
@@ -38,6 +36,30 @@ export const useCommentStore = defineStore('comments', () => {
   }
   const clearReply = () => {
     replyTo.value = null
+  }
+
+  const addComment = async (targetUserId: string | number, text: string) => {
+    const { id, type } = getParams()
+
+    if (!id || !type) return
+
+    const payload = {
+      content: text,
+      parent_id: replyTo.value ? replyTo.value.id : null,
+    }
+
+    try {
+      const { data: axiosData } = await api.post(
+        `/user/${targetUserId}/${type}/${id}/comments`,
+        payload,
+      )
+
+      allComments.value.unshift(axiosData.data)
+      clearReply()
+      return axiosData.data
+    } catch (error) {
+      throw error
+    }
   }
 
   const commentTree = computed(() => {
@@ -65,6 +87,7 @@ export const useCommentStore = defineStore('comments', () => {
     totalCount,
     replyTo,
     commentTree,
+    addComment,
     setReply,
     clearReply,
     fetchMediaComments,

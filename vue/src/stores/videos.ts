@@ -85,6 +85,21 @@ export const useVideoStore = defineStore('videos', () => {
     }
   }
 
+  const deleteVideo = async (userId: string | number, videoId: string | number) => {
+    try {
+      isLoading.value = true
+      await api.delete(`/user/${userId}/video/${videoId}`)
+
+      notify.show('Видео успешно удалено', 'success')
+      return true
+    } catch (error) {
+      notify.show('Не удалось удалить видео', 'error')
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     allVideos,
     isLoading,
@@ -93,6 +108,7 @@ export const useVideoStore = defineStore('videos', () => {
     totalCount,
     fetchVideos,
     fetchVideoById,
+    deleteVideo,
     sendVideo,
     updateVideoInList,
     removeVideoFromStore,

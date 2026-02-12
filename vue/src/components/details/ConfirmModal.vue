@@ -22,10 +22,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 
 const props = defineProps({ isOpen: Boolean })
 const confirmDialog = ref<HTMLDialogElement | null>(null)
+
+onMounted(() => {
+  if (props.isOpen) {
+    confirmDialog.value?.showModal()
+  }
+})
 
 watch(
   () => props.isOpen,

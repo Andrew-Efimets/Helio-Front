@@ -19,7 +19,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import api from '@/api.ts'
 import { useRoute } from 'vue-router'
-import CommentsPlate from '@/components/details/CommentsPlate.vue'
+import CommentsPlate from '@/components/details/media/CommentsPlate.vue'
 import MessageInput from '@/components/details/MessageInput.vue'
 import { useNotificationStore } from '@/stores/notifications.ts'
 import { useAuthStore } from '@/stores/auth.ts'
@@ -67,23 +67,11 @@ const initComments = async (mediaType: string | null, mediaId: any, oldMediaId?:
 }
 
 const saveComment = async (text: string) => {
-  const { type, id } = currentMedia.value
-  const replyTo = commentStore.replyTo
-
-  const payload = {
-    content: text,
-    parent_id: replyTo ? replyTo.id : null,
-  }
+  if (!text.trim()) return
 
   try {
-    const { data: axiosData } = await api.post(
-      `/user/${targetUserId.value}/${type}/${id}/comments`,
-      payload,
-    )
-
+    await commentStore.addComment(targetUserId.value, text)
     commentText.value = ''
-    commentStore.allComments.unshift(axiosData.data)
-    commentStore.clearReply()
   } catch (error) {
     notify.show('Не удалось отправить комментарий', 'error')
   }

@@ -2,7 +2,7 @@
   <dialog ref="dialogRef" class="modal" @click.self="close">
     <div class="content">
       <button class="close-btn" @click="close">×</button>
-      <RouterView name="modal" />
+      <RouterView name="modalMain" />
     </div>
   </dialog>
 </template>

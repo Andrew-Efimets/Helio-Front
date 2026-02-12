@@ -10,9 +10,8 @@ import ChatsList from '@/components/account/pages/ChatsList.vue'
 import ChatWindow from '@/components/account/pages/ChatWindow.vue'
 import ContactsList from '@/components/account/pages/ContactsList.vue'
 import PhotosList from '@/components/account/pages/PhotosList.vue'
-import PhotoItem from '@/components/account/pages/PhotoItem.vue'
 import VideosList from '@/components/account/pages/VideosList.vue'
-import VideoItem from '@/components/account/pages/VideoItem.vue'
+import MediaItem from '@/components/account/pages/MediaItem.vue'
 import UsersListView from '@/views/UsersListView.vue'
 import ProfileSettingsView from '@/views/ProfileSettingsView.vue'
 import ProfileSettings from '@/components/account/settings/ProfileSettings.vue'
@@ -48,7 +47,7 @@ const router = createRouter({
           name: 'login',
           components: {
             default: HomeView,
-            modal: LoginForm,
+            modalMain: LoginForm,
           },
           meta: { isModal: true },
         },
@@ -56,7 +55,7 @@ const router = createRouter({
           path: 'register',
           name: 'register',
           components: {
-            modal: RegisterForm,
+            modalMain: RegisterForm,
           },
           meta: { isModal: true },
         },
@@ -64,7 +63,7 @@ const router = createRouter({
           path: 'verify',
           name: 'verify',
           components: {
-            modal: VerifyForm,
+            modalMain: VerifyForm,
           },
           meta: { isModal: true },
         },
@@ -144,7 +143,7 @@ const router = createRouter({
               name: 'photo',
               components: {
                 default: PhotosList,
-                modal: PhotoItem,
+                modalMain: MediaItem,
               },
               meta: { isModal: true, backTo: 'photos' },
               props: true,
@@ -160,7 +159,7 @@ const router = createRouter({
               name: 'video',
               components: {
                 default: VideosList,
-                modal: VideoItem,
+                modalMain: MediaItem,
               },
               meta: { isModal: true, backTo: 'videos' },
               props: true,
