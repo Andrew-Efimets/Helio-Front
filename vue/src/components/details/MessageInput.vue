@@ -154,7 +154,7 @@ watch(
 .send {
   position: absolute;
   width: 30px;
-  left: 89%;
+  right: 5px;
   bottom: 2px;
 }
 
@@ -185,7 +185,7 @@ watch(
   border: none;
   background: transparent;
   font-size: 20px;
-  right: 89%;
+  left: 5px;
   bottom: 8px;
   cursor: pointer;
 }

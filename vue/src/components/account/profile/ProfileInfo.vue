@@ -61,7 +61,6 @@ const displayInfo = computed(() => {
   display: flex;
   flex-direction: column;
   background-color: #f5ddc5;
-  min-width: 600px;
   min-height: 200px;
 }
 
@@ -80,13 +79,13 @@ const displayInfo = computed(() => {
 }
 
 .item {
-  padding: 20px 0 10px 20px;
+  margin: 20px 0 10px 20px;
   color: #6e2c11;
-  width: 30%;
 }
 
 .list {
   display: flex;
+  column-gap: 20px;
 }
 
 .item-title {
@@ -94,5 +93,11 @@ const displayInfo = computed(() => {
   padding: 20px 0 10px 20px;
   color: #6e2c11;
   width: 30%;
+}
+
+@media screen and (min-width: 768px) {
+  .wrapper {
+    min-width: 400px;
+  }
 }
 </style>

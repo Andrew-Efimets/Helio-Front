@@ -238,4 +238,10 @@ const isChanged = computed(() => {
   align-items: center;
   justify-content: space-between;
 }
+
+@media screen and (max-width: 768px) {
+  .buttons-wrapper {
+    flex-direction: column;
+  }
+}
 </style>

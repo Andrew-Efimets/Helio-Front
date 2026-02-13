@@ -13,11 +13,12 @@
 <style scoped>
 .container {
   padding: 10px 0 10px;
+  width: 100%;
 }
 
 .wrapper {
   background-color: #f5ddc5;
-  min-width: 600px;
+  max-width: 700px;
   min-height: 600px;
   text-align: center;
 }

@@ -75,7 +75,7 @@ onUnmounted(() => {
 <style scoped>
 .wrapper {
   position: relative;
-  margin: 20px;
+  margin: 25px;
   display: flex;
   text-align: center;
   justify-content: center;
@@ -118,9 +118,9 @@ onUnmounted(() => {
 }
 
 .item-wrapper {
-  margin: 20px;
-  width: 600px;
-  height: 600px;
+  margin: 5px;
+  max-width: 600px;
+  max-height: 600px;
   display: flex;
   align-items: center;
   justify-content: center;

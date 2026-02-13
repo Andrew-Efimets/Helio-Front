@@ -45,13 +45,15 @@ const menuItems = [
 
 <style scoped>
 .menu {
-  min-width: 300px;
-  padding: 40px;
+  white-space: nowrap;
+  padding: 40px 0 0 40px;
 }
 
 .wrapper {
   width: 100%;
   list-style: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .wrapper .item:has(.router-link-exact-active) {
@@ -103,5 +105,48 @@ const menuItems = [
   padding: 3px;
   border-radius: 5px;
   background-color: #e99a9a;
+}
+
+@media screen and (max-width: 1024px) {
+  .item {
+    white-space: nowrap;
+    width: fit-content;
+  }
+
+  .wrapper {
+    flex-direction: row;
+    background-color: #f5ddc5;
+  }
+
+  .link {
+    font-size: 16px;
+    padding: 5px 5px;
+  }
+
+  .menu {
+    padding: 40px 0;
+    margin: auto;
+  }
+
+  .separator {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .item {
+  }
+
+  .wrapper {
+    flex-direction: column;
+  }
+
+  .link {
+    font-size: 18px;
+  }
+
+  .separator {
+    display: block;
+  }
 }
 </style>

@@ -18,6 +18,7 @@ body {
 
 .app__container {
   max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
   padding: 0 15px;
   flex-grow: 1;
@@ -38,6 +39,7 @@ body {
   box-shadow: 0 0 3px 3px rgba(190, 127, 25, 0.5);
   background-color: #fee6c4;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .button:active {
@@ -88,4 +90,10 @@ body {
   50%  { content: 'Загрузка..'; }
   75%  { content: 'Загрузка...'; }
   100% { content: 'Загрузка'; }
+}
+
+@media screen and (max-width: 1024px){
+  .app__container {
+    padding: 0 5px;
+  }
 }

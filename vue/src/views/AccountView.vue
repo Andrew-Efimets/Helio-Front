@@ -104,7 +104,26 @@ watch(
 </script>
 
 <style scoped>
+.account {
+  display: flex;
+  width: 100%;
+}
+
 .wrapper {
   display: flex;
+  width: 100%;
+}
+
+.content {
+  flex-grow: 1;
+  max-width: 700px;
+  width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  .wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 </style>

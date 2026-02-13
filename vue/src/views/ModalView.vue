@@ -103,6 +103,7 @@ onMounted(updateModalState)
   padding: 30px;
   position: relative;
   min-width: 400px;
+  width: 100%;
 }
 
 .close-btn {

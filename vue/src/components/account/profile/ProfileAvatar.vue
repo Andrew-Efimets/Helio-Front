@@ -136,6 +136,10 @@ const acceptContact = async () => {
 </script>
 
 <style scoped>
+.avatar {
+  flex-shrink: 0;
+}
+
 .container {
   display: flex;
   flex-direction: column;

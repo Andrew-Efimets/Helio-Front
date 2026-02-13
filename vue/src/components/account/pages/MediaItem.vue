@@ -109,10 +109,20 @@ const deleteMedia = async () => {
   padding: 0 20px;
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 1024px) {
   .container {
     flex-direction: column;
     align-self: center;
+  }
+
+  .media {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .bottom {
+    width: 100%;
   }
 }
 </style>

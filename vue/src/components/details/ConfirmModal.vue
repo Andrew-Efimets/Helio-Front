@@ -103,4 +103,15 @@ defineEmits(['close', 'confirm'])
     opacity: 1;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .main {
+    font-size: 16px;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: center;
+  }
+}
 </style>

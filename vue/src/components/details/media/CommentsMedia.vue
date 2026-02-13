@@ -1,16 +1,22 @@
 <template>
   <div class="container">
     <h3 class="title">Комментариев: {{ commentStore.totalCount }}</h3>
-    <div class="wrapper">
-      <CommentsPlate />
-      <div v-if="commentStore.replyTo" class="quote-preview">
-        <div class="quote-content">
-          <span class="quote-author">{{ commentStore.replyTo.user.name }}:</span>
-          <span class="quote-text">{{ commentStore.replyTo.content }}</span>
+    <div class="content">
+      <div class="wrapper">
+        <CommentsPlate />
+        <div v-if="commentStore.replyTo" class="quote-preview">
+          <div class="quote-content">
+            <span class="quote-author">{{ commentStore.replyTo.user.name }}:</span>
+            <span class="quote-text">{{ commentStore.replyTo.content }}</span>
+          </div>
+          <button class="quote-close" @click="commentStore.clearReply">×</button>
         </div>
-        <button class="quote-close" @click="commentStore.clearReply">×</button>
+        <MessageInput
+          v-model="commentText"
+          placeholder="Оставить комментарий"
+          @send="saveComment"
+        />
       </div>
-      <MessageInput v-model="commentText" placeholder="Оставить комментарий" @send="saveComment" />
     </div>
   </div>
 </template>
@@ -103,8 +109,8 @@ onUnmounted(() => {
 
 <style scoped>
 .container {
-  margin: 20px;
-  max-width: 400px;
+  margin: 10px;
+  width: 360px;
   min-height: 400px;
   max-height: 650px;
   background-color: #f9f2e7;
@@ -125,18 +131,28 @@ onUnmounted(() => {
 }
 
 .wrapper {
-  margin: 10px;
+  margin: 0 10px;
+  padding: 10px;
+  border: #6e2c11 1px solid;
+  border-radius: 8px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   row-gap: 10px;
-  border: #6e2c11 1px solid;
-  border-radius: 8px;
+  flex-grow: 1;
+}
+
+.content {
   min-height: inherit;
   height: 100%;
-  width: 380px;
+  min-width: 300px;
+  width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 .quote-preview {
@@ -170,5 +186,13 @@ onUnmounted(() => {
   font-size: 18px;
   cursor: pointer;
   margin-left: 10px;
+}
+
+@media screen and (max-width: 1024px) {
+  .container {
+    min-height: 200px;
+    max-height: 300px;
+    width: 70%;
+  }
 }
 </style>

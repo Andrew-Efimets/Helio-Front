@@ -1,27 +1,41 @@
 <template>
   <div class="likes">
-    <div class="wrapper">
-      <div class="like">
-        <img
-          :class="{ 'is-active': isLiked }"
-          src="@/assets/like.png"
-          alt="like"
-          class="like-img"
-          @click="toggleLikeComponent"
-        />
+    <div v-if="isOpenList" class="liked-list" ref="likedListRef">
+      <div
+        v-for="like in [...likeStore.allLikes].reverse()"
+        :key="like.user.id"
+        class="liked-list__item"
+      >
+        <img :src="like.user.active_avatar.avatar_url" class="mini-avatar" />
+        <RouterLink :to="{ name: 'wall', params: { id: String(like.user.id) } }" class="link">
+          <p class="user-name">{{ like.user.name }}</p>
+        </RouterLink>
       </div>
-      <div v-if="likeStore.totalCount" class="like-counter">
-        <span class="like-description">
-          Нравится {{ myLikeText }}
-          <template v-if="displayCounter"> {{ displayCounter }} {{ human }} </template>
-        </span>
-        <div v-for="like in likeStore.allLikes" :key="like.id" class="avatar__wrapper">
+    </div>
+    <div class="likes-container">
+      <div class="wrapper">
+        <div class="like">
           <img
-            v-if="like.user?.active_avatar?.avatar_url"
-            :src="like.user.active_avatar.avatar_url"
-            alt="avatar"
-            class="mini-avatar"
+            :class="{ 'is-active': isLiked }"
+            src="@/assets/like.png"
+            alt="like"
+            class="like-img"
+            @click="toggleLikeComponent"
           />
+        </div>
+        <div v-if="likeStore.totalCount" class="like-counter">
+          <span class="like-description" @click="openLikedList" ref="likeDescriptionRef">
+            Нравится {{ myLikeText }}
+            <template v-if="displayCounter"> {{ displayCounter }} {{ human }} </template>
+          </span>
+          <div v-for="like in likeStore.allLikes.slice(-5)" :key="like.id" class="avatar__wrapper">
+            <img
+              v-if="like.user.active_avatar.avatar_url"
+              :src="like.user.active_avatar.avatar_url"
+              alt="avatar"
+              class="mini-avatar avatar-preview"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -32,19 +46,36 @@
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useLikeStore } from '@/stores/likes'
 import { useAuthStore } from '@/stores/auth.ts'
-import { useRoute } from 'vue-router'
+import { useRoute, RouterLink } from 'vue-router'
 
 const likeStore = useLikeStore()
 const authStore = useAuthStore()
 const route = useRoute()
 const optimisticLiked = ref(false)
 const isProcessing = ref(false)
+const isOpenList = ref(false)
 
 const actualIsLiked = computed(() => {
   return likeStore.allLikes.some((like) => like.user_id === authStore.user?.id)
 })
 
 const isLiked = computed(() => (isProcessing.value ? optimisticLiked.value : actualIsLiked.value))
+
+const likedListRef = ref<HTMLElement | null>(null)
+const likeDescriptionRef = ref<HTMLElement | null>(null)
+
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as Node
+
+  if (
+    isOpenList.value &&
+    likedListRef.value &&
+    !likedListRef.value.contains(target) &&
+    !likeDescriptionRef.value?.contains(target)
+  ) {
+    isOpenList.value = false
+  }
+}
 
 const toggleLikeComponent = async () => {
   if (!authStore.user?.id || isProcessing.value) return
@@ -90,9 +121,14 @@ const initEcho = () => {
   })
 }
 
+const openLikedList = () => {
+  isOpenList.value = !isOpenList.value
+}
+
 onMounted(() => {
   loadLikes()
   initEcho()
+  window.addEventListener('click', handleClickOutside, true)
 })
 
 onUnmounted(() => {
@@ -100,6 +136,7 @@ onUnmounted(() => {
   if (window.Echo && id && type) {
     window.Echo.leave(`likes.${type}.${id}`)
   }
+  window.removeEventListener('click', handleClickOutside, true)
 })
 
 watch(
@@ -115,8 +152,12 @@ watch(
 
 <style scoped>
 .likes {
+  width: 60%;
+  position: relative;
+}
+
+.likes-container {
   margin: 10px 20px;
-  width: 50%;
   padding: 10px;
   background-color: #f9f2e7;
   border-radius: 10px;
@@ -125,7 +166,8 @@ watch(
 .wrapper {
   display: flex;
   align-items: center;
-  column-gap: 10px;
+  column-gap: 20px;
+  margin-left: 20px;
 }
 
 .like-img {
@@ -151,6 +193,12 @@ watch(
 .like-description {
   color: #6e2c11;
   margin-right: 20px;
+  cursor: pointer;
+}
+
+.like-description:hover {
+  text-decoration: underline;
+  color: #d87c56;
 }
 
 .avatar__wrapper {
@@ -162,6 +210,52 @@ watch(
   width: 24px;
   height: 24px;
   border-radius: 50%;
+}
+
+.avatar-preview {
   margin-left: -15px;
+}
+
+.liked-list {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  position: absolute;
+  bottom: 100%;
+  left: 25%;
+  background-color: #f9f2e7;
+  padding: 10px;
+  border-radius: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(153, 61, 26, 0.5) transparent;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(110, 44, 17, 0.2);
+}
+
+.liked-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.liked-list__item {
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
+
+.link {
+  text-decoration: none;
+  color: #6e2c11;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 1024px) {
+  .likes {
+    width: 100%;
+  }
 }
 </style>

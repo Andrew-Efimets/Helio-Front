@@ -39,7 +39,7 @@ const emptyMessage = computed(() => (!props.items.length ? props.emptyLabel : pr
 .container {
   background-color: #f5ddc5;
   width: 100%;
-  max-width: 700px;
+
   margin: 0 auto;
   min-height: 600px;
   text-align: center;
@@ -62,7 +62,7 @@ const emptyMessage = computed(() => (!props.items.length ? props.emptyLabel : pr
   font-weight: 700;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .wrapper {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
