@@ -6,6 +6,7 @@
         <h3 class="title">
           {{ !postStore.totalCount ? 'Записей пока нет' : 'Записей: ' + postStore.totalCount }}
         </h3>
+        <PostsList />
       </div>
     </div>
   </div>
@@ -14,9 +15,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth.ts'
+import { usePostStore } from '@/stores/posts.ts'
 import { useRoute } from 'vue-router'
 import PostAddBlock from '@/components/details/posts/PostAddBlock.vue'
-import { usePostStore } from '@/stores/posts.ts'
+import PostsList from '@/components/details/posts/PostsList.vue'
 
 const postStore = usePostStore()
 const authStore = useAuthStore()

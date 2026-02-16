@@ -37,8 +37,8 @@ export const usePostStore = defineStore('posts', () => {
 
       const response = await api.post(`/user/${route.params.id}/post`, formData)
 
-      if (response.data) {
-        allPosts.value.unshift(response.data)
+      if (response.data.data) {
+        allPosts.value.unshift(response.data.data)
       }
     } catch (error: any) {
       console.error(error)
