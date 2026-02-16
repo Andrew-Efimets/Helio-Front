@@ -15,7 +15,7 @@ import ModalView from '@/views/ModalView.vue'
 .content {
   background-image: url('@/assets/background.png');
   background-repeat: no-repeat;
-  background-size: 120%;
+  background-size: 90%;
   background-position: center center;
   min-height: 100vh;
 }

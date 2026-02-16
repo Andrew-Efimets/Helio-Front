@@ -52,7 +52,6 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
 .comment-wrapper {
   display: flex;
   flex-direction: column;
-  width: 100%;
   box-sizing: border-box;
   min-width: 0;
 }
@@ -61,7 +60,7 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
-  width: 100%;
+  flex-wrap: wrap;
 }
 
 .avatar {
@@ -144,13 +143,6 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
   font-size: 13px;
 }
 
-@media (max-width: 350px) {
-  .replies {
-    margin-left: 10px;
-    padding-left: 5px;
-  }
-}
-
 .replies-toggle {
   display: flex;
 }
@@ -172,5 +164,50 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
 
 .button-text:hover {
   background-color: #ead7c3;
+}
+
+@media screen and (max-width: 768px) {
+  .replies {
+    margin-left: 10px;
+    padding-left: 5px;
+  }
+
+  .avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  .replies .avatar {
+    width: 18px;
+    height: 18px;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .author {
+    font-size: 9px;
+  }
+
+  .date {
+    font-size: 9px;
+  }
+
+  .text {
+    font-size: 12px;
+  }
+
+  .quote {
+    font-size: 9px;
+  }
+
+  .replies .text {
+    font-size: 11px;
+  }
+
+  .button-text {
+    font-size: 10px;
+  }
 }
 </style>

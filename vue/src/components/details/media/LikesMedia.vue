@@ -28,13 +28,19 @@
             Нравится {{ myLikeText }}
             <template v-if="displayCounter"> {{ displayCounter }} {{ human }} </template>
           </span>
-          <div v-for="like in likeStore.allLikes.slice(-5)" :key="like.id" class="avatar__wrapper">
-            <img
-              v-if="like.user.active_avatar.avatar_url"
-              :src="like.user.active_avatar.avatar_url"
-              alt="avatar"
-              class="mini-avatar avatar-preview"
-            />
+          <div class="avatars__wrapper">
+            <div
+              v-for="like in likeStore.allLikes.slice(-5)"
+              :key="like.id"
+              class="avatar__wrapper"
+            >
+              <img
+                v-if="like.user.active_avatar.avatar_url"
+                :src="like.user.active_avatar.avatar_url"
+                alt="avatar"
+                class="mini-avatar avatar-preview"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -188,6 +194,7 @@ watch(
   display: flex;
   align-items: center;
   column-gap: 5px;
+  row-gap: 10px;
 }
 
 .like-description {
@@ -199,6 +206,10 @@ watch(
 .like-description:hover {
   text-decoration: underline;
   color: #d87c56;
+}
+
+.avatars__wrapper {
+  display: flex;
 }
 
 .avatar__wrapper {
@@ -213,7 +224,7 @@ watch(
 }
 
 .avatar-preview {
-  margin-left: -15px;
+  margin-left: -10px;
 }
 
 .liked-list {
@@ -256,6 +267,17 @@ watch(
 @media screen and (max-width: 1024px) {
   .likes {
     width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .like-description {
+    font-size: 12px;
+  }
+
+  .like-counter {
+    flex-direction: column;
+    text-align: center;
   }
 }
 </style>

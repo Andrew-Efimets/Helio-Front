@@ -1,26 +1,40 @@
 <template>
   <div class="wall">
     <div class="container">
-      <div class="wrapper">
-        <h3 class="title">СТЕНААААА</h3>
+      <PostAddBlock v-if="isOwner" />
+      <div class="content">
+        <h3 class="title">
+          {{ !postStore.totalCount ? 'Записей пока нет' : 'Записей: ' + postStore.totalCount }}
+        </h3>
       </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth.ts'
+import { useRoute } from 'vue-router'
+import PostAddBlock from '@/components/details/posts/PostAddBlock.vue'
+import { usePostStore } from '@/stores/posts.ts'
+
+const postStore = usePostStore()
+const authStore = useAuthStore()
+const route = useRoute()
+const isOwner = computed(() => Number(authStore.user?.id) === Number(route.params.id))
+</script>
 
 <style scoped>
 .container {
   padding: 10px 0 10px;
   width: 100%;
+  background-color: #f5ddc5;
 }
 
-.wrapper {
-  background-color: #f5ddc5;
+.content {
   max-width: 700px;
   min-height: 600px;
-  text-align: center;
+  margin: 20px;
 }
 
 .title {

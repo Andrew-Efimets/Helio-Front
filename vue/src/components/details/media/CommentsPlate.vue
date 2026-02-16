@@ -17,7 +17,8 @@ const commentStore = useCommentStore()
 
 <style scoped>
 .comments-list {
-  width: 100%;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 10px;
   display: flex;

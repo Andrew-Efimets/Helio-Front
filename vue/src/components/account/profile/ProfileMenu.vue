@@ -1,32 +1,41 @@
 <template>
   <nav v-if="authStore.user?.id" class="menu">
-    <ul class="wrapper">
-      <li v-for="item in menuItems" :key="item.name" class="item">
-        <RouterLink class="link" :to="{ name: item.name, params: { id: myId } }">
-          <div class="link-content">
-            {{ item.label }}
+    <div class="menu__wrapper">
+      <div class="burger__wrapper" @click="openMenu">
+        <img src="@/assets/burger.png" alt="burger" class="burger" />
+      </div>
+      <ul
+        class="links__wrapper"
+        :class="{ 'links__wrapper--open': isOpen }"
+        @click="isOpen = false"
+      >
+        <li v-for="item in menuItems" :key="item.name" class="item">
+          <RouterLink class="link" :to="{ name: item.name, params: { id: myId } }">
+            <div class="link-content">
+              {{ item.label }}
 
-            <span v-if="item.countKey && (authStore.user as any)?.[item.countKey]" class="badge">
-              {{ item.countKey === 'pending_contacts_count' ? '+' : '' }}
-              {{ (authStore.user as any)[item.countKey] }}
-            </span>
-          </div>
-        </RouterLink>
-      </li>
+              <span v-if="item.countKey && (authStore.user as any)?.[item.countKey]" class="badge">
+                {{ item.countKey === 'pending_contacts_count' ? '+' : '' }}
+                {{ (authStore.user as any)[item.countKey] }}
+              </span>
+            </div>
+          </RouterLink>
+        </li>
 
-      <li class="separator"></li>
+        <li class="separator"></li>
 
-      <li class="settings">
-        <RouterLink class="link" :to="{ name: 'settings', params: { id: myId } }">
-          Настройки профиля
-        </RouterLink>
-      </li>
-    </ul>
+        <li class="settings">
+          <RouterLink class="link" :to="{ name: 'settings', params: { id: myId } }">
+            Настройки профиля
+          </RouterLink>
+        </li>
+      </ul>
+    </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.ts'
 
@@ -41,6 +50,11 @@ const menuItems = [
   { name: 'photos', label: 'Мои фотографии' },
   { name: 'videos', label: 'Мои видеозаписи' },
 ]
+
+const isOpen = ref(false)
+const openMenu = () => {
+  isOpen.value = !isOpen.value
+}
 </script>
 
 <style scoped>
@@ -49,26 +63,39 @@ const menuItems = [
   padding: 40px 0 0 40px;
 }
 
-.wrapper {
+.menu__wrapper {
+  display: flex;
+}
+
+.burger__wrapper {
+  display: none;
+}
+
+.burger {
+  width: 40px;
+  height: 40px;
+}
+
+.links__wrapper {
   width: 100%;
   list-style: none;
   display: flex;
   flex-direction: column;
 }
 
-.wrapper .item:has(.router-link-exact-active) {
+.links__wrapper .item:has(.router-link-exact-active) {
   background-color: #f0ccaa;
 }
 
-.wrapper .item:hover:not(:has(.router-link-exact-active)) {
+.links__wrapper .item:hover:not(:has(.router-link-exact-active)) {
   background-color: #ead7c3;
 }
 
-.wrapper .settings:has(.router-link-active) {
+.links__wrapper .settings:has(.router-link-active) {
   background-color: #f0ccaa;
 }
 
-.wrapper .settings:hover:not(:has(.router-link-active)) {
+.links__wrapper .settings:hover:not(:has(.router-link-active)) {
   background-color: #ead7c3;
 }
 
@@ -108,37 +135,40 @@ const menuItems = [
 }
 
 @media screen and (max-width: 1024px) {
-  .item {
-    white-space: nowrap;
-    width: fit-content;
-  }
-
-  .wrapper {
-    flex-direction: row;
-    background-color: #f5ddc5;
-  }
-
-  .link {
-    font-size: 16px;
-    padding: 5px 5px;
-  }
-
   .menu {
-    padding: 40px 0;
-    margin: auto;
+    margin: 20px 20px 40px 40px;
+    width: fit-content;
+    padding: 0;
   }
 
-  .separator {
+  .burger__wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    background-color: #f5ddc5;
+    border-radius: 10px;
+    z-index: 100;
+    box-shadow: 0 4px 15px rgba(110, 44, 17, 0.2);
+  }
+
+  .links__wrapper {
     display: none;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .item {
-  }
-
-  .wrapper {
     flex-direction: column;
+    width: fit-content;
+    position: fixed;
+    padding: 10px;
+    border-radius: 10px;
+    left: 100px;
+    z-index: 80;
+    background-color: #f5ddc5;
+    box-shadow: 0 4px 15px rgba(110, 44, 17, 0.2);
+  }
+
+  .links__wrapper--open {
+    display: flex;
   }
 
   .link {
@@ -147,6 +177,16 @@ const menuItems = [
 
   .separator {
     display: block;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .menu {
+    margin-left: 20px;
+  }
+
+  .links__wrapper {
+    left: 80px;
   }
 }
 </style>

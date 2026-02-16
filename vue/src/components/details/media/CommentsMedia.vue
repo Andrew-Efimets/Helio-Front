@@ -131,6 +131,8 @@ onUnmounted(() => {
 }
 
 .wrapper {
+  flex: 1;
+  min-height: 0;
   margin: 0 10px;
   padding: 10px;
   border: #6e2c11 1px solid;
@@ -140,11 +142,11 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: flex-end;
   row-gap: 10px;
-  flex-grow: 1;
 }
 
 .content {
-  min-height: inherit;
+  flex: 1;
+  min-height: 0;
   height: 100%;
   min-width: 300px;
   width: 100%;
@@ -193,6 +195,16 @@ onUnmounted(() => {
     min-height: 200px;
     max-height: 300px;
     width: 70%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    width: 100%;
+  }
+
+  .content {
+    min-width: 100px;
   }
 }
 </style>

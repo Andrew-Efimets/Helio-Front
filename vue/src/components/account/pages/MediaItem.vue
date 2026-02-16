@@ -125,4 +125,10 @@ const deleteMedia = async () => {
     width: 100%;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .bottom {
+    flex-direction: column;
+  }
+}
 </style>

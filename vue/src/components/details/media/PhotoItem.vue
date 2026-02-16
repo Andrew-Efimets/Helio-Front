@@ -134,7 +134,7 @@ onUnmounted(() => {
   object-fit: contain;
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
   .item {
     margin: 0 auto;
   }
@@ -156,8 +156,8 @@ onUnmounted(() => {
   }
 
   .item-wrapper {
-    width: 90vw;
-    height: 90vw;
+    max-width: 400px;
+    max-height: 400px;
     margin: 10px auto;
   }
 }

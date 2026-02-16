@@ -137,7 +137,7 @@ watch(
   background: transparent;
   width: 100%;
   max-height: 300px;
-  padding: 10px 40px 10px 40px;
+  padding: 10px 40px;
   border: #6e2c11 1px solid;
   border-radius: 8px;
   color: #6e2c11;
@@ -188,5 +188,23 @@ watch(
   left: 5px;
   bottom: 8px;
   cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .input {
+    font-size: 10px;
+    line-height: 18px;
+    padding: 9px 30px;
+  }
+
+  .send {
+    width: 20px;
+    bottom: 5px;
+  }
+
+  .emoji__button {
+    font-size: 16px;
+    margin-bottom: 2px;
+  }
 }
 </style>
