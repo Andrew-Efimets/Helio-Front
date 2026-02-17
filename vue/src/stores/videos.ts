@@ -12,7 +12,7 @@ export const useVideoStore = defineStore('videos', () => {
   const route = useRoute()
   const uploadProgress = ref(0)
 
-  const totalCount = computed(() => allVideos.length)
+  const totalCount = computed(() => allVideos.value.length)
 
   const fetchVideos = async (userId: string | number) => {
     try {

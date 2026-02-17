@@ -5,12 +5,12 @@ import { useRoute } from 'vue-router'
 import { useNotificationStore } from '@/stores/notifications.ts'
 
 export const usePostStore = defineStore('posts', () => {
-  const allPosts = ref<any[]>([])
+  const allPosts = ref<{ data: any[] }>({ data: [] })
   const isLoading = ref(false)
   const route = useRoute()
   const notify = useNotificationStore()
 
-  const totalCount = computed(() => allPosts.length)
+  const totalCount = computed(() => allPosts.value.data.length)
 
   const fetchPosts = async (userId: string | number) => {
     try {
@@ -38,7 +38,7 @@ export const usePostStore = defineStore('posts', () => {
       const response = await api.post(`/user/${route.params.id}/post`, formData)
 
       if (response.data.data) {
-        allPosts.value.unshift(response.data.data)
+        allPosts.value.data.unshift(response.data.data)
       }
     } catch (error: any) {
       console.error(error)
@@ -56,11 +56,11 @@ export const usePostStore = defineStore('posts', () => {
         content: content,
       })
 
-      const updatedPost = response.data
+      const updatedPost = response.data.data
 
-      const index = allPosts.value.findIndex((p) => p.id === postId)
+      const index = allPosts.value.data.findIndex((p) => p.id === postId)
       if (index !== -1) {
-        allPosts.value[index] = updatedPost
+        allPosts.value.data[index] = updatedPost
       }
     } catch (error: any) {
       notify.show('Не удалось обновить запись', 'error')
@@ -75,7 +75,7 @@ export const usePostStore = defineStore('posts', () => {
       isLoading.value = true
       await api.delete(`/user/${route.params.id}/post/${postId}`)
 
-      allPosts.value = allPosts.value.filter((post) => post.id !== postId)
+      allPosts.value.data = allPosts.value.data.filter((post) => post.id !== postId)
 
       notify.show('Запись удалена', 'success')
       return true

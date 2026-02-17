@@ -3,10 +3,21 @@
     <div class="container">
       <PhotoItem v-if="mediaType === 'photo'" />
       <VideoItem v-if="mediaType === 'video'" />
-      <CommentsMedia />
+      <CommentsMedia
+        v-if="mediaId && mediaType"
+        :key="`${mediaType}-${mediaId}`"
+        :media-id="mediaId"
+        :media-type="mediaType"
+        :owner-id="ownerId"
+      />
     </div>
     <div class="bottom">
-      <LikesMedia />
+      <LikesMedia
+        v-if="mediaId && mediaType"
+        :media-id="mediaId"
+        :media-type="mediaType"
+        :owner-id="ownerId"
+      />
       <button
         v-if="isOwner"
         class="button button--danger"
@@ -56,6 +67,16 @@ const mediaType = computed(() => {
   return null
 })
 
+const mediaId = computed(() => {
+  const id = route.params.videoId || route.params.photoId
+  return Array.isArray(id) ? id[0] : String(id || '')
+})
+
+const ownerId = computed((): string => {
+  const id = route.params.id
+  const rawId = Array.isArray(id) ? id[0] : id
+  return String(rawId || '')
+})
 const isOwner = computed(() => Number(authStore.user?.id) === Number(route.params.id))
 const isLoading = computed(() => videoStore.isLoading || photoStore.isLoading)
 

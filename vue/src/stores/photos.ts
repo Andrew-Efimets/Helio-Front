@@ -11,7 +11,7 @@ export const usePhotoStore = defineStore('photos', () => {
   const route = useRoute()
   const notify = useNotificationStore()
 
-  const totalCount = computed(() => allPhotos.length)
+  const totalCount = computed(() => allPhotos.value.length)
 
   const getPhotoIndexById = (photoId: string | number) => {
     return allPhotos.value.findIndex((p) => Number(p.id) === Number(photoId))

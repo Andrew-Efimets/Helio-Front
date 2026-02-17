@@ -1,54 +1,49 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import api from '@/api'
-import { useRoute } from 'vue-router'
 
 export const useLikeStore = defineStore('likes', () => {
-  const route = useRoute()
+  const likesMap = ref<Record<string, any[]>>({})
   const isLoading = ref(false)
-  const allLikes = ref<any[]>([])
 
-  const totalCount = computed(() => allLikes.value.length)
-
-  const getParams = () => {
-    const id = route.params.videoId || route.params.photoId || route.params.postId
-    const type = route.params.videoId ? 'video' : route.params.photoId ? 'photo' : 'post'
-    return { id, type }
+  const getLikes = (type: string, id: string | number) => {
+    return likesMap.value[`${type}_${id}`] || null
   }
 
-  const fetchMediaLikes = async (userId: string | number) => {
-    allLikes.value = []
-    const { id, type } = getParams()
-
-    if (!id || !type) return
-
+  const fetchMediaLikes = async (userId: string | number, type: string, id: string | number) => {
+    const key = `${type}_${id}`
     try {
       isLoading.value = true
       const response = await api.get(`/user/${userId}/${type}/${id}/likes`)
-      allLikes.value = response.data.data
+      likesMap.value[key] = response.data.data
     } finally {
       isLoading.value = false
     }
   }
 
-  const toggleLike = async (userId: string | number) => {
-    const { id, type } = getParams()
-    if (!id || !type) return
+  const updateLikesFromSocket = (type: string, id: string | number, likes: any[]) => {
+    likesMap.value[`${type}_${id}`] = likes
+  }
 
+  const toggleLike = async (userId: string | number, type: string, id: string | number) => {
+    const key = `${type}_${id}`
     try {
+      isLoading.value = true
       const response = await api.post(`/user/${userId}/${type}/${id}/likes`)
-      allLikes.value = response.data.data
+      likesMap.value[key] = response.data.likes
+      isLoading.value = false
     } catch (error) {
+      isLoading.value = false
       throw error
     }
   }
 
   return {
-    allLikes,
+    likesMap,
     isLoading,
-    totalCount,
-    getParams,
-    toggleLike,
+    getLikes,
     fetchMediaLikes,
+    updateLikesFromSocket,
+    toggleLike,
   }
 })

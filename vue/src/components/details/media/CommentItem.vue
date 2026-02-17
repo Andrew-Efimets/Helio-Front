@@ -160,6 +160,7 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
   font-size: 12px;
   padding: 5px 10px;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .button-text:hover {

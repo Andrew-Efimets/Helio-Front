@@ -32,14 +32,15 @@ const sortedItems = computed(() =>
   ),
 )
 
-const emptyMessage = computed(() => (!props.items.length ? props.emptyLabel : props.activeLabel))
+const emptyMessage = computed(() =>
+  !props.items.length ? props.emptyLabel : `${props.activeLabel}: ${props.items.length}`,
+)
 </script>
 
 <style scoped>
 .container {
   background-color: #f5ddc5;
   width: 100%;
-
   margin: 0 auto;
   min-height: 600px;
   text-align: center;
@@ -56,6 +57,7 @@ const emptyMessage = computed(() => (!props.items.length ? props.emptyLabel : pr
 .notify-wrapper {
   padding: 10px;
 }
+
 .notify {
   color: #6e2c11;
   font-size: 18px;

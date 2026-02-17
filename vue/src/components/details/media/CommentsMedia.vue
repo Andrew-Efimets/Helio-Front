@@ -1,9 +1,9 @@
 <template>
   <div class="container">
-    <h3 class="title">Комментариев: {{ commentStore.totalCount }}</h3>
+    <h3 class="title">Комментариев: {{ totalCount }}</h3>
     <div class="content">
       <div class="wrapper">
-        <CommentsPlate />
+        <CommentsPlate :tree="currentCommentsTree" />
         <div v-if="commentStore.replyTo" class="quote-preview">
           <div class="quote-content">
             <span class="quote-author">{{ commentStore.replyTo.user.name }}:</span>
@@ -22,87 +22,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import api from '@/api.ts'
-import { useRoute } from 'vue-router'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import CommentsPlate from '@/components/details/media/CommentsPlate.vue'
 import MessageInput from '@/components/details/MessageInput.vue'
 import { useNotificationStore } from '@/stores/notifications.ts'
-import { useAuthStore } from '@/stores/auth.ts'
 import { useCommentStore } from '@/stores/comments.ts'
-import router from '@/router'
+
+const props = defineProps<{
+  mediaId: number | string
+  mediaType: 'post' | 'photo' | 'video'
+  ownerId: number | string
+}>()
 
 const notify = useNotificationStore()
 const commentText = ref('')
-const route = useRoute()
-const authStore = useAuthStore()
 const commentStore = useCommentStore()
 
-const currentMedia = computed(() => {
-  const videoId = route.params.videoId
-  const photoId = route.params.photoId
-  const postId = route.params.postId
+const currentCommentsTree = computed(() =>
+  commentStore.getCommentTree(props.mediaType, props.mediaId),
+)
+const totalCount = computed(() => commentStore.getComments(props.mediaType, props.mediaId).length)
 
-  if (videoId) return { type: 'video', id: videoId }
-  if (photoId) return { type: 'photo', id: photoId }
-  if (postId) return { type: 'post', id: postId }
-
-  return { type: null, id: null }
-})
-
-const targetUserId = computed(() => String(route.params.id || ''))
-const commentsCount = computed(() => commentStore.allComments.length)
-
-const initComments = async (mediaType: string | null, mediaId: any, oldMediaId?: any) => {
-  if (!mediaId || !mediaType || !targetUserId.value) return
-
-  await commentStore.fetchMediaComments(targetUserId.value)
+const initComments = async () => {
+  await commentStore.fetchMediaComments(props.ownerId, props.mediaType, props.mediaId)
 
   if (window.Echo) {
-    if (oldMediaId) {
-      window.Echo.leave(`comments.${mediaType}.${oldMediaId}`)
-    }
-
-    window.Echo.channel(`comments.${mediaType}.${mediaId}`).listen('CommentCreated', (e: any) => {
-      const isDuplicate = commentStore.allComments.some((c) => c.id === e.comment.id)
-      if (!isDuplicate) {
-        commentStore.allComments.unshift(e.comment)
-      }
-    })
+    window.Echo.channel(`comments.${props.mediaType}.${props.mediaId}`).listen(
+      'CommentCreated',
+      (e: any) => {
+        commentStore.addEchoComment(e.comment, props.mediaType, props.mediaId)
+      },
+    )
   }
 }
 
 const saveComment = async (text: string) => {
   if (!text.trim()) return
-
   try {
-    await commentStore.addComment(targetUserId.value, text)
+    await commentStore.addComment(props.ownerId, text, props.mediaType, props.mediaId)
     commentText.value = ''
   } catch (error) {
     notify.show('Не удалось отправить комментарий', 'error')
   }
 }
 
-watch(
-  () => currentMedia.value.id,
-  (newId, oldId) => {
-    if (newId) {
-      initComments(currentMedia.value.type, newId, oldId)
-    }
-  },
-)
-
 onMounted(() => {
-  const { type, id } = currentMedia.value
-  if (id) {
-    initComments(type, id)
-  }
+  initComments()
 })
 
 onUnmounted(() => {
-  const { type, id } = currentMedia.value
-  if (type && id && window.Echo) {
-    window.Echo.leave(`comments.${type}.${id}`)
+  if (window.Echo) {
+    window.Echo.leave(`comments.${props.mediaType}.${props.mediaId}`)
   }
 })
 </script>
@@ -122,7 +92,6 @@ onUnmounted(() => {
 
 .title {
   border-radius: 10px 10px 0 0;
-  background-color: #f0ccaa;
   width: 100%;
   padding: 5px 10px;
   font-size: 16px;
@@ -152,7 +121,7 @@ onUnmounted(() => {
   width: 100%;
   box-sizing: border-box;
   overflow: hidden;
-  margin: 10px;
+  margin: 10px 0;
   display: flex;
   flex-direction: column;
 }

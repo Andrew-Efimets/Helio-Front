@@ -7,7 +7,7 @@
       :items="photoStore.allPhotos"
       :is-loading="photoStore.isLoading"
       empty-label="Фотографий пока нет"
-      active-label="Фотографии"
+      active-label="Фотографий"
     >
       <template #header>
         <MediaAddBlock

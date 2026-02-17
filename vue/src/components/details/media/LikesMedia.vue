@@ -1,11 +1,7 @@
 <template>
   <div class="likes">
     <div v-if="isOpenList" class="liked-list" ref="likedListRef">
-      <div
-        v-for="like in [...likeStore.allLikes].reverse()"
-        :key="like.user.id"
-        class="liked-list__item"
-      >
+      <div v-for="like in [...currentLikes].reverse()" :key="like.user.id" class="liked-list__item">
         <img :src="like.user.active_avatar.avatar_url" class="mini-avatar" />
         <RouterLink :to="{ name: 'wall', params: { id: String(like.user.id) } }" class="link">
           <p class="user-name">{{ like.user.name }}</p>
@@ -16,63 +12,68 @@
       <div class="wrapper">
         <div class="like">
           <img
-            :class="{ 'is-active': isLiked }"
+            :class="{ 'is-active': isLikedLocal }"
             src="@/assets/like.png"
             alt="like"
             class="like-img"
             @click="toggleLikeComponent"
           />
         </div>
-        <div v-if="likeStore.totalCount" class="like-counter">
-          <span class="like-description" @click="openLikedList" ref="likeDescriptionRef">
-            Нравится {{ myLikeText }}
-            <template v-if="displayCounter"> {{ displayCounter }} {{ human }} </template>
-          </span>
-          <div class="avatars__wrapper">
-            <div
-              v-for="like in likeStore.allLikes.slice(-5)"
-              :key="like.id"
-              class="avatar__wrapper"
-            >
-              <img
-                v-if="like.user.active_avatar.avatar_url"
-                :src="like.user.active_avatar.avatar_url"
-                alt="avatar"
-                class="mini-avatar avatar-preview"
-              />
+        <template v-if="isDataLoaded">
+          <div v-if="totalCount" class="like-counter">
+            <span class="like-description" @click="openLikedList" ref="likeDescriptionRef">
+              Нравится {{ myLikeText }}
+              <template v-if="displayCounter"> {{ displayCounter }} {{ human }} </template>
+            </span>
+            <div class="avatars__wrapper">
+              <div v-for="like in currentLikes.slice(-5)" :key="like.id" class="avatar__wrapper">
+                <img
+                  v-if="like.user.active_avatar.avatar_url"
+                  :src="like.user.active_avatar.avatar_url"
+                  alt="avatar"
+                  class="mini-avatar avatar-preview"
+                />
+              </div>
             </div>
           </div>
-        </div>
+          <span v-else class="like-empty"> Оценить </span>
+        </template>
+        <span v-else class="app-mini-loader"></span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useLikeStore } from '@/stores/likes'
 import { useAuthStore } from '@/stores/auth.ts'
-import { useRoute, RouterLink } from 'vue-router'
+import { RouterLink } from 'vue-router'
+
+const props = defineProps<{
+  mediaId: string | number
+  mediaType: 'post' | 'photo' | 'video'
+  ownerId: string | number
+}>()
 
 const likeStore = useLikeStore()
 const authStore = useAuthStore()
-const route = useRoute()
-const optimisticLiked = ref(false)
-const isProcessing = ref(false)
 const isOpenList = ref(false)
+const currentLikes = computed(() => likeStore.getLikes(props.mediaType, props.mediaId))
+const isDataLoaded = computed(() => currentLikes.value !== null)
+const totalCount = computed(() => (currentLikes.value ? currentLikes.value.length : 0))
 
 const actualIsLiked = computed(() => {
-  return likeStore.allLikes.some((like) => like.user_id === authStore.user?.id)
+  if (!currentLikes.value) return false
+  return currentLikes.value.some((like) => Number(like.user_id) === Number(authStore.user?.id))
 })
-
-const isLiked = computed(() => (isProcessing.value ? optimisticLiked.value : actualIsLiked.value))
 
 const likedListRef = ref<HTMLElement | null>(null)
 const likeDescriptionRef = ref<HTMLElement | null>(null)
+const isLikedLocal = ref(actualIsLiked.value)
 
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as Node
-
   if (
     isOpenList.value &&
     likedListRef.value &&
@@ -83,29 +84,28 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
-const toggleLikeComponent = async () => {
-  if (!authStore.user?.id || isProcessing.value) return
+watch(actualIsLiked, (newVal) => {
+  isLikedLocal.value = newVal
+})
 
-  optimisticLiked.value = !actualIsLiked.value
-  isProcessing.value = true
+const toggleLikeComponent = async () => {
+  if (!authStore.user?.id) return
+
+  const previousState = isLikedLocal.value
+
+  isLikedLocal.value = !isLikedLocal.value
 
   try {
-    await likeStore.toggleLike(authStore.user.id)
+    await likeStore.toggleLike(props.ownerId, props.mediaType, props.mediaId)
   } catch (error) {
-    console.error('Ошибка при лайке:', error)
-  } finally {
-    isProcessing.value = false
+    isLikedLocal.value = previousState
+    console.error(error)
   }
 }
 
 const myLikeText = computed(() => {
   if (!actualIsLiked.value) return ''
-  return likeStore.totalCount > 1 ? 'вам и ещё ' : 'вам'
-})
-
-const displayCounter = computed(() => {
-  if (actualIsLiked.value && likeStore.totalCount === 1) return 0
-  return actualIsLiked.value ? likeStore.totalCount - 1 : likeStore.totalCount
+  return totalCount.value > 1 ? 'вам и ещё ' : 'вам'
 })
 
 const human = computed(() => {
@@ -113,17 +113,16 @@ const human = computed(() => {
   return count % 10 === 1 && count % 100 !== 11 ? 'человеку' : 'людям'
 })
 
-const loadLikes = () => {
-  const ownerId = route.params.id as string
-  if (ownerId) likeStore.fetchMediaLikes(ownerId)
-}
+const displayCounter = computed(() => {
+  const count = actualIsLiked.value ? totalCount.value - 1 : totalCount.value
+  return count > 0 ? count : null
+})
 
 const initEcho = () => {
-  const { id, type } = likeStore.getParams()
-  if (!window.Echo || !id || !type) return
-
-  window.Echo.channel(`likes.${type}.${id}`).listen('LikesUpdate', (e) => {
-    likeStore.allLikes = e.likes
+  if (!window.Echo) return
+  const channelName = `likes.${props.mediaType}.${props.mediaId}`
+  window.Echo.channel(channelName).listen('LikesUpdate', (e: any) => {
+    likeStore.updateLikesFromSocket(props.mediaType, props.mediaId, e.likes)
   })
 }
 
@@ -131,29 +130,34 @@ const openLikedList = () => {
   isOpenList.value = !isOpenList.value
 }
 
+watch(
+  () => props.mediaId,
+  async (newId, oldId) => {
+    if (window.Echo && oldId) {
+      window.Echo.leave(`likes.${props.mediaType}.${oldId}`)
+    }
+
+    likeStore.likesMap[`${props.mediaType}_${newId}`] = null as any
+
+    isLikedLocal.value = false
+    await likeStore.fetchMediaLikes(props.ownerId, props.mediaType, newId)
+
+    isLikedLocal.value = actualIsLiked.value
+    initEcho()
+  },
+  { immediate: true },
+)
+
 onMounted(() => {
-  loadLikes()
-  initEcho()
   window.addEventListener('click', handleClickOutside, true)
 })
 
 onUnmounted(() => {
-  const { id, type } = likeStore.getParams()
-  if (window.Echo && id && type) {
-    window.Echo.leave(`likes.${type}.${id}`)
+  if (window.Echo) {
+    window.Echo.leave(`likes.${props.mediaType}.${props.mediaId}`)
   }
   window.removeEventListener('click', handleClickOutside, true)
 })
-
-watch(
-  () => [route.params.videoId, route.params.photoId],
-  () => {
-    const { id, type } = likeStore.getParams()
-    window.Echo.leave(`likes.${type}.${id}`)
-    loadLikes()
-    initEcho()
-  },
-)
 </script>
 
 <style scoped>
@@ -201,6 +205,11 @@ watch(
   color: #6e2c11;
   margin-right: 20px;
   cursor: pointer;
+}
+
+.like-empty {
+  color: #6e2c11;
+  margin-right: 20px;
 }
 
 .like-description:hover {

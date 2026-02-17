@@ -7,7 +7,7 @@
       :items="videoStore.allVideos"
       :is-loading="videoStore.isLoading"
       empty-label="Видеозаписей пока нет"
-      active-label="Видеозаписи"
+      active-label="Видеозаписей"
     >
       <template #header>
         <MediaAddBlock

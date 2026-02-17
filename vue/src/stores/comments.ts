@@ -1,48 +1,34 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import api from '@/api'
-import { useRoute } from 'vue-router'
 
 export const useCommentStore = defineStore('comments', () => {
-  const allComments = ref<any[]>([])
+  const commentsMap = ref<Record<string, any[]>>({})
   const isLoading = ref(false)
-  const route = useRoute()
   const replyTo = ref<any>(null)
 
-  const totalCount = computed(() => allComments.value.length)
-
-  const getParams = () => {
-    const id = route.params.videoId || route.params.photoId || route.params.postId
-    const type = route.params.videoId ? 'video' : route.params.photoId ? 'photo' : 'post'
-    return { id, type }
+  const getComments = (type: string, id: string | number) => {
+    return commentsMap.value[`${type}_${id}`] || []
   }
 
-  const fetchMediaComments = async (userId: string | number) => {
-    allComments.value = []
-    const { id, type } = getParams()
-    if (!id || !type) return
-
+  const fetchMediaComments = async (userId: string | number, type: string, id: string | number) => {
+    const key = `${type}_${id}`
     try {
       isLoading.value = true
       const response = await api.get(`/user/${userId}/${type}/${id}/comments`)
-      allComments.value = response.data.data
+      commentsMap.value[key] = response.data.data
     } finally {
       isLoading.value = false
     }
   }
 
-  const setReply = (comment: any) => {
-    replyTo.value = comment
-  }
-  const clearReply = () => {
-    replyTo.value = null
-  }
-
-  const addComment = async (targetUserId: string | number, text: string) => {
-    const { id, type } = getParams()
-
-    if (!id || !type) return
-
+  const addComment = async (
+    targetUserId: string | number,
+    text: string,
+    type: string,
+    id: string | number,
+  ) => {
+    const key = `${type}_${id}`
     const payload = {
       content: text,
       parent_id: replyTo.value ? replyTo.value.id : null,
@@ -54,7 +40,9 @@ export const useCommentStore = defineStore('comments', () => {
         payload,
       )
 
-      allComments.value.unshift(axiosData.data)
+      if (!commentsMap.value[key]) commentsMap.value[key] = []
+      commentsMap.value[key].unshift(axiosData.data)
+
       clearReply()
       return axiosData.data
     } catch (error) {
@@ -62,11 +50,22 @@ export const useCommentStore = defineStore('comments', () => {
     }
   }
 
-  const commentTree = computed(() => {
+  const addEchoComment = (comment: any, type: string, id: string | number) => {
+    const key = `${type}_${id}`
+    if (!commentsMap.value[key]) commentsMap.value[key] = []
+
+    const isDuplicate = commentsMap.value[key].some((c) => c.id === comment.id)
+    if (!isDuplicate) {
+      commentsMap.value[key].unshift(comment)
+    }
+  }
+
+  const getCommentTree = (type: string, id: string | number) => {
+    const comments = getComments(type, id)
     const map = new Map()
     const tree: any[] = []
 
-    allComments.value.forEach((comment) => {
+    comments.forEach((comment) => {
       map.set(comment.id, { ...comment, replies: [] })
     })
 
@@ -77,17 +76,20 @@ export const useCommentStore = defineStore('comments', () => {
         tree.push(comment)
       }
     })
-
     return tree
-  })
+  }
+
+  const setReply = (comment: any) => (replyTo.value = comment)
+  const clearReply = () => (replyTo.value = null)
 
   return {
-    allComments,
+    commentsMap,
     isLoading,
-    totalCount,
     replyTo,
-    commentTree,
+    getComments,
+    getCommentTree,
     addComment,
+    addEchoComment,
     setReply,
     clearReply,
     fetchMediaComments,
