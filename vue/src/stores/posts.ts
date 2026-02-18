@@ -10,31 +10,53 @@ export const usePostStore = defineStore('posts', () => {
     total: 0,
   })
   const isLoading = ref(false)
+  const isSubmitting = ref(false)
   const route = useRoute()
   const notify = useNotificationStore()
+  const currentPage = ref(1)
+  const lastPage = ref(1)
 
   const totalCount = computed(() => {
     return allPosts.value.total ?? allPosts.value.data.length
   })
 
-  const fetchPosts = async (userId: string | number) => {
+  const fetchPosts = async (userId: string | number, append = false) => {
+    if (isSubmitting.value) return
     try {
-      isLoading.value = true
-      const response = await api.get(`/user/${userId}/posts`)
+      if (!append) currentPage.value = 1
+      isSubmitting.value = true
+      const response = await api.get(`/user/${userId}/posts?page=${currentPage.value}`)
       const result = response.data.data
 
-      if (result.data) {
-        allPosts.value.data = result.data
-        allPosts.value.total = result.total
+      if (append) {
+        const newPosts = result.data.filter(
+          (newPost: any) => !allPosts.value.data.some((existing) => existing.id === newPost.id),
+        )
+        allPosts.value.data = [...allPosts.value.data, ...newPosts]
       } else {
-        allPosts.value.data = result
+        allPosts.value.data = result.data
       }
+
+      allPosts.value.total = result.total
+      lastPage.value = result.last_page
     } catch (error) {
       console.error('Ошибка загрузки записи:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isSubmitting.value = false
     }
+  }
+
+  const loadMore = async (userId: string | number) => {
+    if (currentPage.value < lastPage.value && !isLoading.value) {
+      currentPage.value++
+      await fetchPosts(userId, true)
+    }
+  }
+
+  const resetPagination = () => {
+    currentPage.value = 1
+    allPosts.value = { data: [], total: 0 }
   }
 
   const createPost = async (postData: { content: string; image: File | null }) => {
@@ -73,10 +95,10 @@ export const usePostStore = defineStore('posts', () => {
       })
 
       const updatedPost = response.data.data
-
       const index = allPosts.value.data.findIndex((p) => p.id === postId)
+
       if (index !== -1) {
-        allPosts.value.data[index] = updatedPost
+        allPosts.value.data.splice(index, 1, updatedPost)
       }
     } catch (error: any) {
       notify.show('Не удалось обновить запись', 'error')
@@ -92,6 +114,9 @@ export const usePostStore = defineStore('posts', () => {
       await api.delete(`/user/${route.params.id}/post/${postId}`)
 
       allPosts.value.data = allPosts.value.data.filter((post) => post.id !== postId)
+      if (typeof allPosts.value.total === 'number') {
+        allPosts.value.total--
+      }
 
       notify.show('Запись удалена', 'success')
       return true
@@ -104,13 +129,52 @@ export const usePostStore = defineStore('posts', () => {
     }
   }
 
+  const handleSocketEvent = (e: any, type: 'upsert' | 'delete') => {
+    const postData = e.post || e
+    const posts = allPosts.value.data
+    const index = posts.findIndex((p) => Number(p.id) === Number(postData.id))
+
+    if (type === 'delete') {
+      if (index !== -1) {
+        posts.splice(index, 1)
+        allPosts.value.total--
+      }
+      return
+    }
+
+    if (index !== -1) {
+      Object.assign(posts[index], postData)
+    } else {
+      posts.unshift(postData)
+      allPosts.value.total++
+    }
+  }
+
+  const listenForUpdates = (userId: string | number) => {
+    if (!window.Echo) return
+    ;(window as any).Echo.channel(`posts.${userId}`)
+      .listen('.PostCreated', (e: any) => handleSocketEvent(e, 'upsert'))
+      .listen('.PostUpdated', (e: any) => handleSocketEvent(e, 'upsert'))
+      .listen('.PostDeleted', (e: any) => handleSocketEvent(e, 'delete'))
+  }
+
+  const stopListening = (userId: string | number) => {
+    ;(window as any).Echo?.leave(`posts.${userId}`)
+  }
+
   return {
     allPosts,
     isLoading,
+    isSubmitting,
     totalCount,
+    currentPage,
+    listenForUpdates,
+    stopListening,
     fetchPosts,
     createPost,
     updatePost,
     deletePost,
+    loadMore,
+    resetPagination,
   }
 })

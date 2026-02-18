@@ -37,6 +37,7 @@
               :key="like.id"
               class="avatar__wrapper"
               @click="openLikedList"
+              ref="avatarsRef"
             >
               <img
                 v-if="like.user.active_avatar.avatar_url"
@@ -79,6 +80,7 @@ const actualIsLiked = computed(() => {
   return currentLikes.value.some((like) => Number(like.user_id) === Number(authStore.user?.id))
 })
 
+const avatarsRef = ref<HTMLElement | null>(null)
 const likedListRef = ref<HTMLElement | null>(null)
 const likeDescriptionRef = ref<HTMLElement | null>(null)
 const isLikedLocal = ref(actualIsLiked.value)
@@ -89,7 +91,8 @@ const handleClickOutside = (event: MouseEvent) => {
     isOpenList.value &&
     likedListRef.value &&
     !likedListRef.value.contains(target) &&
-    !likeDescriptionRef.value?.contains(target)
+    !likeDescriptionRef.value?.contains(target) &&
+    !avatarsRef.value?.contains(target)
   ) {
     isOpenList.value = false
   }
@@ -230,14 +233,11 @@ onUnmounted(() => {
   color: #d87c56;
 }
 
-.avatars__wrapper {
-  display: flex;
-}
-
 .avatar__wrapper {
   display: flex;
   align-items: center;
   cursor: pointer;
+  user-select: none;
 }
 
 .mini-avatar {
@@ -247,7 +247,7 @@ onUnmounted(() => {
 }
 
 .avatar-preview {
-  margin-left: -10px;
+  margin-left: -15px;
 }
 
 .liked-list {

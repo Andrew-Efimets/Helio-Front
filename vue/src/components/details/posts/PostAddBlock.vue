@@ -10,6 +10,7 @@
         placeholder="Что у вас нового?"
         @send="handlePostSend"
         :allow-empty="!!selectedFile"
+        :disabled="postStore.isSubmitting"
       />
 
       <div v-if="previewUrl" class="preview-container">
@@ -45,6 +46,16 @@ const openForm = () => {
   isOpened.value = !isOpened.value
 }
 
+const addFile = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+
+  if (file) {
+    selectedFile.value = file
+    previewUrl.value = URL.createObjectURL(file)
+  }
+}
+
 const isSubmitting = ref(false)
 
 const handlePostSend = async (text: string) => {
@@ -71,6 +82,9 @@ const handlePostSend = async (text: string) => {
 }
 
 const removeFile = () => {
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value)
+  }
   selectedFile.value = null
   previewUrl.value = null
   if (fileInput.value) fileInput.value.value = ''

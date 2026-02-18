@@ -28,28 +28,11 @@ const userId = String(route.params.id)
 
 onMounted(async () => {
   await postStore.fetchPosts(userId)
-
-  if (window.Echo) {
-    window.Echo.channel(`posts.${userId}`).listen('.PostCreated', (e: any) => {
-      const postData = e.post || e
-      const posts = postStore.allPosts.data
-
-      const index = posts.findIndex((p) => Number(p.id) === Number(postData.id))
-
-      if (index !== -1) {
-        posts.splice(index, 1, { ...postData })
-      } else {
-        posts.unshift({ ...postData })
-        postStore.allPosts.total++
-      }
-    })
-  }
+  postStore.listenForUpdates(userId)
 })
 
 onUnmounted(() => {
-  if (window.Echo) {
-    window.Echo.leave(`posts.${userId}`)
-  }
+  postStore.stopListening(userId)
 })
 </script>
 

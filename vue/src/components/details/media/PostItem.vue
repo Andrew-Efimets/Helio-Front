@@ -1,35 +1,37 @@
 <template>
-  <div class="post">
-    <div class="post-header">
-      <span class="date">{{ formatDate(post.created_at) }}</span>
-      <div class="post-actions">
-        <span class="post-update" @click="openEditor">Изменить</span>
-        <span class="post-delete" @click="isConfirmOpen = true">Удалить</span>
+  <AppTransition>
+    <div class="post">
+      <div class="post-header">
+        <span class="date">{{ formatDate(post.created_at) }}</span>
+        <div class="post-actions">
+          <span class="post-update" @click="openEditor">Изменить</span>
+          <span class="post-delete" @click="isConfirmOpen = true">Удалить</span>
+        </div>
       </div>
-    </div>
-    <AppTransition>
-      <div v-if="post.image_url" class="post-img__wrapper">
-        <img :src="post?.image_url" alt="post image" class="post-img" />
+      <AppTransition>
+        <div v-if="post.image_url" class="post-img__wrapper">
+          <img :src="post?.image_url" alt="post image" class="post-img" />
+        </div>
+      </AppTransition>
+      <div class="post-text__wrapper">
+        <p class="post-text">{{ post.content }}</p>
       </div>
-    </AppTransition>
-    <div class="post-text__wrapper">
-      <p class="post-text">{{ post.content }}</p>
+      <AppTransition>
+        <MessageInput v-if="isOpenedEditor" v-model="postText" @send="handleUpdatePost" />
+      </AppTransition>
+      <div class="post-activity">
+        <LikesMedia :media-id="post.id" media-type="post" :owner-id="post.user_id" />
+        <span class="post-comments__link" @click="openComments">Комментировать</span>
+      </div>
+      <CommentsMedia
+        v-if="isOpenedComments"
+        class="post-comments"
+        :media-id="post.id"
+        media-type="post"
+        :owner-id="post.user_id"
+      />
     </div>
-    <AppTransition>
-      <MessageInput v-if="isOpenedEditor" v-model="postText" @send="handleUpdatePost" />
-    </AppTransition>
-    <div class="post-activity">
-      <LikesMedia :media-id="post.id" media-type="post" :owner-id="post.user_id" />
-      <span class="post-comments__link" @click="openComments">Комментировать</span>
-    </div>
-    <CommentsMedia
-      v-if="isOpenedComments"
-      class="post-comments"
-      :media-id="post.id"
-      media-type="post"
-      :owner-id="post.user_id"
-    />
-  </div>
+  </AppTransition>
   <ConfirmModal
     v-if="isConfirmOpen"
     :is-open="isConfirmOpen"
@@ -60,7 +62,16 @@ const isConfirmOpen = ref(false)
 const postText = ref(props.post.content)
 const postStore = usePostStore()
 
-const formatDate = (date: string) => new Date(date).toLocaleDateString()
+const formatDate = (date: string) => {
+  const d = new Date(date)
+  const now = new Date()
+  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+  if (d.toDateString() === now.toDateString()) {
+    return `Сегодня в ${time}`
+  }
+  return `${d.toLocaleDateString()} в ${time}`
+}
 
 const openComments = () => {
   isOpenedComments.value = !isOpenedComments.value
@@ -115,7 +126,7 @@ const handleDeletePost = () => {
   align-items: center;
   justify-content: center;
   max-width: 400px;
-  max-height: 300px;
+  height: 300px;
   margin: 10px auto;
 }
 
@@ -156,6 +167,8 @@ const handleDeletePost = () => {
 }
 
 .post-header {
+  position: relative;
+  z-index: 10;
   margin: 0 20px 10px;
   display: flex;
   align-items: center;
@@ -195,6 +208,12 @@ const handleDeletePost = () => {
   .post-comments__link {
     width: 100%;
     text-align: end;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .date {
+    margin: 0;
   }
 }
 </style>
