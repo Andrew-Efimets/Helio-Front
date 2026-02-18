@@ -45,6 +45,7 @@ import 'vue3-emoji-picker/css'
 const props = defineProps({
   modelValue: { type: String, default: '' },
   placeholder: { type: String, default: 'Введите текст...' },
+  allowEmpty: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue', 'send'])
@@ -78,7 +79,7 @@ const onSelectEmoji = (emoji: any) => {
 }
 
 const handleSend = () => {
-  if (props.modelValue.trim()) {
+  if (props.modelValue.trim() || props.allowEmpty) {
     emit('send', props.modelValue)
   }
 }

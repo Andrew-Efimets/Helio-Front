@@ -82,7 +82,7 @@ onUnmounted(() => {
   margin: 10px;
   width: 360px;
   min-height: 400px;
-  max-height: 650px;
+  max-height: 620px;
   background-color: #f9f2e7;
   border-radius: 10px;
   display: flex;
@@ -165,11 +165,15 @@ onUnmounted(() => {
     max-height: 300px;
     width: 70%;
   }
+
+  .title {
+    font-size: 14px;
+  }
 }
 
 @media screen and (max-width: 768px) {
   .container {
-    width: 100%;
+    width: 90%;
   }
 
   .content {

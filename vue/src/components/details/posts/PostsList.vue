@@ -15,7 +15,4 @@ import PostItem from '@/components/details/media/PostItem.vue'
 const postStore = usePostStore()
 </script>
 
-<style scoped>
-.post-list {
-}
-</style>
+<style scoped></style>

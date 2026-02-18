@@ -30,13 +30,17 @@ onMounted(async () => {
   await postStore.fetchPosts(userId)
 
   if (window.Echo) {
-    window.Echo.channel(`posts.${userId}`).listen('PostCreated', (e: any) => {
-      const index = postStore.allPosts.data.findIndex((p) => p.id === e.post.id)
+    window.Echo.channel(`posts.${userId}`).listen('.PostCreated', (e: any) => {
+      const postData = e.post || e
+      const posts = postStore.allPosts.data
+
+      const index = posts.findIndex((p) => Number(p.id) === Number(postData.id))
 
       if (index !== -1) {
-        postStore.allPosts.data[index] = e.post
+        posts.splice(index, 1, { ...postData })
       } else {
-        postStore.allPosts.data.unshift(e.post)
+        posts.unshift({ ...postData })
+        postStore.allPosts.total++
       }
     })
   }

@@ -127,7 +127,7 @@ const deleteMedia = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding-left: 20px;
 }
 
 @media screen and (max-width: 1024px) {

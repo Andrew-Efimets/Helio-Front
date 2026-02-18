@@ -6,7 +6,9 @@
       </div>
       <div v-else class="wrapper">
         <RouterLink :to="{ name: 'wall' }">
-          <img :src="user.avatar" alt="аватар" class="img" />
+          <AppTransition>
+            <img :src="user.avatar" alt="аватар" class="img" />
+          </AppTransition>
         </RouterLink>
       </div>
       <template v-if="user && user.id !== authStore.user?.id">
@@ -65,6 +67,7 @@ import { useRoute, RouterLink } from 'vue-router'
 import { ref } from 'vue'
 import api from '@/api'
 import { useNotificationStore } from '@/stores/notifications.ts'
+import AppTransition from '@/components/details/AppTransition.vue'
 
 const menuLinks = [
   { name: 'photos', label: 'Фотографии', count: 'photos_count' },

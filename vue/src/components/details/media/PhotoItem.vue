@@ -119,8 +119,8 @@ onUnmounted(() => {
 
 .item-wrapper {
   margin: 5px;
-  max-width: 600px;
-  max-height: 600px;
+  width: 600px;
+  height: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -132,6 +132,13 @@ onUnmounted(() => {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+
+@media screen and (max-width: 1120px) {
+  .item-wrapper {
+    width: 450px;
+    height: 450px;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -156,8 +163,8 @@ onUnmounted(() => {
   }
 
   .item-wrapper {
-    max-width: 400px;
-    max-height: 400px;
+    max-width: 300px;
+    max-height: 300px;
     margin: 10px auto;
   }
 }

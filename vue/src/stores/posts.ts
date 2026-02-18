@@ -5,18 +5,30 @@ import { useRoute } from 'vue-router'
 import { useNotificationStore } from '@/stores/notifications.ts'
 
 export const usePostStore = defineStore('posts', () => {
-  const allPosts = ref<{ data: any[] }>({ data: [] })
+  const allPosts = ref({
+    data: [] as any[],
+    total: 0,
+  })
   const isLoading = ref(false)
   const route = useRoute()
   const notify = useNotificationStore()
 
-  const totalCount = computed(() => allPosts.value.data.length)
+  const totalCount = computed(() => {
+    return allPosts.value.total ?? allPosts.value.data.length
+  })
 
   const fetchPosts = async (userId: string | number) => {
     try {
       isLoading.value = true
       const response = await api.get(`/user/${userId}/posts`)
-      allPosts.value = response.data.data || []
+      const result = response.data.data
+
+      if (result.data) {
+        allPosts.value.data = result.data
+        allPosts.value.total = result.total
+      } else {
+        allPosts.value.data = result
+      }
     } catch (error) {
       console.error('Ошибка загрузки записи:', error)
       throw error
@@ -39,6 +51,10 @@ export const usePostStore = defineStore('posts', () => {
 
       if (response.data.data) {
         allPosts.value.data.unshift(response.data.data)
+      }
+
+      if (typeof allPosts.value.total === 'number') {
+        allPosts.value.total++
       }
     } catch (error: any) {
       console.error(error)

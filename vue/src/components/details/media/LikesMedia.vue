@@ -1,13 +1,19 @@
 <template>
   <div class="likes">
-    <div v-if="isOpenList" class="liked-list" ref="likedListRef">
-      <div v-for="like in [...currentLikes].reverse()" :key="like.user.id" class="liked-list__item">
-        <img :src="like.user.active_avatar.avatar_url" class="mini-avatar" />
-        <RouterLink :to="{ name: 'wall', params: { id: String(like.user.id) } }" class="link">
-          <p class="user-name">{{ like.user.name }}</p>
-        </RouterLink>
+    <AppTransition name="dropdown">
+      <div v-if="isOpenList" class="liked-list" ref="likedListRef">
+        <div
+          v-for="like in [...currentLikes].reverse()"
+          :key="like.user.id"
+          class="liked-list__item"
+        >
+          <img :src="like.user.active_avatar.avatar_url" class="mini-avatar" />
+          <RouterLink :to="{ name: 'wall', params: { id: String(like.user.id) } }" class="link">
+            <p class="user-name">{{ like.user.name }}</p>
+          </RouterLink>
+        </div>
       </div>
-    </div>
+    </AppTransition>
     <div class="likes-container">
       <div class="wrapper">
         <div class="like">
@@ -25,15 +31,19 @@
               Нравится {{ myLikeText }}
               <template v-if="displayCounter"> {{ displayCounter }} {{ human }} </template>
             </span>
-            <div class="avatars__wrapper">
-              <div v-for="like in currentLikes.slice(-5)" :key="like.id" class="avatar__wrapper">
-                <img
-                  v-if="like.user.active_avatar.avatar_url"
-                  :src="like.user.active_avatar.avatar_url"
-                  alt="avatar"
-                  class="mini-avatar avatar-preview"
-                />
-              </div>
+
+            <div
+              v-for="like in currentLikes.slice(-5)"
+              :key="like.id"
+              class="avatar__wrapper"
+              @click="openLikedList"
+            >
+              <img
+                v-if="like.user.active_avatar.avatar_url"
+                :src="like.user.active_avatar.avatar_url"
+                alt="avatar"
+                class="mini-avatar avatar-preview"
+              />
             </div>
           </div>
           <span v-else class="like-empty"> Оценить </span>
@@ -49,6 +59,7 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useLikeStore } from '@/stores/likes'
 import { useAuthStore } from '@/stores/auth.ts'
 import { RouterLink } from 'vue-router'
+import AppTransition from '@/components/details/AppTransition.vue'
 
 const props = defineProps<{
   mediaId: string | number
@@ -162,12 +173,11 @@ onUnmounted(() => {
 
 <style scoped>
 .likes {
-  width: 60%;
+  width: 100%;
   position: relative;
 }
 
 .likes-container {
-  margin: 10px 20px;
   padding: 10px;
   background-color: #f9f2e7;
   border-radius: 10px;
@@ -205,11 +215,14 @@ onUnmounted(() => {
   color: #6e2c11;
   margin-right: 20px;
   cursor: pointer;
+  user-select: none;
+  font-size: 14px;
 }
 
 .like-empty {
   color: #6e2c11;
   margin-right: 20px;
+  font-size: 14px;
 }
 
 .like-description:hover {
@@ -224,6 +237,7 @@ onUnmounted(() => {
 .avatar__wrapper {
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 .mini-avatar {
@@ -279,14 +293,9 @@ onUnmounted(() => {
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 490px) {
   .like-description {
-    font-size: 12px;
-  }
-
-  .like-counter {
-    flex-direction: column;
-    text-align: center;
+    display: none;
   }
 }
 </style>

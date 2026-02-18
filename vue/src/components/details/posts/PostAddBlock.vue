@@ -5,7 +5,12 @@
     </h3>
     <div v-if="postStore.isLoading" class="app-loader"></div>
     <form class="post-form" v-if="isOpened" @submit.prevent>
-      <MessageInput v-model="postText" placeholder="Что у вас нового?" @send="handlePostSend" />
+      <MessageInput
+        v-model="postText"
+        placeholder="Что у вас нового?"
+        @send="handlePostSend"
+        :allow-empty="!!selectedFile"
+      />
 
       <div v-if="previewUrl" class="preview-container">
         <img :src="previewUrl" class="preview-image" />
@@ -25,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { usePostStore } from '@/stores/posts.ts'
 import MessageInput from '@/components/details/MessageInput.vue'
 
@@ -40,10 +45,16 @@ const openForm = () => {
   isOpened.value = !isOpened.value
 }
 
+const isSubmitting = ref(false)
+
 const handlePostSend = async (text: string) => {
+  if (isSubmitting.value) return
+
   if (!text.trim() && !selectedFile.value) return
 
   try {
+    isSubmitting.value = true
+
     await postStore.createPost({
       content: text,
       image: selectedFile.value,
@@ -54,15 +65,8 @@ const handlePostSend = async (text: string) => {
     isOpened.value = false
   } catch (error) {
     console.error('Ошибка при создании поста:', error)
-  }
-}
-const addFile = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-
-  if (file) {
-    selectedFile.value = file
-    previewUrl.value = URL.createObjectURL(file)
+  } finally {
+    isSubmitting.value = false
   }
 }
 
@@ -71,6 +75,23 @@ const removeFile = () => {
   previewUrl.value = null
   if (fileInput.value) fileInput.value.value = ''
 }
+
+const globalHandleEnter = (event: KeyboardEvent) => {
+  const isInputFocused = ['TEXTAREA', 'INPUT'].includes(document.activeElement?.tagName || '')
+
+  if (isOpened.value && event.key === 'Enter' && !isInputFocused) {
+    event.preventDefault()
+    handlePostSend(postText.value)
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', globalHandleEnter)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', globalHandleEnter)
+})
 </script>
 
 <style scoped>

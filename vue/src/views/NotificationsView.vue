@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <Transition name="slide-down">
+    <AppTransition name="slide-down">
       <div
         ref="popoverRef"
         popover="manual"
@@ -9,13 +9,14 @@
       >
         {{ notification.message }}
       </div>
-    </Transition>
+    </AppTransition>
   </Teleport>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { useNotificationStore } from '@/stores/notifications'
+import AppTransition from '@/components/details/AppTransition.vue'
 
 const notification = useNotificationStore()
 const popoverRef = ref<HTMLElement | null>(null)
@@ -62,18 +63,5 @@ watch(
 
 .info {
   background-color: #beeae8;
-}
-
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition:
-    transform 0.4s ease,
-    opacity 0.4s ease;
-}
-
-.slide-down-enter-from,
-.slide-down-leave-to {
-  transform: translateY(-100%);
-  opacity: 0;
 }
 </style>

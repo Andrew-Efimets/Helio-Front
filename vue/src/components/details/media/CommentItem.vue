@@ -11,16 +11,17 @@
         <p class="quote" @click.prevent="commentStore.setReply(comment)">Ответить</p>
       </div>
     </div>
-
     <template v-if="comment.replies && comment.replies.length > 0">
-      <div v-if="showReplies || isChild" class="replies">
-        <CommentItem
-          v-for="reply in comment.replies"
-          :key="reply.id"
-          :comment="reply"
-          :is-child="true"
-        />
-      </div>
+      <AppTransition name="dropdown">
+        <div v-if="showReplies || isChild" class="replies">
+          <CommentItem
+            v-for="reply in comment.replies"
+            :key="reply.id"
+            :comment="reply"
+            :is-child="true"
+          />
+        </div>
+      </AppTransition>
       <div v-if="!isChild" class="replies-toggle" @click="toggleReplies">
         <div class="deco"></div>
         <p class="button-text">{{ !showReplies ? 'Показать ответы' : 'Скрыть ответы' }}</p>
@@ -32,6 +33,7 @@
 <script setup lang="ts">
 import { useCommentStore } from '@/stores/comments.ts'
 import { ref } from 'vue'
+import AppTransition from '@/components/details/AppTransition.vue'
 
 const commentStore = useCommentStore()
 defineProps<{
@@ -53,7 +55,6 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  min-width: 0;
 }
 
 .comment {
@@ -69,11 +70,6 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
   border-radius: 50%;
   flex-shrink: 0;
   object-fit: cover;
-}
-
-.content {
-  flex: 1;
-  min-width: 0;
 }
 
 .header {

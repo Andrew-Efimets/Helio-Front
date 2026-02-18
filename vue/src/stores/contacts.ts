@@ -8,7 +8,7 @@ export const useContactStore = defineStore('comments', () => {
   const isLoading = ref(false)
   const route = useRoute()
 
-  const totalCount = computed(() => allContacts.length)
+  const totalCount = computed(() => allContacts.value.length)
 
   const fetchUserContacts = async (userId: string | number) => {
     // const response = await api.get(`/user/${userId}/contacts`)
