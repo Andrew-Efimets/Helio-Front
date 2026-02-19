@@ -74,6 +74,7 @@ const openMenu = () => {
 .burger {
   width: 40px;
   height: 40px;
+  cursor: pointer;
 }
 
 .links__wrapper {

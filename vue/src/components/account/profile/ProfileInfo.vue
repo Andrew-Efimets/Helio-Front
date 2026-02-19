@@ -12,12 +12,12 @@
 
       <div v-for="item in displayInfo" :key="item.title" class="list">
         <p class="item-title">{{ item.title }}</p>
-        <p class="item">{{ item.value || 'не указан' }}</p>
+        <p class="item">{{ item.value || 'нет даных' }}</p>
       </div>
 
       <div v-if="authStore.canSee(user, 'show_phone')" class="list">
         <p class="item-title">Телефон:</p>
-        <p class="item">{{ user?.phone ? `+ ${user.phone}` : 'не указан' }}</p>
+        <p class="item">{{ user?.phone ? `+ ${user.phone}` : 'нет даных' }}</p>
       </div>
     </div>
   </div>
@@ -45,9 +45,9 @@ const displayInfo = computed(() => {
   const profile = props.user?.profile
   if (!profile) return []
   return [
-    { title: 'Страна:', value: props.user?.profile?.country },
-    { title: 'Город:', value: props.user?.profile?.city },
-    { title: 'День рождения:', value: formatDate(props.user?.profile?.birthday) },
+    { title: 'Страна:', value: props.user?.profile.country },
+    { title: 'Город:', value: props.user?.profile.city },
+    { title: 'День рождения:', value: formatDate(props.user?.profile.birthday) },
   ]
 })
 </script>

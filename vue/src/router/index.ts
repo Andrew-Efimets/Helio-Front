@@ -55,6 +55,7 @@ const router = createRouter({
           path: 'register',
           name: 'register',
           components: {
+            default: HomeView,
             modalMain: RegisterForm,
           },
           meta: { isModal: true },
@@ -63,6 +64,7 @@ const router = createRouter({
           path: 'verify',
           name: 'verify',
           components: {
+            default: HomeView,
             modalMain: VerifyForm,
           },
           meta: { isModal: true },
@@ -70,15 +72,15 @@ const router = createRouter({
       ],
     },
     {
+      path: '/users',
+      name: 'users',
+      component: UsersListView,
+    },
+    {
       path: '/',
       component: MainLayout,
       meta: { requiresAuth: true },
       children: [
-        {
-          path: 'users',
-          name: 'users',
-          component: UsersListView,
-        },
         {
           path: 'settings/:id',
           name: 'settings',

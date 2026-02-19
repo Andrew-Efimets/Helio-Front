@@ -21,8 +21,8 @@
         class="input"
         :placeholder="placeholder"
         rows="1"
-        @keydown.enter.exact.prevent="handleSend"
-        @keydown.enter.shift.exact="() => {}"
+        @keyup.enter.exact.prevent="handleSend"
+        @keyup.enter.shift.exact="() => {}"
         @keydown.left.stop
         @keydown.right.stop
         @keydown.esc.stop

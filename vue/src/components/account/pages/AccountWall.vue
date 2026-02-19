@@ -4,7 +4,9 @@
       <PostAddBlock v-if="isOwner" />
       <div class="content">
         <h3 class="title">
-          {{ !postStore.totalCount ? 'Записей пока нет' : 'Записей: ' + postStore.totalCount }}
+          {{
+            !postStore.totalCount ? 'Записей пока нет' : 'Записей на стене: ' + postStore.totalCount
+          }}
         </h3>
         <PostsList v-if="postStore.totalCount" />
       </div>

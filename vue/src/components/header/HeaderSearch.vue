@@ -1,17 +1,34 @@
 <template>
   <div class="search">
-    <input type="text" class="input" placeholder="Поиск" />
+    <input
+      type="text"
+      class="input"
+      placeholder="Поиск"
+      v-model="searchQuery"
+      @keyup.enter="handleSearch"
+    />
     <div class="icon-wrapper">
       <p class="separator">|</p>
-      <RouterLink :to="{ name: 'users' }" class="link-item">
-        <img src="../../assets/search.png" alt="поиск" class="icon" />
-      </RouterLink>
+      <div class="link-item" @click="handleSearch">
+        <img src="@/assets/search.png" alt="поиск" class="icon" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+
+const router = useRouter()
+const searchQuery = ref('')
+const handleSearch = () => {
+  router.push({
+    name: 'users',
+    query: { search: searchQuery.value },
+  })
+  searchQuery.value = ''
+}
 </script>
 
 <style scoped>
@@ -56,6 +73,7 @@ import { RouterLink } from 'vue-router'
 
 .link-item {
   width: 35%;
+  cursor: pointer;
 }
 
 .icon {
