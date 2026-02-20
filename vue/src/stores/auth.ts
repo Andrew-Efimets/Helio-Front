@@ -8,6 +8,7 @@ export interface PrivacySettings {
   show_video: 'public' | 'contacts_only' | 'private'
   show_contacts: 'public' | 'contacts_only' | 'private'
 }
+
 export interface Profile {
   country?: string | null
   city?: string | null

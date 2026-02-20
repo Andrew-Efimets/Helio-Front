@@ -1,7 +1,10 @@
 <template>
   <div class="users">
     <UsersFilter />
-    <UsersListItem v-for="user in users" :key="user.id" :user="user" />
+    <div v-if="isLoading" class="app-loader"></div>
+    <div v-else class="wrapper">
+      <UsersListItem v-for="user in users" :key="user.id" :user="user" />
+    </div>
   </div>
 </template>
 
@@ -26,6 +29,7 @@ const fetchUsers = async () => {
         city: route.query.city,
         age_from: route.query.age_from,
         age_to: route.query.age_to,
+        sort: route.query.sort,
       },
     })
 
@@ -49,3 +53,12 @@ onMounted(() => {
   fetchUsers()
 })
 </script>
+
+<style scoped>
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: #f5ddc5;
+}
+</style>

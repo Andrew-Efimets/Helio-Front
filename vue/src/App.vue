@@ -54,50 +54,58 @@ const setupGlobalListeners = (userId: number | string) => {
   })
 
   channel.listen('.contact.request', (e: any) => {
+    const myId = Number(authStore.user?.id)
+    if (Number(e.senderId) === myId) return
+
     notify.show(e.message, 'info')
 
-    if (authStore.user) {
-      authStore.user.pending_contacts_count = (authStore.user.pending_contacts_count || 0) + 1
-      authStore.setUser(authStore.user)
+    if (authStore.user && Number(e.receiverId) === myId) {
+      authStore.setUser({
+        ...authStore.user,
+        pending_contacts_count: (authStore.user.pending_contacts_count || 0) + 1,
+      })
     }
 
     if (userStore.profile && Number(userStore.profile.id) === Number(e.senderId)) {
-      userStore.updateStatus({
-        type: 'pending',
-        is_sender: false,
-      })
+      userStore.updateStatus({ type: 'pending', is_sender: true })
     }
   })
 
   channel.listen('.contact.accepted', (e: any) => {
+    const myId = Number(authStore.user?.id)
+    if (Number(e.receiverId) === myId) return
+
     notify.show(e.message, 'success')
 
     if (authStore.user) {
-      authStore.user.contacts_count = (authStore.user.contacts_count || 0) + 1
-      authStore.setUser(authStore.user)
+      authStore.setUser({
+        ...authStore.user,
+        contacts_count: (authStore.user.contacts_count || 0) + 1,
+      })
     }
 
     if (userStore.profile && Number(userStore.profile.id) === Number(e.senderId)) {
       userStore.updateStatus(
-        { type: 'accepted', is_sender: true },
+        { type: 'accepted', is_sender: false },
         (userStore.profile.contacts_count || 0) + 1,
       )
     }
   })
 
   channel.listen('.contact.deleted', (e: any) => {
+    const myId = Number(authStore.user?.id)
+    if (Number(e.senderId) === myId) return
+
     if (authStore.user) {
+      const newUser = { ...authStore.user }
       if (e.status === 'pending') {
         notify.show(`${e.senderName} отклонил(а) заявку`, 'info')
-        authStore.user.pending_contacts_count = Math.max(
-          0,
-          (authStore.user.pending_contacts_count || 0) - 1,
-        )
+        newUser.pending_contacts_count = Math.max(0, (newUser.pending_contacts_count || 0) - 1)
       } else {
         notify.show(`${e.senderName} удалился(ась) из контактов`, 'info')
-        authStore.user.contacts_count = Math.max(0, (authStore.user.contacts_count || 0) - 1)
+        newUser.contacts_count = Math.max(0, (newUser.contacts_count || 0) - 1)
       }
-      authStore.setUser(authStore.user)
+      authStore.setUser(newUser)
     }
 
     if (userStore.profile && Number(userStore.profile.id) === Number(e.senderId)) {

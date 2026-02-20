@@ -16,7 +16,7 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { usePostStore } from '@/stores/posts.ts'
 import { useRoute } from 'vue-router'
-import PostItem from '@/components/details/media/PostItem.vue'
+import PostItem from '@/components/details/posts/PostItem.vue'
 
 const postStore = usePostStore()
 const route = useRoute()

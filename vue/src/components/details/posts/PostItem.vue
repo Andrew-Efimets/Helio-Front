@@ -95,6 +95,7 @@ const handleUpdatePost = async (postText: string) => {
 }
 
 const handleDeletePost = () => {
+  isConfirmOpen.value = false
   return postStore.deletePost(props.post.id)
 }
 </script>
