@@ -2,11 +2,26 @@ import { ref } from 'vue'
 import api from '@/api'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notifications'
+import { useUserStore } from '@/stores/user.ts'
 
 export function useContacts() {
   const isAddition = ref(false)
   const authStore = useAuthStore()
   const notify = useNotificationStore()
+  const userStore = useUserStore()
+
+  const fetchContacts = async (userId: number | string, contactStatus: string) => {
+    try {
+      const response = await api.get(`/user/${userId}/contacts`, {
+        params: {
+          contact_status: contactStatus,
+        },
+      })
+      userStore.setUsers(response.data.data)
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   const toggleContact = async (userId: number | string) => {
     try {
@@ -38,5 +53,5 @@ export function useContacts() {
     }
   }
 
-  return { isAddition, toggleContact, acceptContact }
+  return { isAddition, toggleContact, acceptContact, fetchContacts }
 }

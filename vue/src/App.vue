@@ -53,27 +53,44 @@ const setupGlobalListeners = (userId: number | string) => {
     // if (route.name !== 'chat') toast.info(`Новое сообщение от ${e.message.user.name}`)
   })
 
-  channel.listen('.contact.request', (e: any) => {
+  channel.listen('.contact.request', (data: any) => {
+    userStore.triggerRefresh()
+    const e = typeof data === 'string' ? JSON.parse(data) : data
+
     const myId = Number(authStore.user?.id)
-    if (Number(e.senderId) === myId) return
+    const senderId = Number(e.senderId)
+    const receiverId = Number(e.receiverId)
 
-    notify.show(e.message, 'info')
-
-    if (authStore.user && Number(e.receiverId) === myId) {
-      authStore.setUser({
-        ...authStore.user,
-        pending_contacts_count: (authStore.user.pending_contacts_count || 0) + 1,
+    if (senderId === myId) {
+      userStore.updateUserInList(receiverId, {
+        type: 'pending',
+        is_sender: false,
       })
+      return
     }
 
-    if (userStore.profile && Number(userStore.profile.id) === Number(e.senderId)) {
-      userStore.updateStatus({ type: 'pending', is_sender: true })
+    if (receiverId === myId) {
+      notify.show(e.message, 'info')
+
+      authStore.setUser({
+        ...authStore.user,
+        pending_contacts_count: (authStore.user?.pending_contacts_count || 0) + 1,
+      })
+
+      const newStatus = { type: 'pending', is_sender: true }
+
+      if (userStore.profile && Number(userStore.profile.id) === senderId) {
+        userStore.updateStatus(newStatus)
+      }
+
+      userStore.updateUserInList(senderId, newStatus)
     }
   })
 
   channel.listen('.contact.accepted', (e: any) => {
+    userStore.triggerRefresh()
     const myId = Number(authStore.user?.id)
-    if (Number(e.receiverId) === myId) return
+    if (Number(e.senderId) === myId) return
 
     notify.show(e.message, 'success')
 
@@ -81,18 +98,23 @@ const setupGlobalListeners = (userId: number | string) => {
       authStore.setUser({
         ...authStore.user,
         contacts_count: (authStore.user.contacts_count || 0) + 1,
+        pending_contacts_count: Math.max(0, (authStore.user.pending_contacts_count || 0) - 1),
       })
     }
 
+    const newStatus = { type: 'accepted', is_sender: false }
     if (userStore.profile && Number(userStore.profile.id) === Number(e.senderId)) {
-      userStore.updateStatus(
-        { type: 'accepted', is_sender: false },
-        (userStore.profile.contacts_count || 0) + 1,
-      )
+      const newCount = (userStore.profile.contacts_count || 0) + 1
+      userStore.updateStatus(newStatus, newCount)
     }
+    userStore.updateUserInList(Number(e.senderId), {
+      type: 'accepted',
+      is_sender: false,
+    })
   })
 
   channel.listen('.contact.deleted', (e: any) => {
+    userStore.triggerRefresh()
     const myId = Number(authStore.user?.id)
     if (Number(e.senderId) === myId) return
 
@@ -113,6 +135,8 @@ const setupGlobalListeners = (userId: number | string) => {
       const newCount = e.status === 'accepted' ? Math.max(0, currentCount - 1) : currentCount
       userStore.updateStatus(null, newCount)
     }
+
+    userStore.updateUserInList(Number(e.senderId), null)
   })
 }
 

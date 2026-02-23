@@ -3,7 +3,12 @@
     <UsersFilter />
     <div v-if="isLoading" class="app-loader"></div>
     <div v-else class="wrapper">
-      <UsersListItem v-for="user in users" :key="user.id" :user="user" />
+      <UsersListItem
+        v-for="user in userStore.users"
+        :key="user.id"
+        :user="user"
+        @update-user="handleUpdateUser"
+      />
     </div>
   </div>
 </template>
@@ -12,12 +17,13 @@
 import api from '@/api'
 import { useRoute } from 'vue-router'
 import { ref, watch, onMounted } from 'vue'
+import { useUserStore } from '@/stores/user.ts'
 import UsersFilter from '@/components/details/users/UsersFilter.vue'
 import UsersListItem from '@/components/details/users/UsersListItem.vue'
 
 const route = useRoute()
-const users = ref<any[]>([])
 const isLoading = ref(false)
+const userStore = useUserStore()
 
 const fetchUsers = async () => {
   try {
@@ -33,7 +39,7 @@ const fetchUsers = async () => {
       },
     })
 
-    users.value = response.data.data
+    userStore.setUsers(response.data.data)
   } catch (e) {
     console.error(e)
   } finally {
@@ -49,6 +55,10 @@ watch(
   { deep: true },
 )
 
+const handleUpdateUser = (updatedUser: any) => {
+  userStore.updateUserInList(updatedUser.id, updatedUser.contact_status, updatedUser.contacts_count)
+}
+
 onMounted(() => {
   fetchUsers()
 })
@@ -58,7 +68,7 @@ onMounted(() => {
 .wrapper {
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 10px;
   background-color: #f5ddc5;
 }
 </style>

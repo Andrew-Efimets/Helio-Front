@@ -2,7 +2,7 @@
   <section class="account">
     <div v-if="isLoading || (user && authStore.canSee(user, 'show_account'))" class="wrapper">
       <ProfileAvatar
-        :user="user"
+        :user="userStore.profile"
         :is-loading="isLoading"
         @update-user="(val) => userStore.setProfile(val)"
       />
@@ -61,9 +61,9 @@ const userStore = useUserStore()
 
 const user = computed<UserProfileData | null>(() => userStore.profile)
 
-const fetchAccount = async () => {
+const fetchAccount = async (silent = false) => {
   try {
-    isLoading.value = true
+    if (!silent) isLoading.value = true
     const response = await api.get(`/user/${route.params.id}`)
     userStore.setProfile(response.data.data)
 
@@ -87,18 +87,13 @@ watch(
       fetchAccount()
     }
   },
+  { deep: true },
 )
 
 watch(
-  () => userStore.profile?.contact_status?.type,
-  (newStatus, oldStatus) => {
-    if (newStatus === 'accepted' && oldStatus !== 'accepted') {
-      fetchAccount()
-    }
-
-    if (!newStatus && oldStatus === 'accepted' && user.value?.id !== authStore.user?.id) {
-      fetchAccount()
-    }
+  () => userStore.refreshTicket,
+  () => {
+    fetchAccount(true)
   },
 )
 </script>

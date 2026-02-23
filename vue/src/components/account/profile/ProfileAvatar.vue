@@ -6,9 +6,7 @@
       </div>
       <div v-else class="wrapper">
         <RouterLink :to="{ name: 'wall' }">
-          <AppTransition>
-            <img :src="user.avatar" alt="аватар" class="img" />
-          </AppTransition>
+          <img :src="user.avatar" alt="аватар" class="img" />
         </RouterLink>
       </div>
       <template v-if="user && user.id !== authStore.user?.id">
@@ -73,8 +71,8 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth.ts'
 import { useContacts } from '@/composables/useContacts'
-import { ref } from 'vue'
-import AppTransition from '@/components/details/AppTransition.vue'
+import { ref, watch } from 'vue'
+import { useUserStore } from '@/stores/user'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 
 const menuLinks = [
@@ -89,8 +87,9 @@ const props = defineProps<{
 }>()
 
 const isConfirmOpen = ref(false)
-const emit = defineEmits(['update-user'])
+const emit = defineEmits(['update-user', 'refresh-account'])
 const authStore = useAuthStore()
+const userStore = useUserStore()
 
 const { isAddition, toggleContact, acceptContact } = useContacts()
 const handleToggle = async () => {
@@ -102,6 +101,7 @@ const handleToggle = async () => {
       contact_status: data.contact_status,
       contacts_count: data.contacts_count,
     })
+    userStore.triggerRefresh()
   }
 }
 
@@ -113,6 +113,7 @@ const handleAccept = async () => {
       contact_status: data.contact_status,
       contacts_count: data.contacts_count,
     })
+    userStore.triggerRefresh()
   }
 }
 </script>

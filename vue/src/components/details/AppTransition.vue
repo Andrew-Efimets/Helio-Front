@@ -14,8 +14,8 @@ defineProps({
 .fade-enter-active,
 .fade-leave-active {
   transition:
-    opacity 0.4s ease,
-    transform 0.4s ease;
+    opacity 0.5s ease,
+    transform 0.5s ease;
 }
 .fade-enter-from,
 .fade-leave-to {
