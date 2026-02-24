@@ -29,7 +29,7 @@ export const useVideoStore = defineStore('videos', () => {
 
   const sendVideo = async (file: File) => {
     if (!file) return
-    if (file.size > 1024 * 1024 * 1024) {
+    if (file.size > 1.5 * 1024 * 1024 * 1024) {
       return notify.show('Файл слишком большой!', 'error')
     }
 

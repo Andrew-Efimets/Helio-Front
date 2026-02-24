@@ -13,6 +13,8 @@ import ModalView from '@/views/ModalView.vue'
 
 <style scoped>
 .content {
+  display: flex;
+  align-items: start;
   background-image: url('@/assets/background.png');
   background-repeat: no-repeat;
   background-size: 90%;

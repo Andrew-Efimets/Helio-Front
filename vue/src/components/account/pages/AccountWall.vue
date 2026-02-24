@@ -39,6 +39,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.wall {
+  width: 100%;
+}
+
 .container {
   padding: 10px 0 10px;
   width: 100%;
@@ -46,6 +50,9 @@ onUnmounted(() => {
 }
 
 .content {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
   max-width: 700px;
   min-height: 600px;
   margin: 20px 10px;
@@ -54,5 +61,6 @@ onUnmounted(() => {
 .title {
   color: #6e2c11;
   margin-left: 10px;
+  align-self: start;
 }
 </style>

@@ -1,15 +1,17 @@
 <template>
   <div class="users">
     <UsersFilter />
-    <div v-if="isLoading" class="app-loader"></div>
-    <div v-else class="wrapper">
-      <UsersListItem
-        v-for="user in userStore.users"
-        :key="user.id"
-        :user="user"
-        @update-user="handleUpdateUser"
-      />
-    </div>
+    <AppTransition name="dropdown" mode="out-in">
+      <div v-if="isLoading" class="app-loader"></div>
+      <div v-else class="wrapper">
+        <UsersListItem
+          v-for="user in userStore.users"
+          :key="user.id"
+          :user="user"
+          @update-user="handleUpdateUser"
+        />
+      </div>
+    </AppTransition>
   </div>
 </template>
 
@@ -20,6 +22,7 @@ import { ref, watch, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user.ts'
 import UsersFilter from '@/components/details/users/UsersFilter.vue'
 import UsersListItem from '@/components/details/users/UsersListItem.vue'
+import AppTransition from '@/components/details/AppTransition.vue'
 
 const route = useRoute()
 const isLoading = ref(false)

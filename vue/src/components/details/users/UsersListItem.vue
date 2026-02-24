@@ -1,10 +1,12 @@
 <template>
   <div class="user-item">
-    <img v-if="user.avatar" :src="user.avatar" alt="" class="user-avatar" />
     <div class="content">
+      <img v-if="user.avatar" :src="user.avatar" alt="" class="user-avatar" />
       <RouterLink :to="{ name: 'wall', params: { id: String(user.id) } }" class="link">
         <p class="user-name">{{ user.name }}</p>
       </RouterLink>
+    </div>
+    <div class="bottom-bar__wrapper">
       <template v-if="user && user.id !== authStore.user?.id">
         <span
           v-if="!user.contact_status"
@@ -16,16 +18,20 @@
         </span>
 
         <template v-else>
-          <span
-            v-if="user.contact_status.type === 'accepted'"
-            class="contact-button cancel-button"
-            @click="isConfirmOpen = true"
-            :disabled="isAddition"
-          >
-            Удалить из контактов
-          </span>
+          <div v-if="user.contact_status.type === 'accepted'" class="bottom-bar">
+            <p class="bottom-bar__notify">Ваш контакт</p>
+            <span class="contact-button" @click="toChat" :disabled="isLoading"> Написать </span>
+            <span
+              class="contact-button cancel-button"
+              @click="isConfirmOpen = true"
+              :disabled="isAddition"
+            >
+              Удалить из контактов
+            </span>
+          </div>
 
-          <template v-else-if="user.contact_status.type === 'pending'">
+          <div v-else-if="user.contact_status.type === 'pending'" class="bottom-bar">
+            <p class="bottom-bar__notify">В заявках</p>
             <div v-if="user.contact_status.is_sender" class="button-wrapper">
               <span class="contact-button" @click="handleAccept" :disabled="isAddition">
                 Принять заявку
@@ -47,7 +53,7 @@
             >
               Отменить запрос
             </span>
-          </template>
+          </div>
         </template>
       </template>
       <ConfirmModal :is-open="isConfirmOpen" @close="isConfirmOpen = false" @confirm="handleToggle">
@@ -71,6 +77,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['update-user'])
 const isConfirmOpen = ref(false)
+const isLoading = ref(false)
 const authStore = useAuthStore()
 const userStore = useUserStore()
 
@@ -116,14 +123,24 @@ const syncProfileButtons = (data: any) => {
     userStore.updateStatus(data.contact_status, data.contacts_count)
   }
 }
+
+const toChat = async () => {
+  try {
+    isLoading.value = true
+    const response = await fetchChat(`/user/${authStore.user?.id}/chat/${chatStore.user?.id}`)
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
-<style>
+<style scoped>
 .user-item {
   display: flex;
-  align-items: center;
-  column-gap: 20px;
-  padding: 10px;
+  flex-direction: column;
+  padding: 10px 20px;
   margin: 10px;
   height: fit-content;
   background-color: #f9f2e7;
@@ -133,6 +150,12 @@ const syncProfileButtons = (data: any) => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+}
+
+.content {
+  display: flex;
+  column-gap: 20px;
+  align-items: center;
 }
 
 .button-wrapper {
@@ -152,6 +175,25 @@ const syncProfileButtons = (data: any) => {
   cursor: pointer;
 }
 
+.bottom-bar__wrapper {
+  margin-left: 60px;
+}
+
+.bottom-bar {
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
+
+.bottom-bar__notify {
+  font-size: 12px;
+  color: #6e2c11;
+  font-weight: bold;
+  background-color: #f0ccaa;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
 .contact-button:hover,
 .cancel-button:hover {
   text-decoration: underline;
@@ -160,6 +202,7 @@ const syncProfileButtons = (data: any) => {
 .link {
   text-decoration: none;
   color: #6e2c11;
+  font-weight: bold;
 }
 
 .link:hover {

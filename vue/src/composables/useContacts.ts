@@ -20,6 +20,7 @@ export function useContacts() {
       userStore.setUsers(response.data.data)
     } catch (e) {
       console.error(e)
+      throw e
     }
   }
 

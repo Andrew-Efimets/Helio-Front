@@ -110,6 +110,7 @@ watch(
 }
 
 .content {
+  flex-direction: column;
   flex-grow: 1;
   max-width: 700px;
   width: 100%;

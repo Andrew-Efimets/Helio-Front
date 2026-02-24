@@ -122,6 +122,16 @@ body {
   100% { content: '.'; }
 }
 
+/* error-message */
+
+.error-message {
+  width: 100%;
+  font-size: 16px;
+  padding: 20px;
+  background-color: #e99a9a;
+  color: darkred;
+  text-align: center;
+}
 
 @media screen and (max-width: 1024px){
   .app__container {

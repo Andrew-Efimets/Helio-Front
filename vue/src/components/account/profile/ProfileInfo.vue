@@ -55,6 +55,7 @@ const displayInfo = computed(() => {
 <style scoped>
 .info {
   padding: 40px 0 20px;
+  width: 100%;
 }
 
 .wrapper {

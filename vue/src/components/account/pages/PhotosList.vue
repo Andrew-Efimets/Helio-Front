@@ -46,7 +46,7 @@ import MediaLoadingPlaceholder from '@/components/details/media/MediaLoadingPlac
 const authStore = useAuthStore()
 const photoStore = usePhotoStore()
 const route = useRoute()
-const privacyError = ref()
+const privacyError = ref<string | null>(null)
 
 watch(
   () => route.params.id,
@@ -67,6 +67,7 @@ const isOwner = computed(() => Number(authStore.user?.id) === Number(route.param
 <style scoped>
 .photos {
   padding: 10px 0;
+  width: 100%;
 }
 
 .media-item {
@@ -79,14 +80,5 @@ const isOwner = computed(() => Number(authStore.user?.id) === Number(route.param
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.error-message {
-  width: 100%;
-  font-size: 16px;
-  padding: 20px;
-  background-color: #e99a9a;
-  color: darkred;
-  text-align: center;
 }
 </style>

@@ -60,6 +60,7 @@ watch(
 <style scoped>
 .videos {
   padding: 10px 0;
+  width: 100%;
 }
 
 .error-message {
