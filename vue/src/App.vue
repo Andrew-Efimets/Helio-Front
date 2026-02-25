@@ -94,13 +94,15 @@ const setupGlobalListeners = (userId: number | string) => {
 
     notify.show(e.message, 'success')
 
-    if (authStore.user) {
-      authStore.setUser({
-        ...authStore.user,
-        contacts_count: (authStore.user.contacts_count || 0) + 1,
-        pending_contacts_count: Math.max(0, (authStore.user.pending_contacts_count || 0) - 1),
-      })
-    }
+    const isReceiver = Number(e.receiverId) === myId
+
+    authStore.setUser({
+      ...authStore.user,
+      contacts_count: (authStore.user?.contacts_count || 0) + 1,
+      pending_contacts_count: !isReceiver
+        ? Math.max(0, (authStore.user?.pending_contacts_count || 0) - 1)
+        : authStore.user?.pending_contacts_count,
+    })
 
     const newStatus = { type: 'accepted', is_sender: false }
     if (userStore.profile && Number(userStore.profile.id) === Number(e.senderId)) {
@@ -116,17 +118,24 @@ const setupGlobalListeners = (userId: number | string) => {
   channel.listen('.contact.deleted', (e: any) => {
     userStore.triggerRefresh()
     const myId = Number(authStore.user?.id)
+
     if (Number(e.senderId) === myId) return
 
     if (authStore.user) {
       const newUser = { ...authStore.user }
+
       if (e.status === 'pending') {
-        notify.show(`${e.senderName} отклонил(а) заявку`, 'info')
-        newUser.pending_contacts_count = Math.max(0, (newUser.pending_contacts_count || 0) - 1)
+        if (e.isInitiator) {
+          notify.show(`${e.senderName} отменил(а) запрос`, 'info')
+          newUser.pending_contacts_count = Math.max(0, (newUser.pending_contacts_count || 0) - 1)
+        } else {
+          notify.show(`${e.senderName} отклонил(а) вашу заявку`, 'info')
+        }
       } else {
-        notify.show(`${e.senderName} удалился(ась) из контактов`, 'info')
+        notify.show(`${e.senderName} удалил(а) вас из контактов`, 'info')
         newUser.contacts_count = Math.max(0, (newUser.contacts_count || 0) - 1)
       }
+
       authStore.setUser(newUser)
     }
 
@@ -136,9 +145,23 @@ const setupGlobalListeners = (userId: number | string) => {
       userStore.updateStatus(null, newCount)
     }
 
-    userStore.updateUserInList(Number(e.senderId), null)
+    userStore.updateUserInList(Number(e.senderId), {
+      type: null,
+      is_sender: false,
+    })
   })
 }
+
+window.addEventListener('storage', (event) => {
+  if (event.key === 'user_data' && event.newValue) {
+    try {
+      const freshUserData = JSON.parse(event.newValue)
+      authStore.setUser(freshUserData)
+    } catch (e) {
+      console.error('Ошибка синхронизации вкладок', e)
+    }
+  }
+})
 
 watch(
   () => authStore.user?.id,

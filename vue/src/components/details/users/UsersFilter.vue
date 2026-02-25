@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import AppTransition from '@/components/details/AppTransition.vue'
 import UsersFilterInput from './UsersFilterInput.vue'
-import { reactive } from 'vue'
+import { reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ref } from 'vue'
 
@@ -68,7 +68,8 @@ const applyFilters = () => {
   )
 
   router.push({
-    name: 'users',
+    name: route.name,
+    params: route.params,
     query: cleanFilters,
   })
   isOpen.value = false
@@ -77,6 +78,19 @@ const applyFilters = () => {
 const openFilter = () => {
   isOpen.value = !isOpen.value
 }
+
+watch(
+  () => route.query,
+  (newQuery) => {
+    filters.country = String(newQuery.country || '')
+    filters.city = String(newQuery.city || '')
+    filters.age_from = newQuery.age_from ? Number(newQuery.age_from) : ''
+    filters.age_to = newQuery.age_to ? Number(newQuery.age_to) : ''
+    filters.sort = String(newQuery.sort || 'asc')
+    filters.search = String(newQuery.search || '')
+  },
+  { deep: true },
+)
 </script>
 
 <style scoped>
@@ -109,8 +123,8 @@ const openFilter = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  z-index: 100;
+  gap: 5px;
+  z-index: 2000;
   background-color: #f7e4d2;
   box-shadow: 0 4px 15px rgba(110, 44, 17, 0.2);
   position: absolute;

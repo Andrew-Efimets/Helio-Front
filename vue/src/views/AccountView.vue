@@ -81,8 +81,8 @@ onMounted(fetchAccount)
 
 watch(
   () => route.params.id,
-  (newId) => {
-    if (newId) {
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
       userStore.clear()
       fetchAccount()
     }

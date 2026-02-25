@@ -30,7 +30,7 @@ onMounted(() => {
         postStore.loadMore(String(route.params.id))
       }
     },
-    { threshold: 1.0 },
+    { threshold: 0.1 },
   )
 
   if (loadMoreTrigger.value) {

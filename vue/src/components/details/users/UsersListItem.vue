@@ -20,7 +20,7 @@
         <template v-else>
           <div v-if="user.contact_status.type === 'accepted'" class="bottom-bar">
             <p class="bottom-bar__notify">Ваш контакт</p>
-            <span class="contact-button" @click="toChat" :disabled="isLoading"> Написать </span>
+            <span class="contact-button" @click="" :disabled="isLoading"> Написать </span>
             <span
               class="contact-button cancel-button"
               @click="isConfirmOpen = true"
@@ -86,15 +86,9 @@ const handleToggle = async () => {
   isConfirmOpen.value = false
   const data = await toggleContact(props.user.id)
   if (data) {
+    userStore.updateUserInList(props.user.id, data.contact_status, data.contacts_count)
+
     syncProfileButtons(data)
-
-    userStore.updateStatus(data.contact_status, data.contacts_count)
-
-    emit('update-user', {
-      ...props.user,
-      contact_status: data.contact_status,
-      contacts_count: data.contacts_count,
-    })
 
     userStore.triggerRefresh()
   }
@@ -103,16 +97,9 @@ const handleToggle = async () => {
 const handleAccept = async () => {
   const data = await acceptContact(props.user.id)
   if (data) {
-    console.log('Ответ от сервера при принятии:', data)
+    userStore.updateUserInList(props.user.id, data.contact_status, data.contacts_count)
+
     syncProfileButtons(data)
-
-    userStore.updateStatus(data.contact_status, data.contacts_count)
-
-    emit('update-user', {
-      ...props.user,
-      contact_status: data.contact_status,
-      contacts_count: data.contacts_count,
-    })
 
     userStore.triggerRefresh()
   }
@@ -124,16 +111,16 @@ const syncProfileButtons = (data: any) => {
   }
 }
 
-const toChat = async () => {
-  try {
-    isLoading.value = true
-    const response = await fetchChat(`/user/${authStore.user?.id}/chat/${chatStore.user?.id}`)
-  } catch (e) {
-    console.error(e)
-  } finally {
-    isLoading.value = false
-  }
-}
+// const toChat = async () => {
+//   try {
+//     isLoading.value = true
+//     const response = await fetchChat(`/user/${authStore.user?.id}/chat/${chatStore.user?.id}`)
+//   } catch (e) {
+//     console.error(e)
+//   } finally {
+//     isLoading.value = false
+//   }
+// }
 </script>
 
 <style scoped>

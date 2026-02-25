@@ -39,7 +39,7 @@ import { useAuthStore } from '@/stores/auth.ts'
 import { usePhotoStore } from '@/stores/photos.ts'
 import { useRoute, RouterLink } from 'vue-router'
 import { watch, ref, computed } from 'vue'
-import MediaGridPage from '@/components/account/pages/MediaGridPage.vue'
+import MediaGridPage from '@/components/details/media/MediaGridPage.vue'
 import MediaAddBlock from '@/components/details/media/MediaAddBlock.vue'
 import MediaLoadingPlaceholder from '@/components/details/media/MediaLoadingPlaceholder.vue'
 

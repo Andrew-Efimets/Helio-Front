@@ -15,7 +15,10 @@
       </div>
       <template v-else>
         <div v-if="isContact" class="users-list">
-          <span class="title">Всего контактов ({{ userStore.users.length }})</span>
+          <div class="header-wrapper">
+            <UsersFilter />
+            <span class="title">Всего контактов ({{ userStore.users.length }})</span>
+          </div>
           <template v-for="user in userStore.users" :key="user.id">
             <UsersListItem :user="user" />
           </template>
@@ -46,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import UsersFilter from '@/components/details/users/UsersFilter.vue'
 import UsersListItem from '@/components/details/users/UsersListItem.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
 import { onMounted, ref, computed, watch } from 'vue'
@@ -83,7 +87,7 @@ const handleFetchContacts = async () => {
   try {
     isLoading.value = true
     userStore.setUsers([])
-    await contacts.fetchContacts(route.params.id as string, currentStatus.value)
+    await contacts.fetchContacts(route.params.id as string, currentStatus.value, route.query)
   } catch (e: any) {
     privacyError.value = e.formattedMessage || 'Доступ ограничен настройками приватности'
     console.error('Ошибка при загрузке контактов:', e)
@@ -143,7 +147,14 @@ watch(
 
 .title {
   color: #6e2c11;
+  font-weight: bold;
   padding: 10px 20px;
+}
+
+.header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .users-list {
