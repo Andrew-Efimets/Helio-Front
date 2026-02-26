@@ -102,9 +102,10 @@ onUnmounted(() => {
 .wrapper {
   flex: 1;
   min-height: 0;
-  margin: 0 10px;
+  margin: 10px;
   padding: 10px;
   border: #6e2c11 1px solid;
+  box-shadow: 0 5px 5px 2px rgba(110, 44, 17, 0.3);
   border-radius: 8px;
   height: 100%;
   display: flex;
@@ -121,7 +122,6 @@ onUnmounted(() => {
   width: 100%;
   box-sizing: border-box;
   overflow: hidden;
-  margin: 10px 0;
   display: flex;
   flex-direction: column;
 }

@@ -17,16 +17,29 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ref } from 'vue'
 
 const router = useRouter()
+const route = useRoute()
 const searchQuery = ref('')
+
+const props = defineProps<{
+  isGlobal?: boolean
+}>()
 const handleSearch = () => {
-  router.push({
-    name: 'users',
-    query: { search: searchQuery.value },
-  })
+  if (props.isGlobal) {
+    router.push({
+      name: 'users',
+      query: { search: searchQuery.value },
+    })
+  } else {
+    router.push({
+      name: route.name as string,
+      params: route.params,
+      query: { search: searchQuery.value },
+    })
+  }
   searchQuery.value = ''
 }
 </script>
@@ -37,14 +50,14 @@ const handleSearch = () => {
   text-align: center;
   align-items: center;
   justify-content: end;
-  width: 30%;
+  width: 40%;
   position: relative;
 }
 
 .input {
   width: 100%;
   font-size: 16px;
-  padding: 5px 0 5px 10px;
+  padding: 5px 50px 5px 10px;
   border: #6e2c11 2px solid;
   border-radius: 18px;
   background-color: #e6bda9;

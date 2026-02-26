@@ -124,7 +124,7 @@ const router = createRouter({
             },
             {
               path: 'chat/:chatId',
-              name: 'chat-item',
+              name: 'chat',
               component: ChatWindow,
               props: true,
             },

@@ -35,6 +35,7 @@
           </select>
         </div>
         <button class="small-button" @click="applyFilters">Применить</button>
+        <button class="small-button" @click="resetFilters">Сбросить</button>
       </div>
     </AppTransition>
   </div>
@@ -72,6 +73,22 @@ const applyFilters = () => {
     params: route.params,
     query: cleanFilters,
   })
+  isOpen.value = false
+}
+
+const resetFilters = () => {
+  filters.country = ''
+  filters.city = ''
+  filters.age_from = ''
+  filters.age_to = ''
+  filters.sort = 'asc'
+
+  router.push({
+    name: route.name,
+    params: route.params,
+    query: {},
+  })
+
   isOpen.value = false
 }
 

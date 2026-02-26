@@ -16,8 +16,8 @@
       <template v-else>
         <div v-if="isContact" class="users-list">
           <div class="header-wrapper">
-            <UsersFilter />
             <span class="title">Всего контактов ({{ userStore.users.length }})</span>
+            <HeaderSearch :is-global="false" />
           </div>
           <template v-for="user in userStore.users" :key="user.id">
             <UsersListItem :user="user" />
@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import UsersFilter from '@/components/details/users/UsersFilter.vue'
+import HeaderSearch from '@/components/header/HeaderSearch.vue'
 import UsersListItem from '@/components/details/users/UsersListItem.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
 import { onMounted, ref, computed, watch } from 'vue'
@@ -155,6 +155,7 @@ watch(
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-right: 20px;
 }
 
 .users-list {

@@ -39,8 +39,4 @@ const commentStore = useCommentStore()
   background-color: #6e2c11;
   border-radius: 10px;
 }
-
-.empty {
-  color: #6e2c11;
-}
 </style>

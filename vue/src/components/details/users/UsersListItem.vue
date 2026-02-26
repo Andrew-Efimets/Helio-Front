@@ -20,7 +20,9 @@
         <template v-else>
           <div v-if="user.contact_status.type === 'accepted'" class="bottom-bar">
             <p class="bottom-bar__notify">Ваш контакт</p>
-            <span class="contact-button" @click="" :disabled="isLoading"> Написать </span>
+            <span class="contact-button" @click="toChat" :disabled="chatStore.isLoading">
+              Написать
+            </span>
             <span
               class="contact-button cancel-button"
               @click="isConfirmOpen = true"
@@ -70,16 +72,16 @@ import { ref } from 'vue'
 import { useContacts } from '@/composables/useContacts.ts'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 import { useUserStore } from '@/stores/user.ts'
+import { useChatStore } from '@/stores/chats.ts'
 
 const props = defineProps<{
   user: any
 }>()
 
-const emit = defineEmits(['update-user'])
 const isConfirmOpen = ref(false)
-const isLoading = ref(false)
 const authStore = useAuthStore()
 const userStore = useUserStore()
+const chatStore = useChatStore()
 
 const { isAddition, toggleContact, acceptContact } = useContacts()
 const handleToggle = async () => {
@@ -111,16 +113,13 @@ const syncProfileButtons = (data: any) => {
   }
 }
 
-// const toChat = async () => {
-//   try {
-//     isLoading.value = true
-//     const response = await fetchChat(`/user/${authStore.user?.id}/chat/${chatStore.user?.id}`)
-//   } catch (e) {
-//     console.error(e)
-//   } finally {
-//     isLoading.value = false
-//   }
-// }
+const toChat = async () => {
+  try {
+    const response = await chatStore.initChat(props.user.id)
+  } catch (e) {
+    console.error(e)
+  }
+}
 </script>
 
 <style scoped>

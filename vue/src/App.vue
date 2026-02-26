@@ -3,6 +3,7 @@
   <div class="app__container">
     <NotificationsView />
     <RouterView />
+    <ScrollToTop />
   </div>
   <AppFooter />
 </template>
@@ -20,6 +21,7 @@ import NotificationsView from '@/views/NotificationsView.vue'
 import { useNotificationStore } from '@/stores/notifications.ts'
 // import { useChatStore } from '@/stores/chats'
 import { useUserStore } from '@/stores/user'
+import ScrollToTop from '@/components/details/ScrollToTop.vue'
 
 onMounted(async () => {
   try {
