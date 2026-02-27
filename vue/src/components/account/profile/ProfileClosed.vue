@@ -59,33 +59,6 @@ const addContact = async () => {
   display: flex;
 }
 
-.avatar__container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 40px;
-  padding: 20px;
-  background-color: #f5ddc5;
-}
-
-.avatar__wrapper {
-  width: 200px;
-  height: 250px;
-}
-
-.avatar__empty {
-  background-color: #957f6f;
-}
-
-.avatar__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border: #6e2c11 2px solid;
-  box-shadow: 0 0 15px 5px rgba(190, 127, 25, 0.5);
-}
-
 .notify {
   font-size: 18px;
   font-weight: 700;
@@ -95,14 +68,15 @@ const addContact = async () => {
 
 .info {
   padding: 40px 0 20px;
+  width: 100%;
 }
 
 .wrapper {
   display: flex;
   flex-direction: column;
   background-color: #f5ddc5;
-  min-width: 600px;
   min-height: 200px;
+  box-shadow: var(--main-box-shadow);
 }
 
 .name-wrapper {

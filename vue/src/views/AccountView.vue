@@ -109,6 +109,10 @@ watch(
   width: 100%;
 }
 
+.wrapper-closed {
+  width: 100%;
+}
+
 .content {
   flex-direction: column;
   flex-grow: 1;

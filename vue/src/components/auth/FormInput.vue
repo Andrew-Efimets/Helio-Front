@@ -44,7 +44,7 @@ const handleInput = (event: Event) => {
 .input:focus {
   outline: none;
   border: 2px solid #be7f19;
-  box-shadow: 0 0 5px rgba(190, 127, 25, 0.5);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .message-error {

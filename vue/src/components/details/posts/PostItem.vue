@@ -107,8 +107,9 @@ const handleDeletePost = () => {
   padding: 20px 5px;
   display: flex;
   flex-direction: column;
-  background-color: #f9f2e7;
-  box-shadow: 0 0 10px 5px rgba(240, 163, 55, 0.3);
+  background: var(--main-plate-gradient);
+  box-shadow: var(--main-box-shadow);
+  border-radius: 10px;
 }
 
 .post-text__wrapper {

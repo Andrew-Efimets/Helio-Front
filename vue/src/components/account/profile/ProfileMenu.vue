@@ -152,7 +152,7 @@ const openMenu = () => {
     background-color: #f5ddc5;
     border-radius: 10px;
     z-index: 100;
-    box-shadow: 0 4px 15px rgba(110, 44, 17, 0.2);
+    box-shadow: var(--main-box-shadow);
   }
 
   .links__wrapper {
@@ -165,7 +165,7 @@ const openMenu = () => {
     left: 100px;
     z-index: 80;
     background-color: #f5ddc5;
-    box-shadow: 0 4px 15px rgba(110, 44, 17, 0.2);
+    box-shadow: var(--main-box-shadow);
   }
 
   .links__wrapper--open {

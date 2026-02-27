@@ -57,7 +57,7 @@ const handleLogout = async () => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  box-shadow: 0 0 15px 5px rgba(215, 142, 22, 0.5);
+  box-shadow: var(--avatar-box-shadow);
 }
 
 .avatar-img {

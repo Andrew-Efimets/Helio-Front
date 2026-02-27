@@ -147,7 +147,7 @@ const handleAccept = async () => {
   height: 100%;
   object-fit: cover;
   border: #6e2c11 2px solid;
-  box-shadow: 0 0 15px 5px rgba(190, 127, 25, 0.5);
+  box-shadow: var(--avatar-box-shadow);
 }
 
 .menu {

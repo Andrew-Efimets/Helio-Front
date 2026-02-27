@@ -88,6 +88,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-self: stretch;
+  box-shadow: var(--main-box-shadow);
 }
 
 .title {
@@ -105,7 +106,7 @@ onUnmounted(() => {
   margin: 10px;
   padding: 10px;
   border: #6e2c11 1px solid;
-  box-shadow: 0 5px 5px 2px rgba(110, 44, 17, 0.3);
+  background: var(--main-plate-gradient);
   border-radius: 8px;
   height: 100%;
   display: flex;

@@ -182,7 +182,7 @@ onUnmounted(() => {
 
 .likes-container {
   padding: 10px;
-  background-color: #f9f2e7;
+  background: transparent;
   border-radius: 10px;
 }
 
@@ -265,7 +265,7 @@ onUnmounted(() => {
   scrollbar-width: thin;
   scrollbar-color: rgba(153, 61, 26, 0.5) transparent;
   z-index: 100;
-  box-shadow: 0 4px 15px rgba(110, 44, 17, 0.2);
+  box-shadow: var(--main-box-shadow);
 }
 
 .liked-list::-webkit-scrollbar {

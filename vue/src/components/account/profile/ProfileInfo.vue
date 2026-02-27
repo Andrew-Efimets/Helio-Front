@@ -63,6 +63,7 @@ const displayInfo = computed(() => {
   flex-direction: column;
   background-color: #f5ddc5;
   min-height: 200px;
+  box-shadow: var(--main-box-shadow);
 }
 
 .name-wrapper {

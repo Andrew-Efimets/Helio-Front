@@ -129,7 +129,9 @@ const toChat = async () => {
   padding: 10px 20px;
   margin: 10px;
   height: fit-content;
-  background-color: #f9f2e7;
+  border-radius: 10px;
+  box-shadow: var(--main-box-shadow);
+  background: var(--items-gradient);
 }
 
 .user-avatar {

@@ -1,3 +1,12 @@
+:root {
+  --main-box-shadow: 0 0 10px rgba(139, 81, 24, 0.5);
+  --avatar-box-shadow: 0 0 20px rgba(139, 81, 24, 0.7);
+  --input-focus-shadow: 0 0 5px rgba(190, 127, 25, 0.5);
+  --message-shadow: 0 0 1px rgba(139, 81, 24, 0.4);
+  --main-plate-gradient: linear-gradient(45deg, #f9f2e7, rgba(255, 236, 211, 0.78), #f9f2e7);
+  --items-gradient: linear-gradient(45deg, rgba(255, 236, 211, 0.78), #f9f2e7);
+}
+
 * {
   margin: 0;
   padding: 0;

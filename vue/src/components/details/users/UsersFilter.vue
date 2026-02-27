@@ -143,7 +143,7 @@ watch(
   gap: 5px;
   z-index: 2000;
   background-color: #f7e4d2;
-  box-shadow: 0 4px 15px rgba(110, 44, 17, 0.2);
+  box-shadow: var(--main-box-shadow);
   position: absolute;
   left: 140px;
 }
@@ -172,7 +172,7 @@ watch(
 .select:focus {
   outline: none;
   border: 2px solid #be7f19;
-  box-shadow: 0 0 5px rgba(190, 127, 25, 0.5);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .burger__wrapper {
@@ -184,7 +184,7 @@ watch(
   background-color: #f5ddc5;
   border-radius: 10px;
   z-index: 100;
-  box-shadow: 0 4px 15px rgba(110, 44, 17, 0.2);
+  box-shadow: var(--main-box-shadow);
 }
 
 .burger {

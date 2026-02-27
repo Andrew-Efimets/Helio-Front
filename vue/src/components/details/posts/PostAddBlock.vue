@@ -115,7 +115,9 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   row-gap: 20px;
-  box-shadow: 0 0 10px 5px rgba(240, 163, 55, 0.3);
+  border-radius: 10px;
+  background: var(--items-gradient);
+  box-shadow: var(--main-box-shadow);
 }
 
 .post-add__title {
@@ -133,7 +135,8 @@ onUnmounted(() => {
   width: 30px;
   height: 30px;
   border: #6e2c11 1px solid;
-  box-shadow: 0 0 5px 5px rgba(240, 163, 55, 0.2);
+  border-radius: 5px;
+  box-shadow: var(--main-box-shadow);
   cursor: pointer;
 }
 
@@ -144,7 +147,6 @@ onUnmounted(() => {
 
 .button-wrapper:active {
   scale: 0.9;
-  box-shadow: inset 0 0 5px 5px rgba(240, 163, 55, 0.2);
 }
 
 .add-button:disabled {

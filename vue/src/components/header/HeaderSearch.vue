@@ -60,13 +60,13 @@ const handleSearch = () => {
   padding: 5px 50px 5px 10px;
   border: #6e2c11 2px solid;
   border-radius: 18px;
-  background-color: #e6bda9;
+  background-color: #f5ddc5;
 }
 
 .input:focus {
   outline: none;
   border: 2px solid #be7f19;
-  box-shadow: 0 0 5px rgba(190, 127, 25, 0.5);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .icon-wrapper {

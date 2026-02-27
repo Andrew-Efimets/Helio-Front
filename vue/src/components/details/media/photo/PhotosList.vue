@@ -74,6 +74,7 @@ const isOwner = computed(() => Number(authStore.user?.id) === Number(route.param
   aspect-ratio: 1/1;
   overflow: hidden;
   border-radius: 8px;
+  box-shadow: var(--main-box-shadow);
 }
 
 .img-fit {

@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import { RouterView, useRoute } from 'vue-router'
-import { onMounted, ref, watch, onUnmounted } from 'vue'
+import { RouterView } from 'vue-router'
+import { onMounted, watch, onUnmounted } from 'vue'
 import AppHeader from '@/components/header/AppHeader.vue'
 import AppFooter from '@/components/footer/AppFooter.vue'
 import axios from 'axios'
@@ -18,8 +18,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useVideoStore } from '@/stores/videos'
 import { usePhotoStore } from '@/stores/photos'
 import NotificationsView from '@/views/NotificationsView.vue'
-import { useNotificationStore } from '@/stores/notifications.ts'
-// import { useChatStore } from '@/stores/chats'
+import { useNotificationStore } from '@/stores/notifications'
 import { useUserStore } from '@/stores/user'
 import ScrollToTop from '@/components/details/ScrollToTop.vue'
 
@@ -35,7 +34,6 @@ const authStore = useAuthStore()
 const videoStore = useVideoStore()
 const photoStore = usePhotoStore()
 const notify = useNotificationStore()
-const route = useRoute()
 const userStore = useUserStore()
 
 const setupGlobalListeners = (userId: number | string) => {
@@ -48,11 +46,6 @@ const setupGlobalListeners = (userId: number | string) => {
 
   channel.listen('.PhotoProcessed', (e: any) => {
     photoStore.updatePhotoInList(e.photo)
-  })
-
-  channel.listen('.NewMessage', (e: any) => {
-    // chatStore.addMessage(e.message)
-    // if (route.name !== 'chat') toast.info(`Новое сообщение от ${e.message.user.name}`)
   })
 
   channel.listen('.contact.request', (data: any) => {
@@ -154,7 +147,7 @@ const setupGlobalListeners = (userId: number | string) => {
   })
 }
 
-window.addEventListener('storage', (event) => {
+const storageSync = (event: StorageEvent) => {
   if (event.key === 'user_data' && event.newValue) {
     try {
       const freshUserData = JSON.parse(event.newValue)
@@ -163,7 +156,9 @@ window.addEventListener('storage', (event) => {
       console.error('Ошибка синхронизации вкладок', e)
     }
   }
-})
+}
+
+window.addEventListener('storage', storageSync)
 
 watch(
   () => authStore.user?.id,
@@ -178,10 +173,6 @@ watch(
 )
 
 onUnmounted(() => {
-  if (authStore.user?.id) {
-    window.Echo.leave(`user.${authStore.user.id}`)
-  }
+  window.removeEventListener('storage', storageSync)
 })
 </script>
-
-<style></style>

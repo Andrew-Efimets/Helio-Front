@@ -21,8 +21,8 @@
         class="input"
         :placeholder="placeholder"
         rows="1"
-        @keyup.enter.exact.prevent="handleSend"
-        @keyup.enter.shift.exact="() => {}"
+        @keydown.enter.exact.prevent="handleSend"
+        @keydown.enter.shift.exact="() => {}"
         @keydown.left.stop
         @keydown.right.stop
         @keydown.esc.stop
@@ -140,7 +140,7 @@ watch(
   max-height: 300px;
   padding: 10px 40px;
   border: #6e2c11 1px solid;
-  box-shadow: 0 5px 5px 2px rgba(110, 44, 17, 0.3);
+  box-shadow: var(--main-box-shadow);
   border-radius: 8px;
   color: #6e2c11;
   line-height: 22px;
@@ -151,6 +151,7 @@ watch(
 
 .input:focus {
   border-color: #be7f19;
+  box-shadow: var(--input-focus-shadow);
 }
 
 .send {
