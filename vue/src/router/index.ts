@@ -6,7 +6,7 @@ import RegisterForm from '@/components/auth/RegisterForm.vue'
 import VerifyForm from '@/components/auth/VerifyForm.vue'
 import AccountView from '@/views/AccountView.vue'
 import AccountWall from '@/components/details/posts/AccountWall.vue'
-import ChatsList from '@/components/details/chats/ChatsList.vue'
+import ChatsView from '@/views/ChatsView.vue'
 import ChatWindow from '@/components/details/chats/ChatWindow.vue'
 import ContactsList from '@/components/details/users/ContactsList.vue'
 import PhotosList from '@/components/details/media/photo/PhotosList.vue'
@@ -36,6 +36,26 @@ const router = createRouter({
         }
         return { name: 'login' }
       },
+    },
+    {
+      path: '/users',
+      name: 'users',
+      meta: { requiresAuth: true },
+      component: UsersListView,
+    },
+    {
+      path: '/chats',
+      name: 'chats',
+      meta: { requiresAuth: true },
+      component: ChatsView,
+      children: [
+        {
+          path: ':chatId',
+          name: 'chat',
+          component: ChatWindow,
+          props: true,
+        },
+      ],
     },
     {
       path: '/',
@@ -70,11 +90,6 @@ const router = createRouter({
           meta: { isModal: true },
         },
       ],
-    },
-    {
-      path: '/users',
-      name: 'users',
-      component: UsersListView,
     },
     {
       path: '/',
@@ -114,18 +129,6 @@ const router = createRouter({
               path: '',
               name: 'wall',
               component: AccountWall,
-              props: true,
-            },
-            {
-              path: 'chats',
-              name: 'chats',
-              component: ChatsList,
-              props: true,
-            },
-            {
-              path: 'chat/:chatId',
-              name: 'chat',
-              component: ChatWindow,
               props: true,
             },
             {

@@ -8,10 +8,28 @@ export const useChatStore = defineStore('chat', () => {
   const authStore = useAuthStore()
   const isLoading = ref(false)
   const chat = ref<any>(null)
-  const initChat = async (userId: string | number) => {
+  const allChats = ref<any>(null)
+
+  const fetchAllChats = async (chatType: string) => {
     try {
       isLoading.value = true
-      const response = await api.post(`/user/${userId}/chat`)
+      const response = await api.get(`/chats`, {
+        params: {
+          type: chatType,
+        },
+      })
+      allChats.value = response.data.data
+    } catch (e) {
+      throw e
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const initChat = async (contactId: string | number) => {
+    try {
+      isLoading.value = true
+      const response = await api.post(`/chats/chat`, { contactId })
       const chatId = response.data.data.id
       await router.push({ name: 'chat', params: { chatId: chatId } })
     } catch (e) {
@@ -28,7 +46,7 @@ export const useChatStore = defineStore('chat', () => {
       if (!myId) return
 
       isLoading.value = true
-      const response = await api.get(`/user/${myId}/chat/${chatId}`)
+      const response = await api.get(`/chats/chat/${chatId}`)
       chat.value = response.data.data
     } catch (e) {
       console.error(e)
@@ -37,9 +55,17 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  const updateChatTitle = async (chatId: number, title: string) => {
+    await api.patch(`/chats/chat/${chatId}`, { title })
+  }
+
+  const deleteChat = async (chatId: number) => {
+    await api.delete(`/chats/chat/${chatId}`)
+  }
+
   const addMessage = async (userId: string | number, text: string, chatId) => {
     try {
-      const response = await api.post(`/user/${userId}/chat/${chatId}/messages`, { text })
+      const response = await api.post(`/chats/chat/${chatId}/messages`, { text })
       if (chat.value && chat.value.messages && chat.value.messages.data) {
         chat.value.messages.data.push(response.data.data)
       }
@@ -78,10 +104,14 @@ export const useChatStore = defineStore('chat', () => {
   return {
     chat,
     isLoading,
+    allChats,
     addMessage,
     addEchoMessage,
     loadPreviousMessages,
     initChat,
     fetchChat,
+    fetchAllChats,
+    updateChatTitle,
+    deleteChat,
   }
 })

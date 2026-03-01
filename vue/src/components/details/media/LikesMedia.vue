@@ -275,7 +275,7 @@ onUnmounted(() => {
 .liked-list__item {
   display: flex;
   align-items: center;
-  column-gap: 20px;
+  column-gap: 10px;
 }
 
 .link {
