@@ -7,12 +7,18 @@ import router from '@/router'
 export const useChatStore = defineStore('chat', () => {
   const authStore = useAuthStore()
   const isLoading = ref(false)
+  const isListLoading = ref(false)
   const chat = ref<any>(null)
   const allChats = ref<any>(null)
+  const replyTo = ref<any>(null)
+
+  const setReply = (comment: any) => (replyTo.value = comment)
+  const clearReply = () => (replyTo.value = null)
 
   const fetchAllChats = async (chatType: string) => {
     try {
-      isLoading.value = true
+      isListLoading.value = true
+      allChats.value = []
       const response = await api.get(`/chats`, {
         params: {
           type: chatType,
@@ -22,7 +28,7 @@ export const useChatStore = defineStore('chat', () => {
     } catch (e) {
       throw e
     } finally {
-      isLoading.value = false
+      isListLoading.value = false
     }
   }
 
@@ -44,7 +50,7 @@ export const useChatStore = defineStore('chat', () => {
     try {
       const myId = authStore.user?.id
       if (!myId) return
-
+      chat.value = []
       isLoading.value = true
       const response = await api.get(`/chats/chat/${chatId}`)
       chat.value = response.data.data
@@ -63,15 +69,24 @@ export const useChatStore = defineStore('chat', () => {
     await api.delete(`/chats/chat/${chatId}`)
   }
 
-  const addMessage = async (userId: string | number, text: string, chatId) => {
+  const addMessage = async (text: string, chatId) => {
+    const payload = {
+      text: text,
+      parent_id: replyTo.value ? replyTo.value.id : null,
+      parent_content: replyTo.value ? replyTo.value.content : null,
+    }
     try {
-      const response = await api.post(`/chats/chat/${chatId}/messages`, { text })
+      isLoading.value = true
+      const response = await api.post(`/chats/chat/${chatId}/messages`, payload)
       if (chat.value && chat.value.messages && chat.value.messages.data) {
         chat.value.messages.data.push(response.data.data)
       }
+      clearReply()
     } catch (e) {
       console.error('Ошибка отправки', e)
       throw e
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -81,6 +96,45 @@ export const useChatStore = defineStore('chat', () => {
       if (!exists) {
         chat.value.messages.data.push(message)
       }
+    }
+  }
+
+  const updateMessage = async (
+    messageId: number | string,
+    text: string,
+    chatId: number | string,
+  ) => {
+    try {
+      isLoading.value = true
+      const response = await api.patch(`/chats/chat/${chatId}/messages/${messageId}`, { text })
+
+      if (chat.value?.messages?.data) {
+        const index = chat.value.messages.data.findIndex((m: any) => m.id === messageId)
+        if (index !== -1) {
+          chat.value.messages.data[index] = response.data.data
+        }
+      }
+    } catch (e) {
+      console.error('Ошибка редактирования', e)
+      throw e
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const deleteMessage = async (messageId: number | string, chatId: number | string) => {
+    try {
+      isLoading.value = true
+      await api.delete(`/chats/chat/${chatId}/messages/${messageId}`)
+
+      if (chat.value?.messages?.data) {
+        chat.value.messages.data = chat.value.messages.data.filter((m: any) => m.id !== messageId)
+      }
+    } catch (e) {
+      console.error('Ошибка удаления', e)
+      throw e
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -104,7 +158,9 @@ export const useChatStore = defineStore('chat', () => {
   return {
     chat,
     isLoading,
+    isListLoading,
     allChats,
+    replyTo,
     addMessage,
     addEchoMessage,
     loadPreviousMessages,
@@ -113,5 +169,9 @@ export const useChatStore = defineStore('chat', () => {
     fetchAllChats,
     updateChatTitle,
     deleteChat,
+    updateMessage,
+    deleteMessage,
+    setReply,
+    clearReply,
   }
 })

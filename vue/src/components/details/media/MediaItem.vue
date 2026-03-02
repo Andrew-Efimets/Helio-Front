@@ -50,7 +50,7 @@ import { usePhotoStore } from '@/stores/photos.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import PhotoItem from '@/components/details/media/photo/PhotoItem.vue'
 import VideoItem from '@/components/details/media/video/VideoItem.vue'
-import CommentsMedia from '@/components/details/media/CommentsMedia.vue'
+import CommentsMedia from '@/components/details/media/comments/CommentsMedia.vue'
 import LikesMedia from '@/components/details/media/LikesMedia.vue'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 

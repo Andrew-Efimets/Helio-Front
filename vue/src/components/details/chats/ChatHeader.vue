@@ -13,7 +13,7 @@
         <p @click="openParticipantsList" class="participants__title">Участники</p>
         <div class="avatars__wrapper">
           <div
-            v-for="participant in chatStore.chat?.participants"
+            v-for="participant in (chatStore.chat?.participants || []).slice(-5)"
             :key="participant.id"
             class="avatar__wrapper"
           >

@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import LikesMedia from '@/components/details/media/LikesMedia.vue'
-import CommentsMedia from '@/components/details/media/CommentsMedia.vue'
+import CommentsMedia from '@/components/details/media/comments/CommentsMedia.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
 import MessageInput from '@/components/details/MessageInput.vue'
 import { usePostStore } from '@/stores/posts.ts'

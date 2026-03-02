@@ -1,31 +1,115 @@
 <template>
-  <div class="chat-message">
-    <div :class="myMessage ? 'send' : 'get'">
-      <p class="text">
-        {{ message?.content }}
-      </p>
+  <div class="chat-message" @click.right.prevent="openEditor">
+    <div :class="{ active: isOpenEditor }" class="message">
+      <div :class="myMessage ? 'send' : 'get'">
+        <div v-if="message.parent_id" class="reply-quote">
+          <div class="quote-header">
+            <img :src="message.parent_user_avatar" class="quote-avatar" />
+            <span class="quote-author">{{ message.parent_user_name }}</span>
+          </div>
+          <p class="quote-text">{{ message.parent_content }}</p>
+        </div>
+        <p class="text">
+          {{ message?.content }}
+        </p>
+      </div>
     </div>
+    <AppTransition name="dropdown">
+      <div v-if="isOpenEditor" class="editor">
+        <p class="editor__link" @click.prevent="chatStore.setReply(message)">Цитировать</p>
+        <p v-if="myMessage" class="editor__link">Редактировать</p>
+        <p class="editor__link danger" @click="isConfirmOpen = true">Удалить</p>
+      </div>
+    </AppTransition>
   </div>
+  <ConfirmModal
+    :is-open="isConfirmOpen"
+    @close="isConfirmOpen = false"
+    @confirm="handleDeleteMessage"
+  >
+    <p>Вы действительно хотите удалить сообщение?</p>
+    <template #button__text>Да, удалить</template>
+  </ConfirmModal>
 </template>
 
 <script setup lang="ts">
 import { useChatStore } from '@/stores/chats.ts'
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useNotificationStore } from '@/stores/notifications.ts'
+import ConfirmModal from '@/components/details/ConfirmModal.vue'
+import AppTransition from '@/components/details/AppTransition.vue'
 
 const props = defineProps<{
   message: any
 }>()
+
+const isConfirmOpen = ref(false)
 const chatStore = useChatStore()
 const authStore = useAuthStore()
+const notify = useNotificationStore()
+const isOpenEditor = ref(false)
+const menuPosition = ref({ x: 0, y: 0 })
+const menuTop = computed(() => `${menuPosition.value.y}px`)
+const menuLeft = computed(() => `${menuPosition.value.x}px`)
 
 const myMessage = computed(() => {
   return Number(authStore.user?.id) === Number(props.message.user_id)
+})
+
+const openEditor = (event: MouseEvent) => {
+  event.stopPropagation()
+
+  window.dispatchEvent(new CustomEvent('close-all-editors'))
+
+  let x = event.clientX
+  let y = event.clientY
+  if (x + 140 > window.innerWidth) {
+    x = x - 140
+  }
+  if (y + 50 > window.innerHeight) {
+    y = y - 50
+  }
+  menuPosition.value = { x, y }
+
+  isOpenEditor.value = true
+}
+
+const closeMenu = () => {
+  isOpenEditor.value = false
+}
+
+const handleDeleteMessage = async () => {
+  try {
+    isConfirmOpen.value = false
+    await chatStore.deleteMessage(props.message.id, chatStore.chat.id)
+    isOpenEditor.value = false
+  } catch (e) {
+    notify.show('Не удалось удалить сообщение', 'error')
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('click', closeMenu)
+  window.addEventListener('scroll', closeMenu, true)
+  window.addEventListener('contextmenu', closeMenu)
+  window.addEventListener('close-all-editors', closeMenu)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('click', closeMenu)
+  window.removeEventListener('scroll', closeMenu, true)
+  window.removeEventListener('contextmenu', closeMenu)
+  window.removeEventListener('close-all-editors', closeMenu)
 })
 </script>
 
 <style scoped>
 .chat-message {
+  position: relative;
+}
+
+.message {
   display: flex;
   flex-direction: column;
   padding: 0 10px;
@@ -78,5 +162,72 @@ const myMessage = computed(() => {
 .text {
   font-size: 14px;
   color: #6e2c11;
+}
+
+.active {
+  background-color: rgba(206, 195, 186, 0.25);
+}
+
+.editor {
+  position: fixed;
+  z-index: 999;
+  background-color: #f7e4d2;
+  border-radius: 10px;
+  width: fit-content;
+  box-shadow: var(--main-box-shadow);
+  top: v-bind(menuTop);
+  left: v-bind(menuLeft);
+}
+
+.editor__link {
+  color: #6e2c11;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.danger {
+  color: #e99a9a;
+}
+
+.editor__link:hover {
+  background-color: rgba(206, 195, 186, 0.25);
+}
+
+.reply-quote {
+  background-color: rgba(206, 195, 186, 0.25);
+  border-left: 3px solid #6e2c11;
+  padding: 4px 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  max-width: 100%;
+}
+
+.quote-header {
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.quote-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.quote-author {
+  color: #6e2c11;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.quote-text {
+  color: #6e2c11;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
 }
 </style>

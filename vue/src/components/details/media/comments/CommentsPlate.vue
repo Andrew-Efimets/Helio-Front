@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { useCommentStore } from '@/stores/comments.ts'
-import CommentItem from '@/components/details/media/CommentItem.vue'
+import CommentItem from '@/components/details/media/comments/CommentItem.vue'
 
 defineProps<{
   tree: any[]

@@ -4,35 +4,41 @@
       <p :class="{ active: !isGroupe }" @click="toggleTab(false)" class="header__link">Чаты</p>
       <p :class="{ active: isGroupe }" @click="toggleTab(true)" class="header__link">Группы</p>
     </div>
-    <div v-for="chat in chatStore?.allChats" :key="chat.id" class="list__wrapper">
-      <div class="list__item">
-        <div class="main">
-          <div class="image__wrapper">
-            <img :src="getChatData(chat).avatar" alt="" class="image" />
+    <div class="list__wrapper">
+      <div v-if="chatStore.isListLoading" class="app-loader"></div>
+      <template v-if="chatStore.allChats?.length">
+        <template v-for="chat in chatStore?.allChats" :key="chat.id">
+          <div class="list__item">
+            <div class="main">
+              <div class="image__wrapper">
+                <img :src="getChatData(chat).avatar" alt="" class="image" />
+              </div>
+              <RouterLink :to="{ name: 'chat', params: { chatId: chat.id } }" class="link">
+                <p class="title">
+                  {{ getChatData(chat).title }}
+                </p>
+              </RouterLink>
+            </div>
           </div>
-          <RouterLink :to="{ name: 'chat', params: { chatId: chat.id } }" class="link">
-            <p class="title">
-              {{ getChatData(chat).title }}
-            </p>
-          </RouterLink>
-        </div>
-      </div>
+        </template>
+      </template>
+      <span v-if="!chatStore.isListLoading && !chatStore.allChats?.length" class="empty-list">
+        Cписок пуст
+      </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const isGroupe = ref(false)
 const chatStore = useChatStore()
-const chatAvatar = ref<any>()
-const chatTitle = ref<any>()
 const authStore = useAuthStore()
 
-const chatType = computed(() => (isGroupe.value ? 'groupe' : 'private'))
+const chatType = computed(() => (isGroupe.value ? 'group' : 'private'))
 
 const getChatData = (chat: any) => {
   if (chat.type === 'private') {
@@ -60,11 +66,16 @@ const handleFetchChats = async () => {
     console.error(e)
   }
 }
+
+onMounted(() => {
+  handleFetchChats()
+})
 </script>
 
 <style scoped>
 .chats-list {
-  max-width: 400px;
+  max-width: 500px;
+  min-width: 300px;
   width: fit-content;
   background-color: #f5ddc5;
   padding: 10px;
@@ -85,6 +96,11 @@ const handleFetchChats = async () => {
 
 .active {
   background-color: #f0ccaa;
+}
+
+.list__wrapper {
+  background-color: #f0ccaa;
+  padding: 10px;
 }
 
 .main {
@@ -112,6 +128,12 @@ const handleFetchChats = async () => {
   font-weight: bold;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.empty-list {
+  color: #6e2c11;
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .link:hover {

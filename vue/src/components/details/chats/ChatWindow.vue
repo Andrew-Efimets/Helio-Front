@@ -8,7 +8,14 @@
           <ChatsMessageItem :message="message" />
         </div>
       </div>
-      <MessageInput v-model="messageText" placeholder="Напишите сообщение" @send="saveMessage" />
+      <div v-if="chatStore.replyTo" class="quote-preview">
+        <div class="quote-content">
+          <span class="quote-author">{{ chatStore.replyTo.user.name }}:</span>
+          <span class="quote-text">{{ chatStore.replyTo.content }}</span>
+        </div>
+        <button class="quote-close" @click="chatStore.clearReply">×</button>
+      </div>
+      <MessageInput v-model="messageText" :is-editing="!!editingMessage" @send="saveMessage" />
     </div>
   </div>
 </template>
@@ -30,11 +37,19 @@ const authStore = useAuthStore()
 const messageText = ref('')
 const notify = useNotificationStore()
 const messagesWrapper = ref<HTMLElement | null>(null)
+const editingMessage = ref<any>(null)
 
 const saveMessage = async (text: string) => {
   if (!text.trim()) return
+
   try {
-    await chatStore.addMessage(Number(authStore.user?.id), text, chatStore.chat?.id)
+    if (editingMessage.value) {
+      await chatStore.updateMessage(editingMessage.value.id, text, chatStore.chat.id)
+      editingMessage.value = null
+    } else {
+      await chatStore.addMessage(text, chatStore.chat.id)
+      scrollToBottom()
+    }
     messageText.value = ''
   } catch (error) {
     notify.show('Не удалось отправить сообщение', 'error')
@@ -55,6 +70,14 @@ const handleScroll = async () => {
   }
 }
 
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (messagesWrapper.value) {
+      messagesWrapper.value.scrollTop = messagesWrapper.value.scrollHeight
+    }
+  })
+}
+
 watch(
   [() => authStore.user?.id, () => route.params.chatId],
   ([newUserId, newChatId]) => {
@@ -66,9 +89,24 @@ watch(
           }
         })
 
-        window.Echo.private(`chats.${newChatId}`).listen('.message.created', (e: any) => {
-          chatStore.addEchoMessage(e.message)
-        })
+        window.Echo.private(`chats.${newChatId}`)
+          .listen('.message.created', (e: any) => {
+            chatStore.addEchoMessage(e.message)
+            scrollToBottom()
+          })
+
+          .listen('.message.updated', (e) => {
+            const index = chatStore.chat.messages.data.findIndex((m) => m.id === e.message.id)
+            if (index !== -1) chatStore.chat.messages.data[index] = e.message
+          })
+
+          .listen('.message.deleted', (e) => {
+            if (chatStore.chat?.messages?.data) {
+              chatStore.chat.messages.data = chatStore.chat.messages.data.filter(
+                (m: any) => m.id !== e.messageId,
+              )
+            }
+          })
       })
     }
   },
@@ -116,5 +154,42 @@ onUnmounted(() => {
 .messages__wrapper::-webkit-scrollbar-thumb {
   background-color: #6e2c11;
   border-radius: 10px;
+}
+
+.quote-preview {
+  display: flex;
+  align-items: center;
+  background: #f0ccaa;
+  padding: 5px 10px;
+  margin: 0 10px;
+  border-left: 4px solid #6e2c11;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.quote-content {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #6e2c11;
+}
+
+.quote-author {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.quote-close {
+  background: none;
+  border: none;
+  color: #6e2c11;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.loader__wrapper {
+  text-align: end;
 }
 </style>
