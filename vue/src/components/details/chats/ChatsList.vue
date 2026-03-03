@@ -1,5 +1,9 @@
 <template>
   <div class="chats-list">
+    <div v-if="messageStore.forwardingMessage" class="forward-banner">
+      <p>Выберите чат</p>
+      <button @click.stop="messageStore.clearForward">Отмена</button>
+    </div>
     <div class="header">
       <p :class="{ active: !isGroupe }" @click="toggleTab(false)" class="header__link">Чаты</p>
       <p :class="{ active: isGroupe }" @click="toggleTab(true)" class="header__link">Группы</p>
@@ -8,16 +12,16 @@
       <div v-if="chatStore.isListLoading" class="app-loader"></div>
       <template v-if="chatStore.allChats?.length">
         <template v-for="chat in chatStore?.allChats" :key="chat.id">
-          <div class="list__item">
+          <div class="list__item" @click="selectChat(chat.id)">
             <div class="main">
               <div class="image__wrapper">
                 <img :src="getChatData(chat).avatar" alt="" class="image" />
               </div>
-              <RouterLink :to="{ name: 'chat', params: { chatId: chat.id } }" class="link">
+              <div class="link">
                 <p class="title">
                   {{ getChatData(chat).title }}
                 </p>
-              </RouterLink>
+              </div>
             </div>
           </div>
         </template>
@@ -31,14 +35,30 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useMessageStore } from '@/stores/messages.ts'
 
 const isGroupe = ref(false)
 const chatStore = useChatStore()
 const authStore = useAuthStore()
+const messageStore = useMessageStore()
+const router = useRouter()
 
 const chatType = computed(() => (isGroupe.value ? 'group' : 'private'))
+
+const selectChat = async (chatId: number) => {
+  if (messageStore.forwardingMessage) {
+    messageStore.setReply(messageStore.forwardingMessage)
+    messageStore.clearForward()
+    router.push({ name: 'chat', params: { chatId } })
+  } else {
+    messageStore.clearReply()
+    messageStore.clearEdit()
+    router.push({ name: 'chat', params: { chatId } })
+  }
+}
 
 const getChatData = (chat: any) => {
   if (chat.type === 'private') {
@@ -127,7 +147,6 @@ onMounted(() => {
   font-size: 16px;
   font-weight: bold;
   white-space: nowrap;
-  cursor: pointer;
 }
 
 .empty-list {
@@ -138,5 +157,31 @@ onMounted(() => {
 
 .link:hover {
   text-decoration: underline;
+}
+
+.list__item {
+  cursor: pointer;
+}
+
+.forward-banner {
+  background-color: #f0ccaa;
+  color: #6e2c11;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+.forward-banner button {
+  background: var(--items-gradient);
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #6e2c11;
+  font-weight: bold;
 }
 </style>

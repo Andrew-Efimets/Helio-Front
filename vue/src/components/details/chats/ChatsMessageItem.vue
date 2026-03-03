@@ -9,16 +9,24 @@
           </div>
           <p class="quote-text">{{ message.parent_content }}</p>
         </div>
-        <p class="text">
-          {{ message?.content }}
-        </p>
+        <div class="content">
+          <p class="text">
+            {{ message?.content }}
+          </p>
+          <p class="time">
+            {{ messageTime }}
+          </p>
+        </div>
       </div>
     </div>
     <AppTransition name="dropdown">
       <div v-if="isOpenEditor" class="editor">
-        <p class="editor__link" @click.prevent="chatStore.setReply(message)">Цитировать</p>
-        <p v-if="myMessage" class="editor__link">Редактировать</p>
-        <p class="editor__link danger" @click="isConfirmOpen = true">Удалить</p>
+        <p class="editor__link" @click.prevent="messageStore.setReply(message)">Цитировать</p>
+        <p class="editor__link" @click.prevent="messageStore.setForward(message)">Переслать</p>
+        <p v-if="myMessage" class="editor__link" @click="messageStore.setEdit(message)">
+          Редактировать
+        </p>
+        <p v-if="myMessage" class="editor__link danger" @click="isConfirmOpen = true">Удалить</p>
       </div>
     </AppTransition>
   </div>
@@ -34,11 +42,12 @@
 
 <script setup lang="ts">
 import { useChatStore } from '@/stores/chats.ts'
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth.ts'
 import { useNotificationStore } from '@/stores/notifications.ts'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
+import { useMessageStore } from '@/stores/messages.ts'
 
 const props = defineProps<{
   message: any
@@ -47,6 +56,7 @@ const props = defineProps<{
 const isConfirmOpen = ref(false)
 const chatStore = useChatStore()
 const authStore = useAuthStore()
+const messageStore = useMessageStore()
 const notify = useNotificationStore()
 const isOpenEditor = ref(false)
 const menuPosition = ref({ x: 0, y: 0 })
@@ -55,6 +65,12 @@ const menuLeft = computed(() => `${menuPosition.value.x}px`)
 
 const myMessage = computed(() => {
   return Number(authStore.user?.id) === Number(props.message.user_id)
+})
+
+const messageTime = computed(() => {
+  const date = new Date(props.message?.created_at)
+  const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return time
 })
 
 const openEditor = (event: MouseEvent) => {
@@ -82,7 +98,7 @@ const closeMenu = () => {
 const handleDeleteMessage = async () => {
   try {
     isConfirmOpen.value = false
-    await chatStore.deleteMessage(props.message.id, chatStore.chat.id)
+    await messageStore.deleteMessage(props.message.id, chatStore.chat.id)
     isOpenEditor.value = false
   } catch (e) {
     notify.show('Не удалось удалить сообщение', 'error')
@@ -112,7 +128,9 @@ onUnmounted(() => {
 .message {
   display: flex;
   flex-direction: column;
-  padding: 0 10px;
+  padding: 0 25px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .send {
@@ -229,5 +247,19 @@ onUnmounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   font-style: italic;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.time {
+  border-radius: 10px;
+  font-size: 12px;
+  width: fit-content;
+  padding: 5px 0;
+  align-self: end;
+  color: #999;
 }
 </style>

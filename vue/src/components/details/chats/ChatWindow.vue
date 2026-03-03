@@ -3,19 +3,35 @@
     <ChatHeader />
     <div class="plate">
       <div class="messages__wrapper" ref="messagesWrapper" @scroll="handleScroll">
-        <div v-if="chatStore.isLoading" class="app-loader"></div>
-        <div class="messages" v-for="message in chatStore.chat?.messages?.data" :key="message.id">
-          <ChatsMessageItem :message="message" />
+        <div v-if="messageStore.isLoading" class="app-loader"></div>
+        <div v-for="group in groupedMessages" :key="group.date" class="group-container">
+          <div class="date-separator">
+            <span class="date">{{ group.date }}</span>
+          </div>
+          <div v-for="message in group.messages" :key="message.id">
+            <ChatsMessageItem :message="message" />
+          </div>
         </div>
       </div>
-      <div v-if="chatStore.replyTo" class="quote-preview">
+      <div v-if="messageStore.replyTo" class="quote-preview">
         <div class="quote-content">
-          <span class="quote-author">{{ chatStore.replyTo.user.name }}:</span>
-          <span class="quote-text">{{ chatStore.replyTo.content }}</span>
+          <span class="quote-author">{{ messageStore.replyTo.user?.name }}:</span>
+          <span class="quote-text">{{ messageStore.replyTo.content }}</span>
         </div>
-        <button class="quote-close" @click="chatStore.clearReply">×</button>
+        <button class="quote-close" @click="messageStore.clearReply">×</button>
       </div>
-      <MessageInput v-model="messageText" :is-editing="!!editingMessage" @send="saveMessage" />
+      <div v-if="messageStore.editingMessage" class="quote-preview edit-mode">
+        <div class="quote-content">
+          <span class="quote-author">Редактирование:</span>
+          <span class="quote-text">{{ messageStore.editingMessage.content }}</span>
+        </div>
+        <button class="quote-close" @click="cancelEdit">×</button>
+      </div>
+      <MessageInput
+        v-model="messageText"
+        :is-editing="!!messageStore.editingMessage"
+        @send="saveMessage"
+      />
     </div>
   </div>
 </template>
@@ -25,11 +41,12 @@ import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
-import { ref, onUnmounted, nextTick } from 'vue'
+import { ref, onUnmounted, nextTick, computed } from 'vue'
 import ChatHeader from '@/components/details/chats/ChatHeader.vue'
 import ChatsMessageItem from '@/components/details/chats/ChatsMessageItem.vue'
 import MessageInput from '@/components/details/MessageInput.vue'
 import { useNotificationStore } from '@/stores/notifications.ts'
+import { useMessageStore } from '@/stores/messages.ts'
 
 const chatStore = useChatStore()
 const route = useRoute()
@@ -37,17 +54,47 @@ const authStore = useAuthStore()
 const messageText = ref('')
 const notify = useNotificationStore()
 const messagesWrapper = ref<HTMLElement | null>(null)
-const editingMessage = ref<any>(null)
+const messageStore = useMessageStore()
+
+const groupedMessages = computed(() => {
+  const groups: { date: string; messages: any[] }[] = []
+
+  messageStore.messages.forEach((message) => {
+    const date = new Date(message.created_at)
+    const today = new Date().setHours(0, 0, 0, 0)
+    const messageDate = new Date(date).setHours(0, 0, 0, 0)
+
+    let dateText = ''
+
+    if (messageDate === today) {
+      dateText = 'Сегодня'
+    } else {
+      dateText = new Intl.DateTimeFormat('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+      }).format(date)
+    }
+
+    let group = groups.find((g) => g.date === dateText)
+    if (!group) {
+      group = { date: dateText, messages: [] }
+      groups.push(group)
+    }
+    group.messages.push(message)
+  })
+
+  return groups
+})
 
 const saveMessage = async (text: string) => {
   if (!text.trim()) return
 
   try {
-    if (editingMessage.value) {
-      await chatStore.updateMessage(editingMessage.value.id, text, chatStore.chat.id)
-      editingMessage.value = null
+    if (messageStore.editingMessage) {
+      await messageStore.updateMessage(messageStore.editingMessage.id, text, chatStore.chat.id)
+      messageStore.clearEdit()
     } else {
-      await chatStore.addMessage(text, chatStore.chat.id)
+      await messageStore.addMessage(text, chatStore.chat.id)
       scrollToBottom()
     }
     messageText.value = ''
@@ -56,13 +103,18 @@ const saveMessage = async (text: string) => {
   }
 }
 
+const cancelEdit = () => {
+  messageStore.clearEdit()
+  messageText.value = ''
+}
+
 const handleScroll = async () => {
   const el = messagesWrapper.value
   if (!el) return
-  if (el.scrollTop < 50 && !chatStore.isLoading) {
+  if (el.scrollTop < 1 && !chatStore.isLoading) {
     const oldHeight = el.scrollHeight
 
-    await chatStore.loadPreviousMessages(route.params.chatId as string)
+    await messageStore.loadPreviousMessages(route.params.chatId as string)
 
     nextTick(() => {
       el.scrollTop = el.scrollHeight - oldHeight
@@ -71,10 +123,14 @@ const handleScroll = async () => {
 }
 
 const scrollToBottom = () => {
-  nextTick(() => {
-    if (messagesWrapper.value) {
-      messagesWrapper.value.scrollTop = messagesWrapper.value.scrollHeight
-    }
+  if (!messagesWrapper.value) return
+
+  const el = messagesWrapper.value
+  requestAnimationFrame(() => {
+    el.scrollTo({
+      top: el.scrollHeight + 100,
+      behavior: 'auto',
+    })
   })
 }
 
@@ -91,26 +147,31 @@ watch(
 
         window.Echo.private(`chats.${newChatId}`)
           .listen('.message.created', (e: any) => {
-            chatStore.addEchoMessage(e.message)
+            messageStore.addEchoMessage(e.message)
             scrollToBottom()
           })
 
           .listen('.message.updated', (e) => {
-            const index = chatStore.chat.messages.data.findIndex((m) => m.id === e.message.id)
-            if (index !== -1) chatStore.chat.messages.data[index] = e.message
+            messageStore.updateEchoMessage(e.message)
           })
 
           .listen('.message.deleted', (e) => {
-            if (chatStore.chat?.messages?.data) {
-              chatStore.chat.messages.data = chatStore.chat.messages.data.filter(
-                (m: any) => m.id !== e.messageId,
-              )
-            }
+            messageStore.deleteEchoMessage(e.messageId)
           })
       })
     }
   },
   { immediate: true },
+)
+
+watch(
+  () => messageStore.editingMessage,
+  (newMessage) => {
+    if (newMessage) {
+      messageText.value = newMessage.content
+      messageStore.clearReply()
+    }
+  },
 )
 
 onUnmounted(() => {
@@ -130,6 +191,7 @@ onUnmounted(() => {
 .plate {
   width: 100%;
   max-height: 500px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   margin: 10px 0;
@@ -141,8 +203,12 @@ onUnmounted(() => {
 }
 
 .messages__wrapper {
-  margin: 10px 0;
+  flex: 1;
+  height: 100%;
   overflow-y: auto;
+  display: block;
+  padding: 20px 0;
+  margin: 0;
   scrollbar-width: thin;
   scrollbar-color: rgba(153, 61, 26, 0.5) transparent;
 }
@@ -189,7 +255,21 @@ onUnmounted(() => {
   margin-left: 10px;
 }
 
-.loader__wrapper {
-  text-align: end;
+.date-separator {
+  position: sticky;
+  top: 5px;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.date {
+  background-color: rgba(206, 195, 186, 0.25);
+  color: #6e2c11;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
 }
 </style>

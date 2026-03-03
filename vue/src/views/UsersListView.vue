@@ -3,6 +3,7 @@
     <UsersFilter />
     <AppTransition name="dropdown" mode="out-in">
       <div v-if="userStore.isLoading && userStore.currentPage === 1" class="app-loader"></div>
+      <span v-else-if="!userStore.users.length" class="empty-list">Ничего не найдено</span>
       <div v-else class="wrapper">
         <UsersListItem v-for="user in userStore.users" :key="user.id" :user="user" />
       </div>
@@ -73,5 +74,12 @@ watch(
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.empty-list {
+  color: #6e2c11;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 0 20px;
 }
 </style>
