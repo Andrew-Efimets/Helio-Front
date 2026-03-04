@@ -177,6 +177,17 @@ const setupGlobalListeners = (userId: number | string) => {
       is_sender: false,
     })
   })
+
+  window.Echo.join('online')
+    .here((users: any[]) => {
+      userStore.setOnlineUsers(users)
+    })
+    .joining((user: any) => {
+      userStore.addOnlineUser(user)
+    })
+    .leaving((user: any) => {
+      userStore.removeOnlineUser(user)
+    })
 }
 
 const storageSync = (event: StorageEvent) => {
@@ -200,6 +211,8 @@ watch(
       chatStore.fetchAllChats()
     } else if (oldId) {
       window.Echo.leave(`user.${oldId}`)
+      window.Echo.leave('online')
+      userStore.setOnlineUsers([])
     }
   },
   { immediate: true },

@@ -10,6 +10,28 @@ export const useUserStore = defineStore('user', () => {
   const hasMore = ref(true)
   const isLoading = ref(false)
   const lastPage = ref(1)
+  const onlineUserIds = ref<Set<number>>(new Set())
+
+  const setOnlineUsers = (users: { id: number }[]) => {
+    onlineUserIds.value = new Set(users.map((u) => Number(u.id)))
+  }
+
+  const addOnlineUser = (user: { id: number }) => {
+    const newSet = new Set(onlineUserIds.value)
+    newSet.add(Number(user.id))
+    onlineUserIds.value = newSet
+  }
+
+  const removeOnlineUser = (user: { id: number }) => {
+    const newSet = new Set(onlineUserIds.value)
+    newSet.delete(Number(user.id))
+    onlineUserIds.value = newSet
+  }
+
+  const isUserOnline = (id: number | string) => {
+    return onlineUserIds.value.has(Number(id))
+  }
+
   const triggerRefresh = () => {
     resetPagination()
     refreshTicket.value++
@@ -94,6 +116,7 @@ export const useUserStore = defineStore('user', () => {
     hasMore,
     isLoading,
     refreshTicket,
+    onlineUserIds,
     setProfile,
     updateStatus,
     setUsers,
@@ -103,5 +126,9 @@ export const useUserStore = defineStore('user', () => {
     loadMore,
     resetPagination,
     clear,
+    setOnlineUsers,
+    addOnlineUser,
+    removeOnlineUser,
+    isUserOnline,
   }
 })

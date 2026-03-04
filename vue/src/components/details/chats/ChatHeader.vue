@@ -8,6 +8,7 @@
         <p class="title">
           {{ chatTitle }}
         </p>
+        <OnlineStatusPointer v-if="companion && userStore.isUserOnline(companion.id)" />
       </div>
       <div class="participants">
         <p @click="openParticipantsList" class="participants__title">Участники</p>
@@ -42,11 +43,14 @@
 <script setup lang="ts">
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useUserStore } from '@/stores/user.ts'
 import { computed, ref } from 'vue'
+import OnlineStatusPointer from '@/components/details/OnlineStatusPointer.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
 
 const chatStore = useChatStore()
 const authStore = useAuthStore()
+const userStore = useUserStore()
 const isOpenList = ref(false)
 
 const companion = computed(() => {
@@ -108,7 +112,6 @@ const openParticipantsList = () => {
   color: #6e2c11;
   font-size: 16px;
   font-weight: bold;
-  margin-right: 20px;
 }
 
 .participants__title {

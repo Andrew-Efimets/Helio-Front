@@ -17,7 +17,10 @@
             {{ messageTime }}
             <span v-if="myMessage" class="status-icon">
               <template v-if="message?.read_at">
-                <span class="read">✔✔</span>
+                <span class="read">
+                  <p>✔</p>
+                  <p>✔</p>
+                </span>
               </template>
               <template v-else>
                 <span class="sent">✔</span>
@@ -263,11 +266,33 @@ onUnmounted(() => {
 }
 
 .time {
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
   border-radius: 10px;
   font-size: 12px;
   width: fit-content;
   padding: 5px 0;
   align-self: end;
   color: #999;
+}
+
+.status-icon {
+  display: flex;
+  align-items: center;
+}
+
+.read {
+  display: flex;
+  align-items: center;
+  color: #6e2c11;
+}
+
+.read p {
+  margin-left: -5px;
+}
+
+.sent {
+  margin-left: -5px;
 }
 </style>

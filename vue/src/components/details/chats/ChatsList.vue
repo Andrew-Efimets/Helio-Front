@@ -56,7 +56,10 @@ const displayChats = computed(() => {
   return chatStore.allChats.filter((c) => c.type === chatType.value)
 })
 
+const emit = defineEmits(['select-chat'])
+
 const selectChat = async (chatId: number) => {
+  emit('select-chat')
   if (messageStore.forwardingMessage) {
     messageStore.setReply(messageStore.forwardingMessage)
     messageStore.clearForward()
@@ -85,12 +88,6 @@ const getChatData = (chat: any) => {
 const toggleTab = (value: boolean) => {
   isGroupe.value = value
 }
-
-// onMounted(() => {
-//   if (!chatStore.allChats?.length) {
-//     chatStore.fetchAllChats()
-//   }
-// })
 </script>
 
 <style scoped>
@@ -180,10 +177,20 @@ const toggleTab = (value: boolean) => {
 .forward-banner button {
   background: var(--items-gradient);
   border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 5px 10px;
+  border-radius: 5px;
   cursor: pointer;
   color: #6e2c11;
   font-weight: bold;
+}
+
+@media screen and (max-width: 1024px) {
+  .chats-list {
+    padding-top: 40px;
+  }
+
+  .header {
+    margin-top: 10px;
+  }
 }
 </style>

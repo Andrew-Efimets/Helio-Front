@@ -5,6 +5,7 @@
       <RouterLink :to="{ name: 'wall', params: { id: String(user.id) } }" class="link">
         <p class="user-name">{{ user.name }}</p>
       </RouterLink>
+      <OnlineStatusPointer v-if="user?.id && userStore.isUserOnline(user.id)" />
     </div>
     <div class="bottom-bar__wrapper">
       <template v-if="user && user.id !== authStore.user?.id">
@@ -73,6 +74,7 @@ import { useContacts } from '@/composables/useContacts.ts'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 import { useUserStore } from '@/stores/user.ts'
 import { useChatStore } from '@/stores/chats.ts'
+import OnlineStatusPointer from '@/components/details/OnlineStatusPointer.vue'
 
 const props = defineProps<{
   user: any

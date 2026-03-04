@@ -8,6 +8,7 @@
         <RouterLink :to="{ name: 'wall', params: { id: user?.id } }" class="name">
           {{ user?.name }}
         </RouterLink>
+        <OnlineStatusPointer v-if="user?.id && userStore.isUserOnline(user.id)" />
       </div>
 
       <div v-for="item in displayInfo" :key="item.title" class="list">
@@ -27,6 +28,8 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useUserStore } from '@/stores/user.ts'
+import OnlineStatusPointer from '@/components/details/OnlineStatusPointer.vue'
 
 const props = defineProps<{
   user: any
@@ -34,6 +37,7 @@ const props = defineProps<{
 }>()
 
 const authStore = useAuthStore()
+const userStore = useUserStore()
 
 const formatDate = (dateString: string | null) => {
   if (!dateString) return null
