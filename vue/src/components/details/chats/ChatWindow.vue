@@ -134,9 +134,15 @@ const scrollToBottom = () => {
   })
 }
 
+let currentChannel: any = null
+
 watch(
   [() => authStore.user?.id, () => route.params.chatId],
-  ([newUserId, newChatId]) => {
+  ([newUserId, newChatId], [oldUserId, oldChatId]) => {
+    if (oldChatId && oldChatId !== newChatId) {
+      window.Echo.leave(`chats.${oldChatId}`)
+    }
+
     if (newUserId && newChatId) {
       chatStore.fetchChat(newChatId as string).then(() => {
         nextTick(() => {
@@ -145,24 +151,40 @@ watch(
           }
         })
 
-        window.Echo.private(`chats.${newChatId}`)
-          .listen('.message.created', (e: any) => {
-            messageStore.addEchoMessage(e.message)
-            scrollToBottom()
-          })
+        currentChannel = window.Echo.private(`chats.${newChatId}`)
 
-          .listen('.message.updated', (e) => {
+        currentChannel
+          .listen('.message.created', (e: any) => {
+            if (Number(e.message.chat_id) === Number(route.params.chatId)) {
+              messageStore.addEchoMessage(e.message)
+              scrollToBottom()
+
+              if (Number(e.message.user_id) !== Number(authStore.user?.id)) {
+                messageStore.markAsRead(route.params.chatId as string)
+              }
+            }
+          })
+          .listen('.message.updated', (e: any) => {
             messageStore.updateEchoMessage(e.message)
           })
-
-          .listen('.message.deleted', (e) => {
-            messageStore.deleteEchoMessage(e.messageId)
+          .listen('.message.read', (e: { readAt: string }) => {
+            messageStore.messages.forEach((m) => {
+              if (Number(m.user_id) === Number(authStore.user?.id) && !m.read_at) {
+                m.read_at = e.readAt
+              }
+            })
           })
       })
     }
   },
   { immediate: true },
 )
+
+onUnmounted(() => {
+  if (route.params.chatId) {
+    window.Echo.leave(`chats.${route.params.chatId}`)
+  }
+})
 
 watch(
   () => messageStore.editingMessage,
@@ -173,12 +195,6 @@ watch(
     }
   },
 )
-
-onUnmounted(() => {
-  if (route.params.chatId) {
-    window.Echo.leave(`chats.${route.params.chatId}`)
-  }
-})
 </script>
 
 <style scoped>

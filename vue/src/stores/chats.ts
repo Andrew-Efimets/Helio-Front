@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import api from '@/api.ts'
 import router from '@/router'
 import { useAuthStore } from '@/stores/auth.ts'
@@ -12,20 +12,34 @@ export const useChatStore = defineStore('chat', () => {
   const chat = ref<any>(null)
   const allChats = ref<any>(null)
 
-  const fetchAllChats = async (chatType: string) => {
+  const fetchAllChats = async (chatType?: string, silent = false) => {
     try {
-      isListLoading.value = true
-      allChats.value = []
+      console.log(silent)
+      if (!silent) {
+        isListLoading.value = true
+      }
       const response = await api.get(`/chats`, {
         params: {
           type: chatType,
         },
       })
-      allChats.value = response.data.data
+      const chats = response.data.data
+      allChats.value = chats.sort((a: any, b: any) => {
+        const timeA = a.latest_message
+          ? new Date(a.latest_message.created_at).getTime()
+          : new Date(a.updated_at).getTime()
+        const timeB = b.latest_message
+          ? new Date(b.latest_message.created_at).getTime()
+          : new Date(b.updated_at).getTime()
+
+        return timeB - timeA
+      })
     } catch (e) {
       throw e
     } finally {
-      isListLoading.value = false
+      if (!silent) {
+        isListLoading.value = false
+      }
     }
   }
 
@@ -37,10 +51,21 @@ export const useChatStore = defineStore('chat', () => {
       chat.value = null
       isLoading.value = true
       const chatData = await messageStore.fetchMessages(chatId)
-      if (chatData.id == chatId) {
-        chat.value = chatData
-      }
+
       chat.value = chatData
+
+      if (allChats.value) {
+        const chatIndex = allChats.value.findIndex((c) => Number(c.id) === Number(chatId))
+
+        if (chatIndex !== -1) {
+          const targetChat = { ...allChats.value[chatIndex] }
+          targetChat.unread_count = 0
+          targetChat.updated_at = new Date().toISOString()
+
+          const otherChats = allChats.value.filter((c) => Number(c.id) !== Number(chatId))
+          allChats.value = [targetChat, ...otherChats]
+        }
+      }
     } catch (e) {
       console.error(e)
     } finally {
@@ -70,11 +95,17 @@ export const useChatStore = defineStore('chat', () => {
     await api.delete(`/chats/chat/${chatId}`)
   }
 
+  const totalUnreadCount = computed(() => {
+    if (!allChats.value) return 0
+    return allChats.value.filter((chat) => (chat.unread_count || 0) > 0).length
+  })
+
   return {
     chat,
     isLoading,
     isListLoading,
     allChats,
+    totalUnreadCount,
     initChat,
     fetchChat,
     fetchAllChats,

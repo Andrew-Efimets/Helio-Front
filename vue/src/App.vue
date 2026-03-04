@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import { onMounted, watch, onUnmounted } from 'vue'
 import AppHeader from '@/components/header/AppHeader.vue'
 import AppFooter from '@/components/footer/AppFooter.vue'
@@ -21,6 +21,8 @@ import NotificationsView from '@/views/NotificationsView.vue'
 import { useNotificationStore } from '@/stores/notifications'
 import { useUserStore } from '@/stores/user'
 import ScrollToTop from '@/components/details/ScrollToTop.vue'
+import { useChatStore } from '@/stores/chats.ts'
+import { useMessageStore } from '@/stores/messages.ts'
 
 onMounted(async () => {
   try {
@@ -35,6 +37,9 @@ const videoStore = useVideoStore()
 const photoStore = usePhotoStore()
 const notify = useNotificationStore()
 const userStore = useUserStore()
+const chatStore = useChatStore()
+const messageStore = useMessageStore()
+const route = useRoute()
 
 const setupGlobalListeners = (userId: number | string) => {
   const channel = window.Echo.private(`user.${userId}`)
@@ -46,6 +51,33 @@ const setupGlobalListeners = (userId: number | string) => {
 
   channel.listen('.PhotoProcessed', (e: any) => {
     photoStore.updatePhotoInList(e.photo)
+  })
+
+  channel.listen('.message.received', (e: any) => {
+    const chatId = e.message.chat_id
+    const chat = chatStore.allChats?.find((c) => Number(c.id) === Number(chatId))
+
+    if (chat) {
+      const isCurrentChat = Number(route.params.chatId) === Number(chatId)
+
+      if (!isCurrentChat) {
+        chat.unread_count = (chat.unread_count || 0) + 1
+        chatStore.allChats = [
+          chat,
+          ...chatStore.allChats.filter((c) => Number(c.id) !== Number(chatId)),
+        ]
+      } else {
+        chatStore.allChats = [
+          chat,
+          ...chatStore.allChats.filter((c) => Number(c.id) !== Number(chatId)),
+        ]
+      }
+    }
+  })
+
+  channel.listen('.message.deleted', (e: any) => {
+    messageStore.deleteEchoMessage(e.messageId)
+    chatStore.fetchAllChats(undefined, true)
   })
 
   channel.listen('.contact.request', (data: any) => {
@@ -165,6 +197,7 @@ watch(
   (newId, oldId) => {
     if (newId) {
       setupGlobalListeners(newId)
+      chatStore.fetchAllChats()
     } else if (oldId) {
       window.Echo.leave(`user.${oldId}`)
     }

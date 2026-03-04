@@ -22,6 +22,17 @@
           </RouterLink>
         </li>
 
+        <li class="item">
+          <RouterLink class="link" :to="{ name: 'chats' }">
+            <div class="link-content">
+              Чаты
+              <span v-if="chatStore.totalUnreadCount" class="badge">
+                + {{ chatStore.totalUnreadCount }}
+              </span>
+            </div>
+          </RouterLink>
+        </li>
+
         <li class="separator"></li>
 
         <li class="settings">
@@ -38,17 +49,18 @@
 import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useChatStore } from '@/stores/chats.ts'
 
 const authStore = useAuthStore()
+const chatStore = useChatStore()
 
 const myId = computed(() => authStore.user?.id)
 
 const menuItems = [
   { name: 'wall', label: 'Мой аккаунт' },
-  { name: 'chats', label: 'Чаты', countKey: 'unread_messages_count' },
-  { name: 'contacts', label: 'Контакты', countKey: 'pending_contacts_count' },
   { name: 'photos', label: 'Мои фотографии' },
   { name: 'videos', label: 'Мои видеозаписи' },
+  { name: 'contacts', label: 'Контакты', countKey: 'pending_contacts_count' },
 ]
 
 const isOpen = ref(false)
@@ -125,14 +137,6 @@ const openMenu = () => {
   border-bottom: 1px solid #6e2c11;
   box-shadow: 0 0 10px 3px rgba(196, 114, 51, 0.5);
   border-radius: 5px;
-}
-
-.badge {
-  font-size: 14px;
-  color: #6e2c11;
-  padding: 3px;
-  border-radius: 5px;
-  background-color: #e99a9a;
 }
 
 @media screen and (max-width: 1024px) {

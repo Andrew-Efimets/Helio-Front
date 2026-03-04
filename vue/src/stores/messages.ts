@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '@/api.ts'
-import router from '@/router'
+import { useChatStore } from '@/stores/chats.ts'
+import { useRoute } from 'vue-router'
 
 export const useMessageStore = defineStore('message', () => {
   const isLoading = ref(false)
@@ -10,6 +11,7 @@ export const useMessageStore = defineStore('message', () => {
   const replyTo = ref<any>(null)
   const editingMessage = ref<any>(null)
   const forwardingMessage = ref<any>(null)
+  const route = useRoute()
 
   const setReply = (message: any) => {
     replyTo.value = message
@@ -66,6 +68,7 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   const addEchoMessage = (message: any) => {
+    if (Number(message.chat_id) !== Number(route.params.chatId)) return
     if (!messages.value.some((m) => m.id === message.id)) {
       messages.value.push(message)
     }
@@ -77,7 +80,11 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   const deleteEchoMessage = (msgId: number | string) => {
-    messages.value = messages.value.filter((m) => m.id !== msgId)
+    messages.value = messages.value.filter((m) => Number(m.id) !== Number(msgId))
+
+    if (Number(replyTo.value?.id) === Number(msgId)) {
+      clearReply()
+    }
   }
 
   const loadPreviousMessages = async (chatId: string | number) => {
@@ -97,6 +104,19 @@ export const useMessageStore = defineStore('message', () => {
     }
   }
 
+  const markAsRead = async (chatId: number | string) => {
+    const chatStore = useChatStore()
+    if (document.visibilityState !== 'visible') return
+
+    try {
+      await api.post(`/chats/chat/${chatId}/read`)
+      const chat = chatStore.allChats?.find((c) => c.id === chatId)
+      if (chat) chat.unread_count = 0
+    } catch (e) {
+      console.error('Ошибка прочтения:', e)
+    }
+  }
+
   return {
     messages,
     pagination,
@@ -104,6 +124,7 @@ export const useMessageStore = defineStore('message', () => {
     replyTo,
     editingMessage,
     forwardingMessage,
+    markAsRead,
     fetchMessages,
     addMessage,
     addEchoMessage,

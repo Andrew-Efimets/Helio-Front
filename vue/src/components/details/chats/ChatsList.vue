@@ -9,26 +9,28 @@
       <p :class="{ active: isGroupe }" @click="toggleTab(true)" class="header__link">Группы</p>
     </div>
     <div class="list__wrapper">
-      <div v-if="chatStore.isListLoading" class="app-loader"></div>
-      <template v-if="chatStore.allChats?.length">
-        <template v-for="chat in chatStore?.allChats" :key="chat.id">
-          <div class="list__item" @click="selectChat(chat.id)">
+      <AppTransition name="dropdown" mode="out-in">
+        <div v-if="chatStore.isListLoading" class="app-loader" key="loader"></div>
+        <span v-else-if="!displayChats.length" class="empty-list" key="empty"> Список пуст </span>
+        <div v-else class="list-container">
+          <div
+            v-for="chat in displayChats"
+            :key="chat.id"
+            class="list__item"
+            @click="selectChat(chat.id)"
+          >
             <div class="main">
               <div class="image__wrapper">
                 <img :src="getChatData(chat).avatar" alt="" class="image" />
               </div>
               <div class="link">
-                <p class="title">
-                  {{ getChatData(chat).title }}
-                </p>
+                <p class="title">{{ getChatData(chat).title }}</p>
               </div>
+              <span v-if="chat.unread_count > 0" class="badge"> + {{ chat.unread_count }} </span>
             </div>
           </div>
-        </template>
-      </template>
-      <span v-if="!chatStore.isListLoading && !chatStore.allChats?.length" class="empty-list">
-        Cписок пуст
-      </span>
+        </div>
+      </AppTransition>
     </div>
   </div>
 </template>
@@ -39,6 +41,7 @@ import { useRouter } from 'vue-router'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import { useMessageStore } from '@/stores/messages.ts'
+import AppTransition from '@/components/details/AppTransition.vue'
 
 const isGroupe = ref(false)
 const chatStore = useChatStore()
@@ -47,6 +50,11 @@ const messageStore = useMessageStore()
 const router = useRouter()
 
 const chatType = computed(() => (isGroupe.value ? 'group' : 'private'))
+
+const displayChats = computed(() => {
+  if (!chatStore.allChats) return []
+  return chatStore.allChats.filter((c) => c.type === chatType.value)
+})
 
 const selectChat = async (chatId: number) => {
   if (messageStore.forwardingMessage) {
@@ -76,20 +84,13 @@ const getChatData = (chat: any) => {
 
 const toggleTab = (value: boolean) => {
   isGroupe.value = value
-  handleFetchChats()
 }
 
-const handleFetchChats = async () => {
-  try {
-    const response = await chatStore.fetchAllChats(chatType.value)
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-onMounted(() => {
-  handleFetchChats()
-})
+// onMounted(() => {
+//   if (!chatStore.allChats?.length) {
+//     chatStore.fetchAllChats()
+//   }
+// })
 </script>
 
 <style scoped>
@@ -175,6 +176,7 @@ onMounted(() => {
   font-size: 14px;
   font-weight: bold;
 }
+
 .forward-banner button {
   background: var(--items-gradient);
   border: none;

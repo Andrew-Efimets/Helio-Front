@@ -148,3 +148,11 @@ body {
     padding: 0 5px;
   }
 }
+
+.badge {
+  font-size: 14px;
+  color: #6e2c11;
+  padding: 3px;
+  border-radius: 5px;
+  background-color: #e99a9a;
+}

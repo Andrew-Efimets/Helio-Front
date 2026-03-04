@@ -15,6 +15,14 @@
           </p>
           <p class="time">
             {{ messageTime }}
+            <span v-if="myMessage" class="status-icon">
+              <template v-if="message?.read_at">
+                <span class="read">✔✔</span>
+              </template>
+              <template v-else>
+                <span class="sent">✔</span>
+              </template>
+            </span>
           </p>
         </div>
       </div>
