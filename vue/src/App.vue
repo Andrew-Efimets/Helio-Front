@@ -80,6 +80,10 @@ const setupGlobalListeners = (userId: number | string) => {
     chatStore.fetchAllChats(undefined, true)
   })
 
+  channel.listen('.chat.created', (e: any) => {
+    chatStore.fetchAllChats(undefined, true)
+  })
+
   channel.listen('.contact.request', (data: any) => {
     userStore.triggerRefresh()
     const e = typeof data === 'string' ? JSON.parse(data) : data

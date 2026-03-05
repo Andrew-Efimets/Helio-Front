@@ -4,6 +4,8 @@ import api from '@/api.ts'
 import router from '@/router'
 import { useAuthStore } from '@/stores/auth.ts'
 import { useMessageStore } from '@/stores/messages.ts'
+import { useRoute } from 'vue-router'
+import { useNotificationStore } from '@/stores/notifications.ts'
 
 export const useChatStore = defineStore('chat', () => {
   const authStore = useAuthStore()
@@ -11,10 +13,11 @@ export const useChatStore = defineStore('chat', () => {
   const isListLoading = ref(false)
   const chat = ref<any>(null)
   const allChats = ref<any>(null)
+  const route = useRoute()
+  const notify = useNotificationStore()
 
   const fetchAllChats = async (chatType?: string, silent = false) => {
     try {
-      console.log(silent)
       if (!silent) {
         isListLoading.value = true
       }
@@ -100,6 +103,21 @@ export const useChatStore = defineStore('chat', () => {
     return allChats.value.filter((chat) => (chat.unread_count || 0) > 0).length
   })
 
+  const leaveChat = async (chatId: any) => {
+    try {
+      await api.post(`/chats/chat/${chatId}/leave`)
+      allChats.value = allChats.value.filter((chat) => Number(chat.id) !== Number(chatId))
+
+      if (Number(route.params.chatId) === Number(chatId)) {
+        router.push({ name: 'chats' })
+      }
+
+      notify.show('Чат удален', 'success')
+    } catch (e) {
+      console.error('Ошибка при выходе из чата:', e)
+    }
+  }
+
   return {
     chat,
     isLoading,
@@ -111,5 +129,6 @@ export const useChatStore = defineStore('chat', () => {
     fetchAllChats,
     updateChatTitle,
     deleteChat,
+    leaveChat,
   }
 })

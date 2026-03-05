@@ -21,6 +21,9 @@
             <img :src="participant.avatar" alt="avatar" class="avatar" />
           </div>
         </div>
+        <div class="leave-chat" @click="isConfirmOpen = true" :disabled="isLeavingProcess">
+          <p>Покинуть чат</p>
+        </div>
       </div>
     </div>
     <AppTransition name="dropdown">
@@ -38,6 +41,14 @@
       </div>
     </AppTransition>
   </div>
+  <ConfirmModal
+    :is-open="isConfirmOpen"
+    @close="isConfirmOpen = false"
+    @confirm="handleConfirmLeave"
+  >
+    <p>Вы действительно хотите удалиться из чата?</p>
+    <template #button__text>Да, удалиться</template>
+  </ConfirmModal>
 </template>
 
 <script setup lang="ts">
@@ -47,17 +58,24 @@ import { useUserStore } from '@/stores/user.ts'
 import { computed, ref } from 'vue'
 import OnlineStatusPointer from '@/components/details/OnlineStatusPointer.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
+import ConfirmModal from '@/components/details/ConfirmModal.vue'
+import { useRoute } from 'vue-router'
 
 const chatStore = useChatStore()
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const isOpenList = ref(false)
+const isConfirmOpen = ref(false)
+const isLeavingProcess = ref(false)
+
+const route = useRoute()
+
+const myId = authStore.user?.id
+const chatId = route.params.chatId
 
 const companion = computed(() => {
   if (chatStore.chat?.type === 'private') {
-    return chatStore.chat?.participants?.find(
-      (p: any) => Number(p.id) !== Number(authStore.user?.id),
-    )
+    return chatStore.chat?.participants?.find((p: any) => Number(p.id) !== Number(myId))
   }
   return null
 })
@@ -72,6 +90,13 @@ const chatTitle = computed(() => {
 
 const openParticipantsList = () => {
   isOpenList.value = !isOpenList.value
+}
+
+const handleConfirmLeave = async () => {
+  isLeavingProcess.value = true
+  isConfirmOpen.value = false
+  await chatStore.leaveChat(chatId)
+  isLeavingProcess.value = false
 }
 </script>
 
@@ -140,7 +165,7 @@ const openParticipantsList = () => {
 }
 
 .avatar__wrapper {
-  margin-left: -15px;
+  margin-left: -10px;
 }
 
 .participants-list {
@@ -179,5 +204,22 @@ const openParticipantsList = () => {
 
 .link:hover {
   text-decoration: underline;
+}
+
+.leave-chat {
+  color: #e99a9a;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.leave-chat:hover {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 480px) {
+  .header {
+    flex-direction: column;
+  }
 }
 </style>

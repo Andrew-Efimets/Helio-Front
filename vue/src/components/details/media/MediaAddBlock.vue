@@ -15,13 +15,7 @@
       <p class="add-button">&plus;</p>
     </div>
 
-    <input
-      type="file"
-      ref="fileInput"
-      style="display: none"
-      :accept="acceptType"
-      @change="addFile"
-    />
+    <input type="file" ref="fileInput" :accept="acceptType" @change="addFile" />
   </div>
 </template>
 
@@ -73,6 +67,10 @@ const addFile = (event: Event) => {
   justify-content: end;
   border-radius: 10px;
   box-shadow: var(--main-box-shadow);
+}
+
+.add-wrapper input {
+  display: none;
 }
 
 .add-label {

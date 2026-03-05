@@ -9,6 +9,7 @@
       <p :class="{ active: isGroupe }" @click="toggleTab(true)" class="header__link">Группы</p>
     </div>
     <div class="list__wrapper">
+      <GroupAddBlock v-if="isGroupe" />
       <AppTransition name="dropdown" mode="out-in">
         <div v-if="chatStore.isListLoading" class="app-loader" key="loader"></div>
         <span v-else-if="!displayChats.length" class="empty-list" key="empty"> Список пуст </span>
@@ -41,6 +42,7 @@ import { useRouter } from 'vue-router'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import { useMessageStore } from '@/stores/messages.ts'
+import GroupAddBlock from '@/components/details/chats/GroupAddBlock.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
 
 const isGroupe = ref(false)
@@ -119,6 +121,8 @@ const toggleTab = (value: boolean) => {
 .list__wrapper {
   background-color: #f0ccaa;
   padding: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 .main {
@@ -151,6 +155,7 @@ const toggleTab = (value: boolean) => {
   color: #6e2c11;
   font-size: 16px;
   font-weight: bold;
+  padding: 10px;
 }
 
 .link:hover {
