@@ -15,6 +15,7 @@ export const useChatStore = defineStore('chat', () => {
   const allChats = ref<any>(null)
   const route = useRoute()
   const notify = useNotificationStore()
+  const editingGroup = ref<any | null>(null)
 
   const fetchAllChats = async (chatType?: string, silent = false) => {
     try {
@@ -90,12 +91,43 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  const updateChatTitle = async (chatId: number, title: string) => {
-    await api.patch(`/chats/chat/${chatId}`, { title })
+  const startEdit = (chatData: any) => {
+    editingGroup.value = chatData
   }
 
-  const deleteChat = async (chatId: number) => {
-    await api.delete(`/chats/chat/${chatId}`)
+  const cancelEdit = () => {
+    editingGroup.value = null
+  }
+
+  const updateGroup = async (chatId: number, title: string, avatar: File | null) => {
+    try {
+      const formData = new FormData()
+      formData.append('title', title)
+
+      formData.append('_method', 'PATCH')
+
+      if (avatar) {
+        formData.append('avatar', avatar)
+      }
+
+      const response = await api.post(`/chats/chat/${chatId}`, formData)
+      const updatedChat = response.data.data
+
+      if (updatedChat) {
+        if (chat.value && Number(chat.value.id) === Number(chatId)) {
+          chat.value = { ...chat.value, ...updatedChat }
+        }
+
+        const index = allChats.value.findIndex((c) => Number(c.id) === Number(chatId))
+        if (index !== -1) {
+          allChats.value[index] = { ...allChats.value[index], ...updatedChat }
+        }
+      }
+      return updatedChat
+    } catch (e) {
+      console.error('Ошибка при редактировании группы:', e)
+      throw e
+    }
   }
 
   const totalUnreadCount = computed(() => {
@@ -105,6 +137,8 @@ export const useChatStore = defineStore('chat', () => {
 
   const leaveChat = async (chatId: any) => {
     try {
+      const chat = allChats.value.find((c) => Number(c.id) === Number(chatId))
+      const notifyText = chat?.type === 'private' ? 'Чат удалён' : 'Группа удалена'
       await api.post(`/chats/chat/${chatId}/leave`)
       allChats.value = allChats.value.filter((chat) => Number(chat.id) !== Number(chatId))
 
@@ -112,9 +146,31 @@ export const useChatStore = defineStore('chat', () => {
         router.push({ name: 'chats' })
       }
 
-      notify.show('Чат удален', 'success')
+      notify.show(notifyText, 'success')
     } catch (e) {
       console.error('Ошибка при выходе из чата:', e)
+    }
+  }
+
+  const setGroup = async (title: string, avatar: File | null) => {
+    try {
+      const formData = new FormData()
+      formData.append('title', title)
+
+      if (avatar) {
+        formData.append('avatar', avatar)
+      }
+
+      const response = await api.post(`/chats/group`, formData)
+
+      if (response.data.data) {
+        allChats.value.unshift(response.data.data)
+      }
+
+      return response.data.data
+    } catch (e) {
+      console.error('Ошибка при создании группы:', e)
+      throw e
     }
   }
 
@@ -124,11 +180,14 @@ export const useChatStore = defineStore('chat', () => {
     isListLoading,
     allChats,
     totalUnreadCount,
+    editingGroup,
+    startEdit,
+    cancelEdit,
     initChat,
     fetchChat,
     fetchAllChats,
-    updateChatTitle,
-    deleteChat,
+    updateGroup,
     leaveChat,
+    setGroup,
   }
 })

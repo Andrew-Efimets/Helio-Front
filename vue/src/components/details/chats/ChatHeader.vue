@@ -3,7 +3,7 @@
     <div v-if="chatStore.chat" class="header">
       <div class="main">
         <div class="image__wrapper">
-          <img :src="avatarSource" alt="" class="image" />
+          <img v-if="avatarSource" :src="avatarSource" alt="" class="image" />
         </div>
         <p class="title">
           {{ chatTitle }}
@@ -21,9 +21,29 @@
             <img :src="participant.avatar" alt="avatar" class="avatar" />
           </div>
         </div>
-        <div class="leave-chat" @click="isConfirmOpen = true" :disabled="isLeavingProcess">
-          <p>Покинуть чат</p>
-        </div>
+        <span class="menu-burger" @click="toggleMenu">☰</span>
+        <AppTransition name="dropdown">
+          <div
+            v-if="isOpenMenu"
+            class="chat-menu"
+            @click="isConfirmOpen = true"
+            :disabled="isLeavingProcess"
+          >
+            <template v-if="chatStore.chat?.type === 'group'">
+              <p class="menu-item">Пригласить участника</p>
+              <template v-if="isAdmin">
+                <p class="menu-item">Удалить участника</p>
+                <p class="menu-item" @click.stop="startEditing(chatStore.chat)">
+                  Редактировать группу
+                </p>
+              </template>
+              <p class="menu-item delete">{{ isAdmin ? 'Удалить группу' : 'Покинуть группу' }}</p>
+            </template>
+            <div v-else>
+              <p class="menu-item delete">Покинуть чат</p>
+            </div>
+          </div>
+        </AppTransition>
       </div>
     </div>
     <AppTransition name="dropdown">
@@ -46,8 +66,9 @@
     @close="isConfirmOpen = false"
     @confirm="handleConfirmLeave"
   >
-    <p>Вы действительно хотите удалиться из чата?</p>
-    <template #button__text>Да, удалиться</template>
+    <p v-if="chatStore.chat?.type === 'group'">Вы действительно хотите удалить группу?</p>
+    <p v-else>Вы действительно хотите удалиться из чата?</p>
+    <template #button__text>Да</template>
   </ConfirmModal>
 </template>
 
@@ -65,6 +86,7 @@ const chatStore = useChatStore()
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const isOpenList = ref(false)
+const isOpenMenu = ref(false)
 const isConfirmOpen = ref(false)
 const isLeavingProcess = ref(false)
 
@@ -72,6 +94,14 @@ const route = useRoute()
 
 const myId = authStore.user?.id
 const chatId = route.params.chatId
+
+const isAdmin = computed(() => {
+  if (chatStore.chat?.type !== 'group') return false
+
+  const me = chatStore.chat?.participants?.find((p: any) => Number(p.id) === Number(myId))
+
+  return me?.role === 'admin'
+})
 
 const companion = computed(() => {
   if (chatStore.chat?.type === 'private') {
@@ -88,8 +118,17 @@ const chatTitle = computed(() => {
   return companion.value?.name || chatStore.chat?.title || ''
 })
 
+const startEditing = () => {
+  chatStore.startEdit(chatStore.chat)
+  isOpenMenu.value = false
+}
+
 const openParticipantsList = () => {
   isOpenList.value = !isOpenList.value
+}
+
+const toggleMenu = () => {
+  isOpenMenu.value = !isOpenMenu.value
 }
 
 const handleConfirmLeave = async () => {
@@ -105,13 +144,9 @@ const handleConfirmLeave = async () => {
   position: relative;
 }
 
-.image__wrapper {
+.image {
   width: 40px;
   height: 40px;
-}
-
-.image {
-  width: 100%;
   border-radius: 50%;
 }
 
@@ -206,15 +241,41 @@ const handleConfirmLeave = async () => {
   text-decoration: underline;
 }
 
-.leave-chat {
-  color: #e99a9a;
+.chat-menu {
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  background-color: #f9f2e7;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: var(--main-box-shadow);
+  white-space: nowrap;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+.menu-item {
+  color: #6e2c11;
   font-size: 12px;
   font-weight: bold;
   cursor: pointer;
 }
 
-.leave-chat:hover {
+.chat-menu p:hover {
   text-decoration: underline;
+}
+
+.delete {
+  color: #e99a9a;
+}
+
+.menu-burger {
+  color: #6e2c11;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 480px) {

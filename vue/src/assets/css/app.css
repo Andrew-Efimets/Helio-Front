@@ -49,6 +49,7 @@ body {
   background-color: #fee6c4;
   cursor: pointer;
   white-space: nowrap;
+  font-family: Arial;
 }
 
 .small-button {

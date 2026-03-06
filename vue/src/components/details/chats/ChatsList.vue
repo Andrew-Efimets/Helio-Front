@@ -9,7 +9,7 @@
       <p :class="{ active: isGroupe }" @click="toggleTab(true)" class="header__link">Группы</p>
     </div>
     <div class="list__wrapper">
-      <GroupAddBlock v-if="isGroupe" />
+      <GroupAddBlock :initial-chat="chatStore.editingGroup" v-if="isGroupe" />
       <AppTransition name="dropdown" mode="out-in">
         <div v-if="chatStore.isListLoading" class="app-loader" key="loader"></div>
         <span v-else-if="!displayChats.length" class="empty-list" key="empty"> Список пуст </span>
@@ -22,7 +22,12 @@
           >
             <div class="main">
               <div class="image__wrapper">
-                <img :src="getChatData(chat).avatar" alt="" class="image" />
+                <img
+                  v-if="getChatData(chat).avatar"
+                  :src="getChatData(chat).avatar"
+                  alt="image"
+                  class="image"
+                />
               </div>
               <div class="link">
                 <p class="title">{{ getChatData(chat).title }}</p>
@@ -37,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
@@ -83,13 +88,20 @@ const getChatData = (chat: any) => {
   }
   return {
     title: chat.title || 'Групповой чат',
-    avatar: chat.avatar_url,
+    avatar: chat.avatar,
   }
 }
 
 const toggleTab = (value: boolean) => {
   isGroupe.value = value
 }
+
+watch(
+  () => chatStore.editingGroup,
+  (newChat) => {
+    if (newChat) isGroupe.value = true
+  },
+)
 </script>
 
 <style scoped>
