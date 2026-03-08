@@ -17,6 +17,7 @@ import ProfileSettingsView from '@/views/ProfileSettingsView.vue'
 import ProfileSettings from '@/components/account/settings/ProfileSettings.vue'
 import AvatarSettings from '@/components/account/settings/AvatarSettings.vue'
 import PrivacySettings from '@/components/account/settings/PrivacySettings.vue'
+import ChatMembersManager from '@/components/details/chats/ChatMembersManager.vue'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const router = createRouter({
@@ -54,6 +55,21 @@ const router = createRouter({
           name: 'chat',
           component: ChatWindow,
           props: true,
+          children: [
+            {
+              path: ':action(add-member | delete-member)',
+              name: 'chat-manager',
+              components: {
+                default: ChatWindow,
+                modalMain: ChatMembersManager,
+              },
+              meta: {
+                isModal: true,
+                backTo: 'chat',
+              },
+              props: { modalMain: true },
+            },
+          ],
         },
       ],
     },

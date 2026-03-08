@@ -20,6 +20,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import ChatsList from '@/components/details/chats/ChatsList.vue'
+import ModalView from '@/views/ModalView.vue'
 import { RouterView } from 'vue-router'
 
 const isSidebarOpen = ref(false)

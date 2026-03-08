@@ -33,6 +33,7 @@
         @send="saveMessage"
       />
     </div>
+    <ModalView />
   </div>
 </template>
 
@@ -47,6 +48,7 @@ import ChatsMessageItem from '@/components/details/chats/ChatsMessageItem.vue'
 import MessageInput from '@/components/details/MessageInput.vue'
 import { useNotificationStore } from '@/stores/notifications.ts'
 import { useMessageStore } from '@/stores/messages.ts'
+import ModalView from '@/views/ModalView.vue'
 
 const chatStore = useChatStore()
 const route = useRoute()

@@ -23,24 +23,21 @@
         </div>
         <span class="menu-burger" @click="toggleMenu">☰</span>
         <AppTransition name="dropdown">
-          <div
-            v-if="isOpenMenu"
-            class="chat-menu"
-            @click="isConfirmOpen = true"
-            :disabled="isLeavingProcess"
-          >
+          <div v-if="isOpenMenu" class="chat-menu" :disabled="isLeavingProcess">
             <template v-if="chatStore.chat?.type === 'group'">
-              <p class="menu-item">Пригласить участника</p>
+              <p class="menu-item" @click="openMemberManager('add-member')">Добавить участника</p>
               <template v-if="isAdmin">
-                <p class="menu-item">Удалить участника</p>
-                <p class="menu-item" @click.stop="startEditing(chatStore.chat)">
-                  Редактировать группу
+                <p class="menu-item" @click="openMemberManager('delete-member')">
+                  Удалить участника
                 </p>
+                <p class="menu-item" @click.stop="startEditing">Редактировать группу</p>
               </template>
-              <p class="menu-item delete">{{ isAdmin ? 'Удалить группу' : 'Покинуть группу' }}</p>
+              <p class="menu-item delete" @click="isConfirmOpen = true">
+                {{ isAdmin ? 'Удалить группу' : 'Покинуть группу' }}
+              </p>
             </template>
             <div v-else>
-              <p class="menu-item delete">Покинуть чат</p>
+              <p class="menu-item delete" @click="isConfirmOpen = true">Покинуть чат</p>
             </div>
           </div>
         </AppTransition>
@@ -80,11 +77,14 @@ import { computed, ref } from 'vue'
 import OnlineStatusPointer from '@/components/details/OnlineStatusPointer.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
-import { useRoute } from 'vue-router'
+import ModalView from '@/views/ModalView.vue'
+import AddMemberForm from '@/components/details/chats/ChatMembersManager.vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const chatStore = useChatStore()
 const authStore = useAuthStore()
 const userStore = useUserStore()
+const router = useRouter()
 const isOpenList = ref(false)
 const isOpenMenu = ref(false)
 const isConfirmOpen = ref(false)
@@ -136,6 +136,17 @@ const handleConfirmLeave = async () => {
   isConfirmOpen.value = false
   await chatStore.leaveChat(chatId)
   isLeavingProcess.value = false
+}
+
+const openMemberManager = (action: 'add-member' | 'delete-member') => {
+  isOpenMenu.value = false
+  router.push({
+    name: 'chat-manager',
+    params: {
+      chatId: route.params.chatId,
+      action,
+    },
+  })
 }
 </script>
 
