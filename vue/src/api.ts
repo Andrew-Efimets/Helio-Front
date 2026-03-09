@@ -56,6 +56,8 @@ api.interceptors.response.use(
         error.formattedMessage = 'Ошибка на стороне сервера. Попробуйте позже.'
       } else if (status === 403) {
         error.formattedMessage = 'У вас нет доступа'
+      } else if (status === 404) {
+        error.formattedMessage = 'Не найдено'
       } else {
         error.formattedMessage = data.message || 'Произошла непредвиденная ошибка'
       }

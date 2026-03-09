@@ -63,7 +63,10 @@
     @close="isConfirmOpen = false"
     @confirm="handleConfirmLeave"
   >
-    <p v-if="chatStore.chat?.type === 'group'">Вы действительно хотите удалить группу?</p>
+    <template v-if="chatStore.chat?.type === 'group'">
+      <p v-if="isAdmin">Вы действительно хотите удалить группу?</p>
+      <p v-else>Вы действительно хотите покинуть группу?</p>
+    </template>
     <p v-else>Вы действительно хотите удалиться из чата?</p>
     <template #button__text>Да</template>
   </ConfirmModal>

@@ -72,6 +72,7 @@ export const useChatStore = defineStore('chat', () => {
       }
     } catch (e) {
       console.error(e)
+      throw e
     } finally {
       isLoading.value = false
     }
@@ -176,7 +177,7 @@ export const useChatStore = defineStore('chat', () => {
 
   const addMember = async (chatId: string | number, userId: string | number) => {
     try {
-      const { data } = await api.post(`/chats/${chatId}/members/${userId}`)
+      const { data } = await api.post(`/chats/chat/${chatId}/members/${userId}`)
       if (chat.value && data.newMember) {
         chat.value.participants.push(data.newMember)
       }
@@ -188,7 +189,7 @@ export const useChatStore = defineStore('chat', () => {
 
   const deleteMember = async (chatId: string | number, userId: string | number) => {
     try {
-      await api.delete(`/chats/${chatId}/members/${userId}`)
+      await api.delete(`/chats/chat/${chatId}/members/${userId}`)
       if (chat.value) {
         chat.value.participants = chat.value.participants.filter(
           (p: any) => Number(p.id) !== Number(userId),

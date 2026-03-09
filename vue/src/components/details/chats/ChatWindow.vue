@@ -1,5 +1,5 @@
 <template>
-  <div class="chat">
+  <div v-if="!privacyError" class="chat">
     <ChatHeader />
     <div class="plate">
       <div class="messages__wrapper" ref="messagesWrapper" @scroll="handleScroll">
@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import { ref, onUnmounted, nextTick, computed } from 'vue'
@@ -52,11 +52,13 @@ import ModalView from '@/views/ModalView.vue'
 
 const chatStore = useChatStore()
 const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore()
 const messageText = ref('')
 const notify = useNotificationStore()
 const messagesWrapper = ref<HTMLElement | null>(null)
 const messageStore = useMessageStore()
+const privacyError = ref<string | null>(null)
 
 const groupedMessages = computed(() => {
   const groups: { date: string; messages: any[] }[] = []
@@ -140,13 +142,15 @@ let currentChannel: any = null
 
 watch(
   [() => authStore.user?.id, () => route.params.chatId],
-  ([newUserId, newChatId], [oldUserId, oldChatId]) => {
+  async ([newUserId, newChatId], [oldUserId, oldChatId]) => {
     if (oldChatId && oldChatId !== newChatId) {
       window.Echo.leave(`chats.${oldChatId}`)
     }
 
     if (newUserId && newChatId) {
-      chatStore.fetchChat(newChatId as string).then(() => {
+      try {
+        await chatStore.fetchChat(newChatId as string)
+
         nextTick(() => {
           if (messagesWrapper.value) {
             messagesWrapper.value.scrollTop = messagesWrapper.value.scrollHeight
@@ -176,7 +180,14 @@ watch(
               }
             })
           })
-      })
+      } catch (error: any) {
+        privacyError.value = error.formattedMessage || 'Ошибка при загрузке чата'
+        notify.show(privacyError.value as any, 'error')
+
+        if (error.response?.status === 403 || error.response?.status === 404) {
+          router.push({ name: 'chats' })
+        }
+      }
     }
   },
   { immediate: true },

@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { RouterView, useRoute } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import { onMounted, watch, onUnmounted } from 'vue'
 import AppHeader from '@/components/header/AppHeader.vue'
 import AppFooter from '@/components/footer/AppFooter.vue'
@@ -40,6 +40,7 @@ const userStore = useUserStore()
 const chatStore = useChatStore()
 const messageStore = useMessageStore()
 const route = useRoute()
+const router = useRouter()
 
 const setupGlobalListeners = (userId: number | string) => {
   const channel = window.Echo.private(`user.${userId}`)
@@ -82,6 +83,22 @@ const setupGlobalListeners = (userId: number | string) => {
 
   channel.listen('.chat.created', (e: any) => {
     chatStore.fetchAllChats(undefined, true)
+  })
+
+  channel.listen('.member.added', (e: any) => {
+    notify.show(`${e.initiatorName} добавил вас в группу '${e.chatTitle}'`, 'info')
+    chatStore.fetchAllChats(undefined, true)
+  })
+
+  channel.listen('.member.deleted', (e: any) => {
+    notify.show(`Вы удалены администратором из группы '${e.chatTitle}'`, 'info')
+    if (chatStore.allChats) {
+      chatStore.allChats = chatStore.allChats.filter((c: any) => Number(c.id) !== Number(e.chatId))
+    }
+    if (Number(route.params.chatId) === Number(e.chatId)) {
+      router.push({ name: 'chats' })
+      chatStore.chat = null
+    }
   })
 
   channel.listen('.contact.request', (data: any) => {
