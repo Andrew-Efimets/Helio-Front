@@ -75,8 +75,10 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   const updateEchoMessage = (updatedMsg: any) => {
-    const index = messages.value.findIndex((m) => m.id === updatedMsg.id)
-    if (index !== -1) messages.value[index] = updatedMsg
+    const index = messages.value.findIndex((m) => Number(m.id) === Number(updatedMsg.id))
+    if (index !== -1) {
+      messages.value[index] = { ...messages.value[index], ...updatedMsg }
+    }
   }
 
   const deleteEchoMessage = (msgId: number | string) => {

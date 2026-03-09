@@ -96,7 +96,6 @@ const isLeavingProcess = ref(false)
 const route = useRoute()
 
 const myId = authStore.user?.id
-const chatId = route.params.chatId
 
 const isAdmin = computed(() => {
   if (chatStore.chat?.type !== 'group') return false

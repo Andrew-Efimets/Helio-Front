@@ -10,6 +10,12 @@
           <p class="quote-text">{{ message.parent_content }}</p>
         </div>
         <div class="content">
+          <div v-if="isGroup" class="reply-quote">
+            <div class="quote-header">
+              <img :src="message.user.active_avatar.avatar_url" class="quote-avatar" />
+              <span class="quote-author">{{ message.user.name }}</span>
+            </div>
+          </div>
           <p class="text">
             {{ message?.content }}
           </p>
@@ -73,6 +79,10 @@ const isOpenEditor = ref(false)
 const menuPosition = ref({ x: 0, y: 0 })
 const menuTop = computed(() => `${menuPosition.value.y}px`)
 const menuLeft = computed(() => `${menuPosition.value.x}px`)
+
+const isGroup = computed(() => {
+  return chatStore.chat?.type === 'group'
+})
 
 const myMessage = computed(() => {
   return Number(authStore.user?.id) === Number(props.message.user_id)
