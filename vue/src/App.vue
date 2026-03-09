@@ -85,20 +85,31 @@ const setupGlobalListeners = (userId: number | string) => {
     chatStore.fetchAllChats(undefined, true)
   })
 
-  channel.listen('.member.added', (e: any) => {
-    notify.show(`${e.initiatorName} добавил вас в группу '${e.chatTitle}'`, 'info')
-    chatStore.fetchAllChats(undefined, true)
-  })
-
-  channel.listen('.member.deleted', (e: any) => {
-    notify.show(`Вы удалены администратором из группы '${e.chatTitle}'`, 'info')
+  channel.listen('.chat.terminated', (e: any) => {
     if (chatStore.allChats) {
-      chatStore.allChats = chatStore.allChats.filter((c: any) => Number(c.id) !== Number(e.chatId))
+      chatStore.allChats = chatStore.allChats.filter((c) => Number(c.id) !== Number(e.chatId))
     }
+
     if (Number(route.params.chatId) === Number(e.chatId)) {
       router.push({ name: 'chats' })
       chatStore.chat = null
     }
+  })
+
+  channel.listen('.member.added', (e: any) => {
+    chatStore.fetchAllChats(undefined, true)
+    if (Number(route.params.chatId) !== Number(e.chatId)) {
+      notify.show(`${e.initiatorName} добавил(а) вас в группу '${e.chatTitle}'`, 'info')
+    }
+  })
+
+  channel.listen('.member.deleted', (e: any) => {
+    if (Number(route.params.chatId) !== Number(e.chatId)) {
+      notify.show(`Вы удалены администратором из группы '${e.chatTitle}'`, 'error')
+    } else {
+      router.push({ name: 'chats' })
+    }
+    chatStore.fetchAllChats(undefined, true)
   })
 
   channel.listen('.contact.request', (data: any) => {

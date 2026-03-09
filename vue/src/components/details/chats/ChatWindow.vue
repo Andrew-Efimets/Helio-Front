@@ -180,6 +180,53 @@ watch(
               }
             })
           })
+          .listen('.member.added', (e: any) => {
+            if (Number(e.initiatorId) === Number(authStore.user?.id)) {
+              return
+            }
+            if (Number(e.newMember.id) !== Number(authStore.user?.id)) {
+              if (chatStore.chat) {
+                chatStore.chat.participants.push(e.newMember)
+              }
+              notify.show(`${e.newMember.name} присоединился(-ась) к группе`, 'info')
+            } else {
+              notify.show(`Вы присоединились к группе`, 'success')
+            }
+          })
+          .listen('.member.deleted', (e: any) => {
+            if (Number(e.initiatorId) === Number(authStore.user?.id)) {
+              return
+            }
+            if (Number(e.deletedId) !== Number(authStore.user?.id)) {
+              if (chatStore.chat) {
+                chatStore.chat.participants = chatStore.chat.participants.filter(
+                  (p) => Number(p.id) !== Number(e.deletedId),
+                )
+              }
+              notify.show(`${e.deletedName} покинул(а) группу`, 'info')
+            } else {
+              chatStore.chat = null
+              window.Echo.leave(`chats.${e.chatId}`)
+            }
+          })
+          .listen('.chat.terminated', (e: any) => {
+            if (e.type === 'group_deleted') {
+              notify.show(`Группа была удалена администратором`, 'error')
+            } else if (e.userId && Number(e.userId) !== Number(authStore.user?.id)) {
+              chatStore.chat.participants = chatStore.chat.participants.filter(
+                (p) => p.id !== e.userId,
+              )
+              notify.show(`${e.userName} покинул(а) чат`, 'info')
+              return
+            }
+
+            window.Echo.leave(`chats.${e.chatId}`)
+            if (Number(route.params.chatId) === Number(e.chatId)) {
+              router.push({ name: 'chats' })
+              chatStore.chat = null
+            }
+            chatStore.fetchAllChats(undefined, true)
+          })
       } catch (error: any) {
         privacyError.value = error.formattedMessage || 'Ошибка при загрузке чата'
         notify.show(privacyError.value as any, 'error')

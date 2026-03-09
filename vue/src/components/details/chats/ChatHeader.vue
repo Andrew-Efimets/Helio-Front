@@ -32,7 +32,7 @@
                 </p>
                 <p class="menu-item" @click.stop="startEditing">Редактировать группу</p>
               </template>
-              <p class="menu-item delete" @click="isConfirmOpen = true">
+              <p class="menu-item delete" @click="((isConfirmOpen = true), (isOpenMenu = false))">
                 {{ isAdmin ? 'Удалить группу' : 'Покинуть группу' }}
               </p>
             </template>
@@ -137,7 +137,7 @@ const toggleMenu = () => {
 const handleConfirmLeave = async () => {
   isLeavingProcess.value = true
   isConfirmOpen.value = false
-  await chatStore.leaveChat(chatId)
+  await chatStore.leaveChat(route.params.chatId)
   isLeavingProcess.value = false
 }
 
