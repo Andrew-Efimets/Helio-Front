@@ -96,15 +96,15 @@ const handleSubmit = async () => {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  margin: auto;
+  margin: 20px auto;
 }
 
 .notify {
   text-align: center;
   text-decoration: none;
   color: #6e2c11;
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .link {

@@ -1,7 +1,7 @@
 <template>
   <div class="manager">
     <p class="title">{{ isAddMode ? 'Добавить в группу' : 'Удалить из группы' }}</p>
-
+    <HeaderSearch class="search" />
     <div v-if="isLoading" class="app-loader"></div>
     <div v-if="users.length > 0" class="list">
       <div v-for="user in users" :key="user.id" class="user-item">
@@ -31,6 +31,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useContacts } from '@/composables/useContacts.ts'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
+import HeaderSearch from '@/components/header/HeaderSearch.vue'
 
 const props = defineProps<{
   chatId: string
@@ -41,7 +42,6 @@ const chatStore = useChatStore()
 const contacts = useContacts()
 const authStore = useAuthStore()
 const isLoading = ref(false)
-const isProcessing = ref(false)
 
 const myContacts = ref<any[]>([])
 const isAddMode = computed(() => props.action === 'add-member')
@@ -75,6 +75,10 @@ const handleManage = async (userId: number) => {
 </script>
 
 <style scoped>
+.manager {
+  margin: 20px;
+}
+
 .mini-avatar {
   width: 30px;
   height: 30px;
@@ -106,5 +110,24 @@ const handleManage = async (userId: number) => {
   font-weight: bold;
   color: #6e2c11;
   margin-bottom: 20px;
+}
+
+.empty-msg {
+  color: #6e2c11;
+}
+
+.search {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .small-button {
+    scale: 0.7;
+  }
+
+  .text {
+    font-size: 12px;
+  }
 }
 </style>

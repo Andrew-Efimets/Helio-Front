@@ -54,6 +54,7 @@
           <RouterLink :to="{ name: 'wall', params: { id: String(participant.id) } }" class="link">
             <p class="participant-name">{{ participant.name }}</p>
           </RouterLink>
+          <span v-if="userStore.isUserOnline(participant.id)" class="green-dot"></span>
         </div>
       </div>
     </AppTransition>

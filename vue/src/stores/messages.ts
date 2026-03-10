@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import api from '@/api.ts'
 import { useChatStore } from '@/stores/chats.ts'
 import { useRoute } from 'vue-router'
@@ -42,6 +42,7 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   const addMessage = async (text: string, chatId: number | string) => {
+    const chatStore = useChatStore()
     const payload = {
       text,
       parent_id: replyTo.value?.id || null,
@@ -50,6 +51,7 @@ export const useMessageStore = defineStore('message', () => {
     const response = await api.post(`/chats/chat/${chatId}/messages`, payload)
     messages.value.push(response.data.data)
     clearReply()
+    chatStore.fetchAllChats(undefined, true)
   }
 
   const updateMessage = async (
@@ -63,8 +65,10 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   const deleteMessage = async (messageId: number | string, chatId: number | string) => {
+    const chatStore = useChatStore()
     await api.delete(`/chats/chat/${chatId}/messages/${messageId}`)
     messages.value = messages.value.filter((m) => m.id !== messageId)
+    chatStore.fetchAllChats(undefined, true)
   }
 
   const addEchoMessage = (message: any) => {
@@ -119,6 +123,38 @@ export const useMessageStore = defineStore('message', () => {
     }
   }
 
+  const groupedMessages = computed(() => {
+    const groups: { date: string; messages: any[] }[] = []
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const todayTimestamp = today.getTime()
+
+    messages.value.forEach((message) => {
+      const d = new Date(message.created_at)
+      const messageDay = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+
+      let dateText = ''
+      if (messageDay === todayTimestamp) {
+        dateText = 'Сегодня'
+      } else {
+        dateText = new Intl.DateTimeFormat('ru-RU', {
+          day: 'numeric',
+          month: 'long',
+        }).format(d)
+      }
+
+      let group = groups.find((g) => g.date === dateText)
+      if (!group) {
+        group = { date: dateText, messages: [] }
+        groups.push(group)
+      }
+      group.messages.push(message)
+    })
+
+    return groups
+  })
+
   return {
     messages,
     pagination,
@@ -126,6 +162,7 @@ export const useMessageStore = defineStore('message', () => {
     replyTo,
     editingMessage,
     forwardingMessage,
+    groupedMessages,
     markAsRead,
     fetchMessages,
     addMessage,

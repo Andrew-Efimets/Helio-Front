@@ -11,6 +11,7 @@
           <RouterLink :to="{ name: 'wall', params: { id: String(like.user.id) } }" class="link">
             <p class="user-name">{{ like.user.name }}</p>
           </RouterLink>
+          <span v-if="userStore.isUserOnline(like.user.id)" class="green-dot"></span>
         </div>
       </div>
     </AppTransition>
@@ -59,6 +60,7 @@
 import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useLikeStore } from '@/stores/likes'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useUserStore } from '@/stores/user.ts'
 import { RouterLink } from 'vue-router'
 import AppTransition from '@/components/details/AppTransition.vue'
 
@@ -70,6 +72,7 @@ const props = defineProps<{
 
 const likeStore = useLikeStore()
 const authStore = useAuthStore()
+const userStore = useUserStore()
 const isOpenList = ref(false)
 const currentLikes = computed(() => likeStore.getLikes(props.mediaType, props.mediaId))
 const isDataLoaded = computed(() => currentLikes.value !== null)

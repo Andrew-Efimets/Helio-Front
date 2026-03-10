@@ -1,5 +1,6 @@
 <template>
   <div class="chats-list">
+    <HeaderSearch class="search" />
     <div v-if="messageStore.forwardingMessage" class="forward-banner">
       <p>Выберите чат</p>
       <button @click.stop="messageStore.clearForward">Отмена</button>
@@ -21,18 +22,23 @@
             @click="selectChat(chat.id)"
           >
             <div class="main">
-              <div class="image__wrapper">
-                <img
-                  v-if="getChatData(chat).avatar"
-                  :src="getChatData(chat).avatar"
-                  alt="image"
-                  class="image"
-                />
+              <div class="item__wrapper">
+                <div class="image__wrapper">
+                  <img
+                    v-if="getChatData(chat).avatar"
+                    :src="getChatData(chat).avatar"
+                    alt="image"
+                    class="image"
+                  />
+                </div>
+                <div class="link">
+                  <p class="title">{{ getChatData(chat).title }}</p>
+                </div>
+                <span v-if="chat.unread_count > 0" class="badge"> + {{ chat.unread_count }} </span>
               </div>
-              <div class="link">
-                <p class="title">{{ getChatData(chat).title }}</p>
+              <div class="last-message__wrapper">
+                <div class="last-message">{{ chat.latest_message.content }}</div>
               </div>
-              <span v-if="chat.unread_count > 0" class="badge"> + {{ chat.unread_count }} </span>
             </div>
           </div>
         </div>
@@ -49,6 +55,7 @@ import { useAuthStore } from '@/stores/auth.ts'
 import { useMessageStore } from '@/stores/messages.ts'
 import GroupAddBlock from '@/components/details/chats/GroupAddBlock.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
+import HeaderSearch from '@/components/header/HeaderSearch.vue'
 
 const isGroupe = ref(false)
 const chatStore = useChatStore()
@@ -138,15 +145,38 @@ watch(
 }
 
 .main {
+  width: 100%;
   display: flex;
-  align-items: center;
-  column-gap: 10px;
+  flex-direction: column;
   padding: 10px;
   background-color: #f9f2e7;
   box-shadow: var(--main-box-shadow);
   background: var(--items-gradient);
   border-radius: 10px;
   margin-top: 10px;
+}
+
+.item__wrapper {
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+  justify-content: start;
+}
+
+.last-message__wrapper {
+  margin-top: 5px;
+  padding: 10px 20px;
+  background-color: #f9f2e7;
+  border-radius: 10px;
+  width: 100%;
+  text-align: end;
+  box-shadow: inset var(--input-focus-shadow);
+}
+
+.last-message {
+  color: #6e2c11;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .image {
@@ -199,6 +229,11 @@ watch(
   cursor: pointer;
   color: #6e2c11;
   font-weight: bold;
+}
+
+.search {
+  width: 100% !important;
+  margin-bottom: 10px;
 }
 
 @media screen and (max-width: 1024px) {

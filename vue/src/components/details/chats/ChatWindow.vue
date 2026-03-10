@@ -39,17 +39,19 @@
 
 <script setup lang="ts">
 import { watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
+import { ref, onUnmounted, nextTick, computed } from 'vue'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
-import { ref, onUnmounted, nextTick, computed } from 'vue'
+import { useNotificationStore } from '@/stores/notifications.ts'
+import { useMessageStore } from '@/stores/messages.ts'
+import { useChatSocket } from '@/composables/useChatSocket'
+import ModalView from '@/views/ModalView.vue'
 import ChatHeader from '@/components/details/chats/ChatHeader.vue'
 import ChatsMessageItem from '@/components/details/chats/ChatsMessageItem.vue'
 import MessageInput from '@/components/details/MessageInput.vue'
-import { useNotificationStore } from '@/stores/notifications.ts'
-import { useMessageStore } from '@/stores/messages.ts'
-import ModalView from '@/views/ModalView.vue'
 
+const { subscribeToChat, leaveChannel } = useChatSocket()
 const chatStore = useChatStore()
 const route = useRoute()
 const router = useRouter()
@@ -60,35 +62,7 @@ const messagesWrapper = ref<HTMLElement | null>(null)
 const messageStore = useMessageStore()
 const privacyError = ref<string | null>(null)
 
-const groupedMessages = computed(() => {
-  const groups: { date: string; messages: any[] }[] = []
-
-  messageStore.messages.forEach((message) => {
-    const date = new Date(message.created_at)
-    const today = new Date().setHours(0, 0, 0, 0)
-    const messageDate = new Date(date).setHours(0, 0, 0, 0)
-
-    let dateText = ''
-
-    if (messageDate === today) {
-      dateText = 'Сегодня'
-    } else {
-      dateText = new Intl.DateTimeFormat('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-      }).format(date)
-    }
-
-    let group = groups.find((g) => g.date === dateText)
-    if (!group) {
-      group = { date: dateText, messages: [] }
-      groups.push(group)
-    }
-    group.messages.push(message)
-  })
-
-  return groups
-})
+const groupedMessages = computed(() => messageStore.groupedMessages)
 
 const saveMessage = async (text: string) => {
   if (!text.trim()) return
@@ -138,8 +112,6 @@ const scrollToBottom = () => {
   })
 }
 
-let currentChannel: any = null
-
 watch(
   [() => authStore.user?.id, () => route.params.chatId],
   async ([newUserId, newChatId], [oldUserId, oldChatId]) => {
@@ -151,82 +123,13 @@ watch(
       try {
         await chatStore.fetchChat(newChatId as string)
 
+        subscribeToChat(newChatId as string, newUserId, route.params.chatId, scrollToBottom)
+
         nextTick(() => {
           if (messagesWrapper.value) {
             messagesWrapper.value.scrollTop = messagesWrapper.value.scrollHeight
           }
         })
-
-        currentChannel = window.Echo.private(`chats.${newChatId}`)
-
-        currentChannel
-          .listen('.message.created', (e: any) => {
-            if (Number(e.message.chat_id) === Number(route.params.chatId)) {
-              messageStore.addEchoMessage(e.message)
-              scrollToBottom()
-
-              if (Number(e.message.user_id) !== Number(authStore.user?.id)) {
-                messageStore.markAsRead(route.params.chatId as string)
-              }
-            }
-          })
-          .listen('.message.updated', (e: any) => {
-            messageStore.updateEchoMessage(e.message)
-          })
-          .listen('.message.read', (e: { readAt: string }) => {
-            messageStore.messages.forEach((m) => {
-              if (Number(m.user_id) === Number(authStore.user?.id) && !m.read_at) {
-                m.read_at = e.readAt
-              }
-            })
-          })
-          .listen('.member.added', (e: any) => {
-            if (Number(e.initiatorId) === Number(authStore.user?.id)) {
-              return
-            }
-            if (Number(e.newMember.id) !== Number(authStore.user?.id)) {
-              if (chatStore.chat) {
-                chatStore.chat.participants.push(e.newMember)
-              }
-              notify.show(`${e.newMember.name} присоединился(-ась) к группе`, 'info')
-            } else {
-              notify.show(`Вы присоединились к группе`, 'success')
-            }
-          })
-          .listen('.member.deleted', (e: any) => {
-            if (Number(e.initiatorId) === Number(authStore.user?.id)) {
-              return
-            }
-            if (Number(e.deletedId) !== Number(authStore.user?.id)) {
-              if (chatStore.chat) {
-                chatStore.chat.participants = chatStore.chat.participants.filter(
-                  (p) => Number(p.id) !== Number(e.deletedId),
-                )
-              }
-              notify.show(`${e.deletedName} покинул(а) группу`, 'info')
-            } else {
-              chatStore.chat = null
-              window.Echo.leave(`chats.${e.chatId}`)
-            }
-          })
-          .listen('.chat.terminated', (e: any) => {
-            if (e.type === 'group_deleted') {
-              notify.show(`Группа была удалена администратором`, 'error')
-            } else if (e.userId && Number(e.userId) !== Number(authStore.user?.id)) {
-              chatStore.chat.participants = chatStore.chat.participants.filter(
-                (p) => p.id !== e.userId,
-              )
-              notify.show(`${e.userName} покинул(а) чат`, 'info')
-              return
-            }
-
-            window.Echo.leave(`chats.${e.chatId}`)
-            if (Number(route.params.chatId) === Number(e.chatId)) {
-              router.push({ name: 'chats' })
-              chatStore.chat = null
-            }
-            chatStore.fetchAllChats(undefined, true)
-          })
       } catch (error: any) {
         privacyError.value = error.formattedMessage || 'Ошибка при загрузке чата'
         notify.show(privacyError.value as any, 'error')
@@ -240,10 +143,12 @@ watch(
   { immediate: true },
 )
 
+onBeforeRouteLeave((to, from) => {
+  leaveChannel(route.params.chatId as string)
+})
+
 onUnmounted(() => {
-  if (route.params.chatId) {
-    window.Echo.leave(`chats.${route.params.chatId}`)
-  }
+  leaveChannel(route.params.chatId as string)
 })
 
 watch(
@@ -266,14 +171,14 @@ watch(
 
 .plate {
   width: 100%;
-  max-height: 500px;
+  max-height: 600px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   margin: 10px 0;
   padding: 10px;
   background: var(--main-plate-gradient);
-  min-height: 100px;
+  min-height: 400px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(110, 44, 17, 0.3);
 }
