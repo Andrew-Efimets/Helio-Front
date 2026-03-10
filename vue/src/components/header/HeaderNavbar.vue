@@ -18,10 +18,9 @@
 </template>
 
 <script setup lang="ts">
+import api from '@/api'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter, RouterLink } from 'vue-router'
-import api from '@/api'
-import { ref } from 'vue'
 
 const authStore = useAuthStore()
 const router = useRouter()

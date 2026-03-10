@@ -28,8 +28,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { usePhotoStore } from '@/stores/photos.ts'
 
 const route = useRoute()

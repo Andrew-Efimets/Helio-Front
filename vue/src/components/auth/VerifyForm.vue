@@ -18,11 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import FormInput from '@/components/auth/FormInput.vue'
-import { useAuthStore } from '@/stores/auth'
+import { computed, reactive, ref } from 'vue'
 import api from '@/api.ts'
+import { useAuthStore } from '@/stores/auth'
+import FormInput from '@/components/auth/FormInput.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()

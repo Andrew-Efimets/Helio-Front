@@ -25,7 +25,7 @@
         </div>
       </div>
 
-      <input type="file" ref="fileInput" style="display: none" @change="addFile" />
+      <input type="file" ref="fileInput" @change="addFile" class="file-input" />
     </form>
   </div>
 </template>
@@ -198,5 +198,9 @@ onUnmounted(() => {
 
 .remove-btn:hover {
   background: #a34809;
+}
+
+.file-input {
+  display: none;
 }
 </style>

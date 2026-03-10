@@ -18,30 +18,56 @@
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useChatStore } from '@/stores/chats.ts'
+import { useUserStore } from '@/stores/user.ts'
 
 const router = useRouter()
 const route = useRoute()
 const searchQuery = ref('')
+const chatStore = useChatStore()
+const userStore = useUserStore()
 
 const props = defineProps<{
   isGlobal?: boolean
 }>()
+
 const handleSearch = () => {
   if (props.isGlobal) {
-    router.push({
-      name: 'users',
-      query: { search: searchQuery.value },
-    })
-  } else {
-    router.push({
-      name: route.name as string,
-      params: route.params,
-      query: { search: searchQuery.value },
-    })
+    router.push({ name: 'users', query: { search: searchQuery.value } })
+    return
   }
-  searchQuery.value = ''
+
+  const query = searchQuery.value
+
+  chatStore.searchQuery = query
+
+  if (route.name === 'contacts') {
+    userStore.searchQuery = query
+  }
 }
+
+watch(searchQuery, (newVal) => {
+  if (props.isGlobal) return
+
+  chatStore.searchQuery = newVal
+  if (route.name === 'contacts') {
+    userStore.searchQuery = newVal
+  }
+})
+
+watch(
+  () => [chatStore.searchQuery, userStore.searchQuery],
+  ([newChatQuery, newUserQuery]) => {
+    if (!props.isGlobal) {
+      if (route.name === 'chats' || route.name === 'chat' || route.name === 'chat-manager') {
+        searchQuery.value = (newChatQuery as string) ?? ''
+      } else if (route.name === 'contacts') {
+        searchQuery.value = (newUserQuery as string) ?? ''
+      }
+    }
+  },
+)
 </script>
 
 <style scoped>

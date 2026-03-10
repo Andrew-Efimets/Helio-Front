@@ -45,11 +45,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { usePostStore } from '@/stores/posts.ts'
 import LikesMedia from '@/components/details/media/LikesMedia.vue'
 import CommentsMedia from '@/components/details/media/comments/CommentsMedia.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
 import MessageInput from '@/components/details/MessageInput.vue'
-import { usePostStore } from '@/stores/posts.ts'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 
 const props = defineProps<{

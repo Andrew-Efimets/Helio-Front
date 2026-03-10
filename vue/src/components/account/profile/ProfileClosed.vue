@@ -22,12 +22,12 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth.ts'
-import { useRoute, RouterLink } from 'vue-router'
 import { ref } from 'vue'
+import { useRoute, RouterLink } from 'vue-router'
 import api from '@/api'
-import ProfileAvatar from '@/components/account/profile/ProfileAvatar.vue'
+import { useAuthStore } from '@/stores/auth.ts'
 import { useUserStore } from '@/stores/user.ts'
+import ProfileAvatar from '@/components/account/profile/ProfileAvatar.vue'
 
 const props = defineProps<{
   user: any

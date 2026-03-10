@@ -1,7 +1,7 @@
 <template>
   <div class="manager">
     <p class="title">{{ isAddMode ? 'Добавить в группу' : 'Удалить из группы' }}</p>
-    <HeaderSearch class="search" />
+    <HeaderSearch :is-global="false" class="search" />
     <div v-if="isLoading" class="app-loader"></div>
     <div v-if="users.length > 0" class="list">
       <div v-for="user in users" :key="user.id" class="user-item">
@@ -27,10 +27,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useContacts } from '@/composables/useContacts.ts'
+import { computed, onMounted, ref, onUnmounted } from 'vue'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useContacts } from '@/composables/useContacts.ts'
 import HeaderSearch from '@/components/header/HeaderSearch.vue'
 
 const props = defineProps<{
@@ -47,6 +47,7 @@ const myContacts = ref<any[]>([])
 const isAddMode = computed(() => props.action === 'add-member')
 
 onMounted(async () => {
+  chatStore.searchQuery = ''
   if (isAddMode.value && authStore.user?.id) {
     isLoading.value = true
     const response = await contacts.fetchContacts(authStore.user.id, 'accepted')
@@ -56,11 +57,18 @@ onMounted(async () => {
 })
 
 const users = computed(() => {
+  const query = chatStore.searchQuery.toLowerCase().trim()
+  let list = []
   if (isAddMode.value) {
     const participantIds = chatStore.chat?.participants?.map((p: any) => p.id) || []
-    return myContacts.value.filter((contact) => !participantIds.includes(contact.id))
+    list = myContacts.value.filter((contact) => !participantIds.includes(contact.id))
+  } else {
+    list = chatStore.chat?.participants?.filter((p: any) => p.id !== authStore.user?.id) || []
   }
-  return chatStore.chat?.participants?.filter((p: any) => p.id !== authStore.user?.id) || []
+
+  if (!query) return list
+
+  return list.filter((user) => user.name.toLowerCase().includes(query))
 })
 
 const handleManage = async (userId: number) => {
@@ -72,6 +80,10 @@ const handleManage = async (userId: number) => {
   }
   isLoading.value = false
 }
+
+onUnmounted(() => {
+  chatStore.searchQuery = ''
+})
 </script>
 
 <style scoped>

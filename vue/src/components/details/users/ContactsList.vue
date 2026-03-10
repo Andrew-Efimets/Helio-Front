@@ -19,7 +19,7 @@
             <span class="title">Всего контактов ({{ userStore.users.length }})</span>
             <HeaderSearch :is-global="false" />
           </div>
-          <template v-for="user in userStore.users" :key="user.id">
+          <template v-for="user in userStore.filteredUsers" :key="user.id">
             <UsersListItem :user="user" />
           </template>
         </div>
@@ -49,14 +49,14 @@
 </template>
 
 <script setup lang="ts">
-import HeaderSearch from '@/components/header/HeaderSearch.vue'
-import UsersListItem from '@/components/details/users/UsersListItem.vue'
-import AppTransition from '@/components/details/AppTransition.vue'
 import { onMounted, ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useContacts } from '@/composables/useContacts.ts'
 import { useUserStore } from '@/stores/user.ts'
 import { useAuthStore } from '@/stores/auth.ts'
+import HeaderSearch from '@/components/header/HeaderSearch.vue'
+import UsersListItem from '@/components/details/users/UsersListItem.vue'
+import AppTransition from '@/components/details/AppTransition.vue'
 
 const route = useRoute()
 const contacts = useContacts()
@@ -86,8 +86,7 @@ const outgoing = computed(() =>
 const handleFetchContacts = async () => {
   try {
     isLoading.value = true
-    userStore.setUsers([])
-    await contacts.fetchContacts(route.params.id as string, currentStatus.value, route.query)
+    await contacts.fetchContacts(route.params.id as string, currentStatus.value)
   } catch (e: any) {
     privacyError.value = e.formattedMessage || 'Доступ ограничен настройками приватности'
     console.error('Ошибка при загрузке контактов:', e)
@@ -106,26 +105,11 @@ onMounted(() => {
 })
 
 watch(
-  () => route.query,
-  () => {
-    handleFetchContacts()
-  },
-  { deep: true },
-)
-
-watch(
   () => route.params.id,
   (newId) => {
     if (newId && route.name === 'contacts') {
       handleFetchContacts()
     }
-  },
-)
-
-watch(
-  () => userStore.refreshTicket,
-  () => {
-    handleFetchContacts()
   },
 )
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="chats-list">
-    <HeaderSearch class="search" />
+    <HeaderSearch :is-global="false" class="search" />
     <div v-if="messageStore.forwardingMessage" class="forward-banner">
       <p>Выберите чат</p>
       <button @click.stop="messageStore.clearForward">Отмена</button>
@@ -37,7 +37,9 @@
                 <span v-if="chat.unread_count > 0" class="badge"> + {{ chat.unread_count }} </span>
               </div>
               <div class="last-message__wrapper">
-                <div class="last-message">{{ chat.latest_message.content }}</div>
+                <div class="last-message">
+                  {{ chat.latest_message?.content || 'Нет сообщений' }}
+                </div>
               </div>
             </div>
           </div>
@@ -49,7 +51,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useChatStore } from '@/stores/chats.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import { useMessageStore } from '@/stores/messages.ts'
@@ -62,18 +64,32 @@ const chatStore = useChatStore()
 const authStore = useAuthStore()
 const messageStore = useMessageStore()
 const router = useRouter()
+const route = useRoute()
 
 const chatType = computed(() => (isGroupe.value ? 'group' : 'private'))
 
 const displayChats = computed(() => {
   if (!chatStore.allChats) return []
-  return chatStore.allChats.filter((c) => c.type === chatType.value)
+
+  const query = chatStore.searchQuery.toLowerCase().trim()
+
+  const isManagerOpen = route.name === 'chat-manager'
+
+  return chatStore.allChats.filter((chat) => {
+    if (chat.type !== chatType.value) return false
+
+    if (isManagerOpen || !query) return true
+
+    const chatData = getChatData(chat)
+    return chatData.title.toLowerCase().includes(query)
+  })
 })
 
 const emit = defineEmits(['select-chat'])
 
 const selectChat = async (chatId: number) => {
   emit('select-chat')
+  chatStore.searchQuery = ''
   if (messageStore.forwardingMessage) {
     messageStore.setReply(messageStore.forwardingMessage)
     messageStore.clearForward()
@@ -100,6 +116,7 @@ const getChatData = (chat: any) => {
 }
 
 const toggleTab = (value: boolean) => {
+  chatStore.searchQuery = ''
   isGroupe.value = value
 }
 

@@ -21,8 +21,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import MediaLoadingPlaceholder from '@/components/details/media/MediaLoadingPlaceholder.vue'
 import { RouterLink, useRoute } from 'vue-router'
+import MediaLoadingPlaceholder from '@/components/details/media/MediaLoadingPlaceholder.vue'
 
 defineProps<{ video: any }>()
 const videoPlayer = ref<HTMLVideoElement | null>(null)

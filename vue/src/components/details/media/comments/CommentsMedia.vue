@@ -23,10 +23,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import CommentsPlate from '@/components/details/media/comments/CommentsPlate.vue'
-import MessageInput from '@/components/details/MessageInput.vue'
 import { useNotificationStore } from '@/stores/notifications.ts'
 import { useCommentStore } from '@/stores/comments.ts'
+import CommentsPlate from '@/components/details/media/comments/CommentsPlate.vue'
+import MessageInput from '@/components/details/MessageInput.vue'
 
 const props = defineProps<{
   mediaId: number | string

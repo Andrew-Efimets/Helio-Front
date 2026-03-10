@@ -10,11 +10,11 @@ export function useContacts() {
   const notify = useNotificationStore()
   const userStore = useUserStore()
 
-  const fetchContacts = async (userId: number | string, contactStatus: string, query: any = {}) => {
+  const fetchContacts = async (userId: number | string, contactStatus: string) => {
     try {
+      userStore.searchQuery = ''
       const response = await api.get(`/user/${userId}/contacts`, {
         params: {
-          ...query,
           contact_status: contactStatus,
         },
       })

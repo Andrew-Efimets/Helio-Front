@@ -11,18 +11,18 @@
 <script setup lang="ts">
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { onMounted, watch, onUnmounted } from 'vue'
-import AppHeader from '@/components/header/AppHeader.vue'
-import AppFooter from '@/components/footer/AppFooter.vue'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 import { useVideoStore } from '@/stores/videos'
 import { usePhotoStore } from '@/stores/photos'
-import NotificationsView from '@/views/NotificationsView.vue'
 import { useNotificationStore } from '@/stores/notifications'
 import { useUserStore } from '@/stores/user'
-import ScrollToTop from '@/components/details/ScrollToTop.vue'
 import { useChatStore } from '@/stores/chats.ts'
 import { useMessageStore } from '@/stores/messages.ts'
+import AppHeader from '@/components/header/AppHeader.vue'
+import AppFooter from '@/components/footer/AppFooter.vue'
+import NotificationsView from '@/views/NotificationsView.vue'
+import ScrollToTop from '@/components/details/ScrollToTop.vue'
 
 onMounted(async () => {
   try {

@@ -14,8 +14,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { usePostStore } from '@/stores/posts.ts'
 import { useRoute } from 'vue-router'
+import { usePostStore } from '@/stores/posts.ts'
 import PostItem from '@/components/details/posts/PostItem.vue'
 
 const postStore = usePostStore()

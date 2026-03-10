@@ -26,9 +26,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.ts'
 import { useUserStore } from '@/stores/user.ts'
+import { RouterLink } from 'vue-router'
 import OnlineStatusPointer from '@/components/details/OnlineStatusPointer.vue'
 
 const props = defineProps<{

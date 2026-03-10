@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import api from '@/api.ts'
 
 export const useUserStore = defineStore('user', () => {
@@ -11,6 +11,14 @@ export const useUserStore = defineStore('user', () => {
   const isLoading = ref(false)
   const lastPage = ref(1)
   const onlineUserIds = ref<Set<number>>(new Set())
+  const searchQuery = ref('')
+
+  const filteredUsers = computed(() => {
+    const query = searchQuery.value.toLowerCase().trim()
+    if (!query) return users.value
+
+    return users.value.filter((user) => user.name.toLowerCase().includes(query))
+  })
 
   const setOnlineUsers = (users: { id: number }[]) => {
     onlineUserIds.value = new Set(users.map((u) => Number(u.id)))
@@ -117,6 +125,8 @@ export const useUserStore = defineStore('user', () => {
     isLoading,
     refreshTicket,
     onlineUserIds,
+    searchQuery,
+    filteredUsers,
     setProfile,
     updateStatus,
     setUsers,

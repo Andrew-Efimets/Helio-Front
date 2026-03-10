@@ -16,6 +16,20 @@ export const useChatStore = defineStore('chat', () => {
   const route = useRoute()
   const notify = useNotificationStore()
   const editingGroup = ref<any | null>(null)
+  const searchQuery = ref('')
+
+  const filteredChats = computed(() => {
+    const query = searchQuery.value.toLowerCase().trim()
+    if (!query) return allChats.value
+
+    return allChats.value.filter((chat) => {
+      const titleMatch = chat.title?.toLowerCase().includes(query)
+
+      const companionMatch = chat.participants?.some((p) => p.name.toLowerCase().includes(query))
+
+      return titleMatch || companionMatch
+    })
+  })
 
   const fetchAllChats = async (chatType?: string, silent = false) => {
     try {
@@ -208,6 +222,8 @@ export const useChatStore = defineStore('chat', () => {
     allChats,
     totalUnreadCount,
     editingGroup,
+    filteredChats,
+    searchQuery,
     startEdit,
     cancelEdit,
     initChat,

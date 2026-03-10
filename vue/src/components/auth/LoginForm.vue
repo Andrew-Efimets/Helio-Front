@@ -31,11 +31,11 @@
 </template>
 
 <script setup lang="ts">
+import api from '@/api'
+import { useAuthStore } from '@/stores/auth'
 import { computed, reactive, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import FormInput from '@/components/auth/FormInput.vue'
-import api from '@/api'
-import { useAuthStore } from '@/stores/auth'
 
 const loginForm = reactive({
   phone: '',

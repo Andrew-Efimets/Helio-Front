@@ -31,7 +31,6 @@ import { useRoute, RouterView } from 'vue-router'
 import { useAuthStore, type PrivacySettings } from '@/stores/auth.ts'
 import { useUserStore } from '@/stores/user'
 import api from '@/api'
-
 import ProfileAvatar from '@/components/account/profile/ProfileAvatar.vue'
 import ProfileInfo from '@/components/account/profile/ProfileInfo.vue'
 import ProfileClosed from '@/components/account/profile/ProfileClosed.vue'

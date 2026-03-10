@@ -68,12 +68,12 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth.ts'
 import { ref } from 'vue'
 import { useContacts } from '@/composables/useContacts.ts'
-import ConfirmModal from '@/components/details/ConfirmModal.vue'
+import { useAuthStore } from '@/stores/auth.ts'
 import { useUserStore } from '@/stores/user.ts'
 import { useChatStore } from '@/stores/chats.ts'
+import ConfirmModal from '@/components/details/ConfirmModal.vue'
 import OnlineStatusPointer from '@/components/details/OnlineStatusPointer.vue'
 
 const props = defineProps<{

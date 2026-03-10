@@ -15,10 +15,10 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import { computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.ts'
 import { usePostStore } from '@/stores/posts.ts'
-import { useRoute } from 'vue-router'
 import PostAddBlock from '@/components/details/posts/PostAddBlock.vue'
 import PostsList from '@/components/details/posts/PostsList.vue'
 

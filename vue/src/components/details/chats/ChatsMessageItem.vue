@@ -58,13 +58,13 @@
 </template>
 
 <script setup lang="ts">
-import { useChatStore } from '@/stores/chats.ts'
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useChatStore } from '@/stores/chats.ts'
+import { useMessageStore } from '@/stores/messages.ts'
 import { useNotificationStore } from '@/stores/notifications.ts'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 import AppTransition from '@/components/details/AppTransition.vue'
-import { useMessageStore } from '@/stores/messages.ts'
 
 const props = defineProps<{
   message: any

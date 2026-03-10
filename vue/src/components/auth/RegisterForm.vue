@@ -37,11 +37,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import FormInput from '@/components/auth/FormInput.vue'
+import { computed, reactive, ref } from 'vue'
 import api from '@/api'
 import { useAuthStore } from '@/stores/auth'
+import FormInput from '@/components/auth/FormInput.vue'
 
 const registerForm = reactive({
   name: '',

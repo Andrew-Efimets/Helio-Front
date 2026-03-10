@@ -42,11 +42,11 @@
 </template>
 
 <script setup lang="ts">
-import AppTransition from '@/components/details/AppTransition.vue'
-import UsersFilterInput from './UsersFilterInput.vue'
 import { reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ref } from 'vue'
+import UsersFilterInput from './UsersFilterInput.vue'
+import AppTransition from '@/components/details/AppTransition.vue'
 
 const isOpen = ref(false)
 const route = useRoute()

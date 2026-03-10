@@ -45,11 +45,11 @@
 </template>
 
 <script setup lang="ts">
-import { vMaska } from 'maska/vue'
-import { useAuthStore } from '@/stores/auth.ts'
-import { reactive, watch, computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { reactive, watch, computed, ref } from 'vue'
 import api from '@/api.ts'
+import { useAuthStore } from '@/stores/auth.ts'
+import { vMaska } from 'maska/vue'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 
 const authStore = useAuthStore()

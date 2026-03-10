@@ -69,10 +69,10 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth.ts'
-import { useContacts } from '@/composables/useContacts'
 import { ref, watch } from 'vue'
 import { useUserStore } from '@/stores/user'
+import { useAuthStore } from '@/stores/auth.ts'
+import { useContacts } from '@/composables/useContacts'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 
 const menuLinks = [

@@ -15,6 +15,7 @@
 
 <script setup lang="ts">
 import { vMaska } from 'maska/vue'
+
 defineOptions({ inheritAttrs: false })
 
 defineProps<{

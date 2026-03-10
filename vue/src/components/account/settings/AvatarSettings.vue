@@ -61,9 +61,9 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth.ts'
 import { ref, watch, onMounted, computed } from 'vue'
 import api from '@/api.ts'
+import { useAuthStore } from '@/stores/auth.ts'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 
 const authStore = useAuthStore()

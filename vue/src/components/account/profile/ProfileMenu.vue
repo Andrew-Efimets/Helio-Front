@@ -47,9 +47,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.ts'
 import { useChatStore } from '@/stores/chats.ts'
+import { RouterLink } from 'vue-router'
 
 const authStore = useAuthStore()
 const chatStore = useChatStore()

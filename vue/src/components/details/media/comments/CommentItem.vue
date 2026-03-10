@@ -31,8 +31,8 @@
 </template>
 
 <script setup lang="ts">
-import { useCommentStore } from '@/stores/comments.ts'
 import { ref } from 'vue'
+import { useCommentStore } from '@/stores/comments.ts'
 import AppTransition from '@/components/details/AppTransition.vue'
 
 const commentStore = useCommentStore()
