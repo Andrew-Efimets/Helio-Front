@@ -18,6 +18,7 @@ import ProfileSettings from '@/components/account/settings/ProfileSettings.vue'
 import AvatarSettings from '@/components/account/settings/AvatarSettings.vue'
 import PrivacySettings from '@/components/account/settings/PrivacySettings.vue'
 import ChatMembersManager from '@/components/details/chats/ChatMembersManager.vue'
+import ForgotPassword from '@/components/auth/ForgotPassword.vue'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const router = createRouter({
@@ -102,6 +103,15 @@ const router = createRouter({
           components: {
             default: HomeView,
             modalMain: VerifyForm,
+          },
+          meta: { isModal: true },
+        },
+        {
+          path: 'reset-password',
+          name: 'reset-password',
+          components: {
+            default: HomeView,
+            modalMain: ForgotPassword,
           },
           meta: { isModal: true },
         },

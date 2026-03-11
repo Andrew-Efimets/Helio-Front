@@ -69,6 +69,9 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('is_auth')
     localStorage.removeItem('temp_phone')
     localStorage.removeItem('user_data')
+    if (window.Echo) {
+      ;(window as any).Echo.disconnect()
+    }
   }
 
   const canSee = (targetUser: any, key: keyof PrivacySettings) => {

@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { computed, reactive, ref } from 'vue'
 import api from '@/api.ts'
 import { useAuthStore } from '@/stores/auth'
@@ -26,6 +26,7 @@ import FormInput from '@/components/auth/FormInput.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const isLoading = ref(false)
 const serverError = ref('')
 
@@ -57,7 +58,14 @@ const handleSubmit = async () => {
       const response = await api.post('/verify', {
         phone: authStore.tempPhone,
         code: validateForm.code,
+        reset: route.query.type === 'reset',
       })
+
+      if (route.query.type === 'reset') {
+        localStorage.setItem('reset_code', validateForm.code)
+        router.push({ name: 'reset-password' })
+        return
+      }
 
       authStore.setUser(response.data.data)
 
