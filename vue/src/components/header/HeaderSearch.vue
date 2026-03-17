@@ -1,17 +1,73 @@
 <template>
   <div class="search">
-    <input type="text" class="input" placeholder="Поиск" />
+    <input
+      type="text"
+      class="input"
+      placeholder="Поиск"
+      v-model="searchQuery"
+      @keyup.enter="handleSearch"
+    />
     <div class="icon-wrapper">
       <p class="separator">|</p>
-      <RouterLink :to="{ name: 'users' }" class="link-item">
-        <img src="../../assets/search.png" alt="поиск" class="icon" />
-      </RouterLink>
+      <div class="link-item" @click="handleSearch">
+        <img src="@/assets/search.png" alt="поиск" class="icon" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { ref, watch } from 'vue'
+import { useChatStore } from '@/stores/chats.ts'
+import { useUserStore } from '@/stores/user.ts'
+
+const router = useRouter()
+const route = useRoute()
+const searchQuery = ref('')
+const chatStore = useChatStore()
+const userStore = useUserStore()
+
+const props = defineProps<{
+  isGlobal?: boolean
+}>()
+
+const handleSearch = () => {
+  if (props.isGlobal) {
+    router.push({ name: 'users', query: { search: searchQuery.value } })
+    return
+  }
+
+  const query = searchQuery.value
+
+  chatStore.searchQuery = query
+
+  if (route.name === 'contacts') {
+    userStore.searchQuery = query
+  }
+}
+
+watch(searchQuery, (newVal) => {
+  if (props.isGlobal) return
+
+  chatStore.searchQuery = newVal
+  if (route.name === 'contacts') {
+    userStore.searchQuery = newVal
+  }
+})
+
+watch(
+  () => [chatStore.searchQuery, userStore.searchQuery],
+  ([newChatQuery, newUserQuery]) => {
+    if (!props.isGlobal) {
+      if (route.name === 'chats' || route.name === 'chat' || route.name === 'chat-manager') {
+        searchQuery.value = (newChatQuery as string) ?? ''
+      } else if (route.name === 'contacts') {
+        searchQuery.value = (newUserQuery as string) ?? ''
+      }
+    }
+  },
+)
 </script>
 
 <style scoped>
@@ -20,23 +76,23 @@ import { RouterLink } from 'vue-router'
   text-align: center;
   align-items: center;
   justify-content: end;
-  width: 30%;
+  width: 40%;
   position: relative;
 }
 
 .input {
   width: 100%;
   font-size: 16px;
-  padding: 5px 0 5px 10px;
+  padding: 5px 50px 5px 10px;
   border: #6e2c11 2px solid;
   border-radius: 18px;
-  background-color: #e6bda9;
+  background-color: #f5ddc5;
 }
 
 .input:focus {
   outline: none;
   border: 2px solid #be7f19;
-  box-shadow: 0 0 5px rgba(190, 127, 25, 0.5);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .icon-wrapper {
@@ -56,6 +112,7 @@ import { RouterLink } from 'vue-router'
 
 .link-item {
   width: 35%;
+  cursor: pointer;
 }
 
 .icon {

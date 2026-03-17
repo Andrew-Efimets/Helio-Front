@@ -22,10 +22,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 
 const props = defineProps({ isOpen: Boolean })
 const confirmDialog = ref<HTMLDialogElement | null>(null)
+
+onMounted(() => {
+  if (props.isOpen) {
+    confirmDialog.value?.showModal()
+  }
+})
 
 watch(
   () => props.isOpen,
@@ -95,6 +101,17 @@ defineEmits(['close', 'confirm'])
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .main {
+    font-size: 16px;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: center;
   }
 }
 </style>

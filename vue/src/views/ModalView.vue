@@ -2,7 +2,7 @@
   <dialog ref="dialogRef" class="modal" @click.self="close">
     <div class="content">
       <button class="close-btn" @click="close">×</button>
-      <RouterView name="modal" />
+      <RouterView name="modalMain" />
     </div>
   </dialog>
 </template>
@@ -103,6 +103,7 @@ onMounted(updateModalState)
   padding: 30px;
   position: relative;
   min-width: 400px;
+  width: 100%;
 }
 
 .close-btn {
@@ -123,5 +124,12 @@ onMounted(updateModalState)
   transform: scale(1.1);
   transition: all 0.3s linear;
   box-shadow: inset 0 0 3px 3px rgba(190, 127, 25, 0.3);
+}
+
+@media screen and (max-width: 768px) {
+  .content {
+    min-width: 200px;
+    padding: 10px;
+  }
 }
 </style>

@@ -61,9 +61,9 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth.ts'
 import { ref, watch, onMounted, computed } from 'vue'
 import api from '@/api.ts'
+import { useAuthStore } from '@/stores/auth.ts'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 
 const authStore = useAuthStore()
@@ -269,7 +269,7 @@ const openDeleteConfirm = (id: number) => {
   border: #6e2c11 2px solid;
   border-radius: 18px;
   text-transform: uppercase;
-  box-shadow: 0 0 3px 3px rgba(190, 127, 25, 0.5);
+  box-shadow: var(--main-box-shadow);
   background-color: #fee6c4;
   cursor: pointer;
 }
@@ -277,7 +277,6 @@ const openDeleteConfirm = (id: number) => {
 .upload-label:active {
   transform: scale(0.99);
   background-color: #fee6c4;
-  box-shadow: inset 0 0 3px 3px rgba(190, 127, 25, 0.5);
 }
 
 .gallery-title {

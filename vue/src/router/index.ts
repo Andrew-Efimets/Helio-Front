@@ -5,19 +5,20 @@ import LoginForm from '@/components/auth/LoginForm.vue'
 import RegisterForm from '@/components/auth/RegisterForm.vue'
 import VerifyForm from '@/components/auth/VerifyForm.vue'
 import AccountView from '@/views/AccountView.vue'
-import AccountWall from '@/components/account/pages/AccountWall.vue'
-import ChatsList from '@/components/account/pages/ChatsList.vue'
-import ChatWindow from '@/components/account/pages/ChatWindow.vue'
-import ContactsList from '@/components/account/pages/ContactsList.vue'
-import PhotosList from '@/components/account/pages/PhotosList.vue'
-import PhotoItem from '@/components/account/pages/PhotoItem.vue'
-import VideosList from '@/components/account/pages/VideosList.vue'
-import VideoItem from '@/components/account/pages/VideoItem.vue'
+import AccountWall from '@/components/details/posts/AccountWall.vue'
+import ChatsView from '@/views/ChatsView.vue'
+import ChatWindow from '@/components/details/chats/ChatWindow.vue'
+import ContactsList from '@/components/details/users/ContactsList.vue'
+import PhotosList from '@/components/details/media/photo/PhotosList.vue'
+import VideosList from '@/components/details/media/video/VideosList.vue'
+import MediaItem from '@/components/details/media/MediaItem.vue'
 import UsersListView from '@/views/UsersListView.vue'
 import ProfileSettingsView from '@/views/ProfileSettingsView.vue'
 import ProfileSettings from '@/components/account/settings/ProfileSettings.vue'
 import AvatarSettings from '@/components/account/settings/AvatarSettings.vue'
 import PrivacySettings from '@/components/account/settings/PrivacySettings.vue'
+import ChatMembersManager from '@/components/details/chats/ChatMembersManager.vue'
+import ForgotPassword from '@/components/auth/ForgotPassword.vue'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const router = createRouter({
@@ -39,6 +40,41 @@ const router = createRouter({
       },
     },
     {
+      path: '/users',
+      name: 'users',
+      meta: { requiresAuth: true },
+      component: UsersListView,
+    },
+    {
+      path: '/chats',
+      name: 'chats',
+      meta: { requiresAuth: true },
+      component: ChatsView,
+      children: [
+        {
+          path: ':chatId',
+          name: 'chat',
+          component: ChatWindow,
+          props: true,
+          children: [
+            {
+              path: ':action(add-member | delete-member)',
+              name: 'chat-manager',
+              components: {
+                default: ChatWindow,
+                modalMain: ChatMembersManager,
+              },
+              meta: {
+                isModal: true,
+                backTo: 'chat',
+              },
+              props: { modalMain: true },
+            },
+          ],
+        },
+      ],
+    },
+    {
       path: '/',
       component: HomeView,
       meta: { requiresGuest: true },
@@ -48,7 +84,7 @@ const router = createRouter({
           name: 'login',
           components: {
             default: HomeView,
-            modal: LoginForm,
+            modalMain: LoginForm,
           },
           meta: { isModal: true },
         },
@@ -56,7 +92,8 @@ const router = createRouter({
           path: 'register',
           name: 'register',
           components: {
-            modal: RegisterForm,
+            default: HomeView,
+            modalMain: RegisterForm,
           },
           meta: { isModal: true },
         },
@@ -64,7 +101,17 @@ const router = createRouter({
           path: 'verify',
           name: 'verify',
           components: {
-            modal: VerifyForm,
+            default: HomeView,
+            modalMain: VerifyForm,
+          },
+          meta: { isModal: true },
+        },
+        {
+          path: 'reset-password',
+          name: 'reset-password',
+          components: {
+            default: HomeView,
+            modalMain: ForgotPassword,
           },
           meta: { isModal: true },
         },
@@ -75,11 +122,6 @@ const router = createRouter({
       component: MainLayout,
       meta: { requiresAuth: true },
       children: [
-        {
-          path: 'users',
-          name: 'users',
-          component: UsersListView,
-        },
         {
           path: 'settings/:id',
           name: 'settings',
@@ -116,18 +158,6 @@ const router = createRouter({
               props: true,
             },
             {
-              path: 'chats',
-              name: 'chats',
-              component: ChatsList,
-              props: true,
-            },
-            {
-              path: 'chat/:chatId',
-              name: 'chat-item',
-              component: ChatWindow,
-              props: true,
-            },
-            {
               path: 'contacts',
               name: 'contacts',
               component: ContactsList,
@@ -144,7 +174,7 @@ const router = createRouter({
               name: 'photo',
               components: {
                 default: PhotosList,
-                modal: PhotoItem,
+                modalMain: MediaItem,
               },
               meta: { isModal: true, backTo: 'photos' },
               props: true,
@@ -160,7 +190,7 @@ const router = createRouter({
               name: 'video',
               components: {
                 default: VideosList,
-                modal: VideoItem,
+                modalMain: MediaItem,
               },
               meta: { isModal: true, backTo: 'videos' },
               props: true,

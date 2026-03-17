@@ -2,25 +2,28 @@
   <div class="comments-list">
     <div v-if="commentStore.isLoading" class="app-loader"></div>
     <template v-else>
-      <CommentItem v-for="item in commentStore.commentTree" :key="item.id" :comment="item" />
-      <div v-if="commentStore.commentTree.length === 0" class="empty">Комментариев пока нет</div>
+      <CommentItem v-for="item in tree" :key="item.id" :comment="item" />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useCommentStore } from '@/stores/comments'
-import CommentItem from './CommentItem.vue'
+import { useCommentStore } from '@/stores/comments.ts'
+import CommentItem from '@/components/details/media/comments/CommentItem.vue'
+
+defineProps<{
+  tree: any[]
+}>()
 
 const commentStore = useCommentStore()
 </script>
 
 <style scoped>
 .comments-list {
-  width: 100%;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 20px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   row-gap: 10px;
@@ -35,9 +38,5 @@ const commentStore = useCommentStore()
 .comments-list::-webkit-scrollbar-thumb {
   background-color: #6e2c11;
   border-radius: 10px;
-}
-
-.empty {
-  color: #6e2c11;
 }
 </style>

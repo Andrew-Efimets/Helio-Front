@@ -2,7 +2,7 @@
   <div class="header">
     <div class="wrapper">
       <HeaderTitle />
-      <HeaderSearch />
+      <HeaderSearch :is-global="true" />
       <HeaderNavbar />
     </div>
   </div>

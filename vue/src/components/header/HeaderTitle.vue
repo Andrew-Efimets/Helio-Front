@@ -1,7 +1,7 @@
 <template>
   <div class="title">
     <RouterLink :to="{ name: 'home' }" class="link">
-      <img alt="Vue logo" class="logo" src="../../assets/heliologo.png" width="64" height="64" />
+      <img alt="Vue logo" class="logo" src="@/assets/heliologo.png" />
     </RouterLink>
     <RouterLink :to="{ name: 'home' }" class="link">
       <h3>{{ info }}</h3>
@@ -24,6 +24,8 @@ const info = ref('Heliophone')
 
 .logo {
   margin: 0 10px;
+  width: 64px;
+  height: 64px;
 }
 
 h3 {

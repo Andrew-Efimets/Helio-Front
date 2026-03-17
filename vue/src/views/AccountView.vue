@@ -2,7 +2,7 @@
   <section class="account">
     <div v-if="isLoading || (user && authStore.canSee(user, 'show_account'))" class="wrapper">
       <ProfileAvatar
-        :user="user"
+        :user="userStore.profile"
         :is-loading="isLoading"
         @update-user="(val) => userStore.setProfile(val)"
       />
@@ -31,7 +31,6 @@ import { useRoute, RouterView } from 'vue-router'
 import { useAuthStore, type PrivacySettings } from '@/stores/auth.ts'
 import { useUserStore } from '@/stores/user'
 import api from '@/api'
-
 import ProfileAvatar from '@/components/account/profile/ProfileAvatar.vue'
 import ProfileInfo from '@/components/account/profile/ProfileInfo.vue'
 import ProfileClosed from '@/components/account/profile/ProfileClosed.vue'
@@ -61,9 +60,9 @@ const userStore = useUserStore()
 
 const user = computed<UserProfileData | null>(() => userStore.profile)
 
-const fetchAccount = async () => {
+const fetchAccount = async (silent = false) => {
   try {
-    isLoading.value = true
+    if (!silent) isLoading.value = true
     const response = await api.get(`/user/${route.params.id}`)
     userStore.setProfile(response.data.data)
 
@@ -81,30 +80,49 @@ onMounted(fetchAccount)
 
 watch(
   () => route.params.id,
-  (newId) => {
-    if (newId) {
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
       userStore.clear()
       fetchAccount()
     }
   },
+  { deep: true },
 )
 
 watch(
-  () => userStore.profile?.contact_status?.type,
-  (newStatus, oldStatus) => {
-    if (newStatus === 'accepted' && oldStatus !== 'accepted') {
-      fetchAccount()
-    }
-
-    if (!newStatus && oldStatus === 'accepted' && user.value?.id !== authStore.user?.id) {
-      fetchAccount()
-    }
+  () => userStore.refreshTicket,
+  () => {
+    fetchAccount(true)
   },
 )
 </script>
 
 <style scoped>
+.account {
+  display: flex;
+  width: 100%;
+}
+
 .wrapper {
   display: flex;
+  width: 100%;
+}
+
+.wrapper-closed {
+  width: 100%;
+}
+
+.content {
+  flex-direction: column;
+  flex-grow: 1;
+  max-width: 700px;
+  width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  .wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 </style>

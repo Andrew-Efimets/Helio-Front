@@ -7,23 +7,45 @@
           <span class="author">{{ comment.user.name }}</span>
           <span class="date">{{ formatDate(comment.created_at) }}</span>
         </div>
-
         <p class="text">{{ comment.content }}</p>
         <p class="quote" @click.prevent="commentStore.setReply(comment)">Ответить</p>
       </div>
     </div>
-
-    <div v-if="comment.replies && comment.replies.length > 0" class="replies">
-      <CommentItem v-for="reply in comment.replies" :key="reply.id" :comment="reply" />
-    </div>
+    <template v-if="comment.replies && comment.replies.length > 0">
+      <AppTransition name="dropdown">
+        <div v-if="showReplies || isChild" class="replies">
+          <CommentItem
+            v-for="reply in comment.replies"
+            :key="reply.id"
+            :comment="reply"
+            :is-child="true"
+          />
+        </div>
+      </AppTransition>
+      <div v-if="!isChild" class="replies-toggle" @click="toggleReplies">
+        <div class="deco"></div>
+        <p class="button-text">{{ !showReplies ? 'Показать ответы' : 'Скрыть ответы' }}</p>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useCommentStore } from '@/stores/comments'
+import { ref } from 'vue'
+import { useCommentStore } from '@/stores/comments.ts'
+import AppTransition from '@/components/details/AppTransition.vue'
 
 const commentStore = useCommentStore()
-defineProps<{ comment: any }>()
+defineProps<{
+  comment: any
+  isChild?: boolean
+}>()
+
+const showReplies = ref(false)
+
+const toggleReplies = () => {
+  showReplies.value = !showReplies.value
+}
 
 const formatDate = (date: string) => new Date(date).toLocaleDateString()
 </script>
@@ -32,16 +54,14 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
 .comment-wrapper {
   display: flex;
   flex-direction: column;
-  width: 100%;
   box-sizing: border-box;
-  min-width: 0;
 }
 
 .comment {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
-  width: 100%;
+  flex-wrap: wrap;
 }
 
 .avatar {
@@ -50,11 +70,6 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
   border-radius: 50%;
   flex-shrink: 0;
   object-fit: cover;
-}
-
-.content {
-  flex: 1;
-  min-width: 0;
 }
 
 .header {
@@ -97,10 +112,9 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
 }
 
 .replies {
-  margin-left: 10px;
+  margin: 5px 0 8px 10px;
   border-left: 1px dashed #d87c56;
   padding-left: 10px;
-  margin-top: 5px;
   display: flex;
   flex-direction: column;
   row-gap: 5px;
@@ -125,10 +139,72 @@ const formatDate = (date: string) => new Date(date).toLocaleDateString()
   font-size: 13px;
 }
 
-@media (max-width: 350px) {
+.replies-toggle {
+  display: flex;
+}
+
+.deco {
+  margin-left: 10px;
+  width: 20px;
+  border-bottom: 1px #d87c56 dashed;
+  border-radius: 0 0 0 100%;
+  transform: translateY(-50%);
+}
+
+.button-text {
+  color: #d87c56;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.button-text:hover {
+  background-color: #ead7c3;
+}
+
+@media screen and (max-width: 768px) {
   .replies {
     margin-left: 10px;
     padding-left: 5px;
+  }
+
+  .avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  .replies .avatar {
+    width: 18px;
+    height: 18px;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .author {
+    font-size: 9px;
+  }
+
+  .date {
+    font-size: 9px;
+  }
+
+  .text {
+    font-size: 12px;
+  }
+
+  .quote {
+    font-size: 9px;
+  }
+
+  .replies .text {
+    font-size: 11px;
+  }
+
+  .button-text {
+    font-size: 10px;
   }
 }
 </style>

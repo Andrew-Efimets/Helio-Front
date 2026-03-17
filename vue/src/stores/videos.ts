@@ -12,7 +12,7 @@ export const useVideoStore = defineStore('videos', () => {
   const route = useRoute()
   const uploadProgress = ref(0)
 
-  const totalCount = computed(() => allVideos.length)
+  const totalCount = computed(() => allVideos.value.length)
 
   const fetchVideos = async (userId: string | number) => {
     try {
@@ -29,7 +29,7 @@ export const useVideoStore = defineStore('videos', () => {
 
   const sendVideo = async (file: File) => {
     if (!file) return
-    if (file.size > 1024 * 1024 * 1024) {
+    if (file.size > 1.5 * 1024 * 1024 * 1024) {
       return notify.show('Файл слишком большой!', 'error')
     }
 
@@ -85,6 +85,21 @@ export const useVideoStore = defineStore('videos', () => {
     }
   }
 
+  const deleteVideo = async (userId: string | number, videoId: string | number) => {
+    try {
+      isLoading.value = true
+      await api.delete(`/user/${userId}/video/${videoId}`)
+
+      notify.show('Видео успешно удалено', 'success')
+      return true
+    } catch (error) {
+      notify.show('Не удалось удалить видео', 'error')
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     allVideos,
     isLoading,
@@ -93,6 +108,7 @@ export const useVideoStore = defineStore('videos', () => {
     totalCount,
     fetchVideos,
     fetchVideoById,
+    deleteVideo,
     sendVideo,
     updateVideoInList,
     removeVideoFromStore,

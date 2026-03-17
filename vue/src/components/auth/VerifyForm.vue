@@ -18,14 +18,15 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter, useRoute } from 'vue-router'
 import { computed, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import FormInput from '@/components/auth/FormInput.vue'
-import { useAuthStore } from '@/stores/auth'
 import api from '@/api.ts'
+import { useAuthStore } from '@/stores/auth'
+import FormInput from '@/components/auth/FormInput.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const isLoading = ref(false)
 const serverError = ref('')
 
@@ -57,7 +58,14 @@ const handleSubmit = async () => {
       const response = await api.post('/verify', {
         phone: authStore.tempPhone,
         code: validateForm.code,
+        reset: route.query.type === 'reset',
       })
+
+      if (route.query.type === 'reset') {
+        localStorage.setItem('reset_code', validateForm.code)
+        router.push({ name: 'reset-password' })
+        return
+      }
 
       authStore.setUser(response.data.data)
 
@@ -93,15 +101,15 @@ const handleSubmit = async () => {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  margin: auto;
+  margin: 20px auto;
 }
 
 .notify {
   text-align: center;
   text-decoration: none;
   color: #6e2c11;
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .message-error {

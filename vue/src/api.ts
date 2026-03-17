@@ -2,7 +2,7 @@ import axios, { type RawAxiosRequestHeaders } from 'axios'
 import { useAuthStore } from '@/stores/auth.ts'
 import router from '@/router'
 
-const apiServ = axios.create({
+export const apiServ = axios.create({
   withCredentials: true,
   baseURL: import.meta.env.VITE_API_BASE_URL,
 })
@@ -14,6 +14,19 @@ const api = axios.create({
     'X-Requested-With': 'XMLHttpRequest',
     Accept: 'application/json',
   } as RawAxiosRequestHeaders,
+})
+
+api.interceptors.request.use((config) => {
+  const cookieValue = document.cookie.split('; ').find((row) => row.startsWith('XSRF-TOKEN='))
+
+  if (cookieValue) {
+    const token = cookieValue.split('=')[1]
+    if (token) {
+      config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token)
+    }
+  }
+
+  return config
 })
 
 api.interceptors.response.use(
@@ -56,6 +69,8 @@ api.interceptors.response.use(
         error.formattedMessage = 'Ошибка на стороне сервера. Попробуйте позже.'
       } else if (status === 403) {
         error.formattedMessage = 'У вас нет доступа'
+      } else if (status === 404) {
+        error.formattedMessage = 'Не найдено'
       } else {
         error.formattedMessage = data.message || 'Произошла непредвиденная ошибка'
       }

@@ -11,7 +11,7 @@ export const usePhotoStore = defineStore('photos', () => {
   const route = useRoute()
   const notify = useNotificationStore()
 
-  const totalCount = computed(() => allPhotos.length)
+  const totalCount = computed(() => allPhotos.value.length)
 
   const getPhotoIndexById = (photoId: string | number) => {
     return allPhotos.value.findIndex((p) => Number(p.id) === Number(photoId))
@@ -73,6 +73,21 @@ export const usePhotoStore = defineStore('photos', () => {
     }
   }
 
+  const deletePhoto = async (userId: string | number, photoId: string | number) => {
+    try {
+      isLoading.value = true
+      await api.delete(`/user/${userId}/photo/${photoId}`)
+
+      notify.show('Фотография успешно удалена', 'success')
+      return true
+    } catch (error) {
+      notify.show('Не удалось удалить фотографию', 'error')
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const removePhotoFromStore = (photoId: string | number) => {
     allPhotos.value = allPhotos.value.filter((p) => Number(p.id) !== Number(photoId))
   }
@@ -84,6 +99,7 @@ export const usePhotoStore = defineStore('photos', () => {
     totalCount,
     fetchPhotos,
     sendPhoto,
+    deletePhoto,
     getNextPhotoId,
     getPrevPhotoId,
     updatePhotoInList,

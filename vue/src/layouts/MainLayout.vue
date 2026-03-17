@@ -1,9 +1,7 @@
 <template>
   <section class="main">
     <ProfileMenu />
-    <main class="content">
-      <RouterView />
-    </main>
+    <RouterView />
   </section>
 </template>
 
@@ -15,5 +13,11 @@ import ProfileMenu from '@/components/account/profile/ProfileMenu.vue'
 <style scoped>
 .main {
   display: flex;
+}
+
+@media screen and (max-width: 1024px) {
+  .main {
+    flex-direction: column;
+  }
 }
 </style>

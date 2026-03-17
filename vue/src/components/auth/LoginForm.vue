@@ -22,6 +22,7 @@
       <p v-if="serverError" class="message-error">{{ serverError }}</p>
 
       <RouterLink :to="{ name: 'register' }" class="link">Регистрация</RouterLink>
+      <span @click="handleForgotPassword" class="forgot-link">Забыли пароль?</span>
 
       <button type="submit" class="button" :disabled="!isValidate || isLoading">
         {{ isLoading ? 'отправляем код...' : 'продолжить' }}
@@ -31,11 +32,12 @@
 </template>
 
 <script setup lang="ts">
+import api from '@/api'
+import { apiServ } from '@/api'
+import { useAuthStore } from '@/stores/auth'
 import { computed, reactive, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import FormInput from '@/components/auth/FormInput.vue'
-import api from '@/api'
-import { useAuthStore } from '@/stores/auth'
 
 const loginForm = reactive({
   phone: '',
@@ -86,6 +88,32 @@ const handleSubmit = async () => {
     if (loginForm.password.length < 2) errors.password = 'Минимум 6 символов'
   }
 }
+
+const handleForgotPassword = async () => {
+  serverError.value = ''
+  const cleanPhone = loginForm.phone.replace(/\D/g, '')
+
+  if (loginForm.phone.length < 18) {
+    errors.phone = 'Введите номер телефона для восстановления'
+    return
+  }
+
+  try {
+    isLoading.value = true
+
+    await api.post('/forgot-password', {
+      phone: cleanPhone,
+    })
+
+    authStore.setPhone(cleanPhone)
+
+    router.push({ name: 'verify', query: { type: 'reset' } })
+  } catch (err: any) {
+    serverError.value = err.formattedMessage || 'Ошибка при отправке кода'
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -96,15 +124,15 @@ const handleSubmit = async () => {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  margin: auto;
+  margin: 20px auto;
 }
 
 .notify {
   text-align: center;
   text-decoration: none;
   color: #6e2c11;
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .link {
@@ -117,5 +145,11 @@ const handleSubmit = async () => {
 
 .message-error {
   color: darkred;
+}
+
+.forgot-link {
+  color: #6e2c11;
+  font-size: 12px;
+  cursor: pointer;
 }
 </style>

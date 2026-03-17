@@ -18,10 +18,9 @@
 </template>
 
 <script setup lang="ts">
+import api from '@/api'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter, RouterLink } from 'vue-router'
-import api from '@/api'
-import { ref } from 'vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -57,7 +56,7 @@ const handleLogout = async () => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  box-shadow: 0 0 15px 5px rgba(215, 142, 22, 0.5);
+  box-shadow: var(--avatar-box-shadow);
 }
 
 .avatar-img {
@@ -65,5 +64,12 @@ const handleLogout = async () => {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+}
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    column-gap: 15px;
+    margin-right: 0;
+  }
 }
 </style>

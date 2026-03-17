@@ -7,7 +7,7 @@
       :items="videoStore.allVideos"
       :is-loading="videoStore.isLoading"
       empty-label="Видеозаписей пока нет"
-      active-label="Видеозаписи"
+      active-label="Видеозаписей"
     >
       <template #header>
         <MediaAddBlock
@@ -32,8 +32,8 @@ import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.ts'
 import { useVideoStore } from '@/stores/videos.ts'
-import VideoListCard from '@/components/details/media/VideoListCard.vue'
-import MediaGridPage from '@/components/account/pages/MediaGridPage.vue'
+import VideoListCard from '@/components/details/media/video/VideoListCard.vue'
+import MediaGridPage from '@/components/details/media/MediaGridPage.vue'
 import MediaAddBlock from '@/components/details/media/MediaAddBlock.vue'
 import MediaLoadingPlaceholder from '@/components/details/media/MediaLoadingPlaceholder.vue'
 
@@ -60,6 +60,7 @@ watch(
 <style scoped>
 .videos {
   padding: 10px 0;
+  width: 100%;
 }
 
 .error-message {

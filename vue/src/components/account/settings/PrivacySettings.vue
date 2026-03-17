@@ -20,10 +20,10 @@
 </template>
 
 <script setup lang="ts">
-import PrivacyChoice from '@/components/account/settings/PrivacyChoice.vue'
-import { useAuthStore } from '@/stores/auth.ts'
 import { reactive, watch, ref, computed } from 'vue'
 import api from '@/api.ts'
+import { useAuthStore } from '@/stores/auth.ts'
+import PrivacyChoice from '@/components/account/settings/PrivacyChoice.vue'
 
 const authStore = useAuthStore()
 const isLoading = ref(false)

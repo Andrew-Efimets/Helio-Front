@@ -7,7 +7,7 @@
       :items="photoStore.allPhotos"
       :is-loading="photoStore.isLoading"
       empty-label="Фотографий пока нет"
-      active-label="Фотографии"
+      active-label="Фотографий"
     >
       <template #header>
         <MediaAddBlock
@@ -39,14 +39,14 @@ import { useAuthStore } from '@/stores/auth.ts'
 import { usePhotoStore } from '@/stores/photos.ts'
 import { useRoute, RouterLink } from 'vue-router'
 import { watch, ref, computed } from 'vue'
-import MediaGridPage from '@/components/account/pages/MediaGridPage.vue'
+import MediaGridPage from '@/components/details/media/MediaGridPage.vue'
 import MediaAddBlock from '@/components/details/media/MediaAddBlock.vue'
 import MediaLoadingPlaceholder from '@/components/details/media/MediaLoadingPlaceholder.vue'
 
 const authStore = useAuthStore()
 const photoStore = usePhotoStore()
 const route = useRoute()
-const privacyError = ref()
+const privacyError = ref<string | null>(null)
 
 watch(
   () => route.params.id,
@@ -67,26 +67,19 @@ const isOwner = computed(() => Number(authStore.user?.id) === Number(route.param
 <style scoped>
 .photos {
   padding: 10px 0;
+  width: 100%;
 }
 
 .media-item {
   aspect-ratio: 1/1;
   overflow: hidden;
   border-radius: 8px;
+  box-shadow: var(--main-box-shadow);
 }
 
 .img-fit {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.error-message {
-  width: 100%;
-  font-size: 16px;
-  padding: 20px;
-  background-color: #e99a9a;
-  color: darkred;
-  text-align: center;
 }
 </style>

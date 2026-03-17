@@ -28,6 +28,10 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <style scoped>
+.settings {
+  margin-left: 40px;
+}
+
 .links {
   margin-top: 50px;
   display: flex;
@@ -59,5 +63,25 @@ import { RouterLink, RouterView } from 'vue-router'
 
 .pages {
   background-color: #f0ccaa;
+}
+
+@media screen and (max-width: 1024px) {
+  .settings {
+    margin: 0;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .title {
+    font-size: 16px;
+  }
+
+  .link-item {
+    padding: 5px;
+  }
 }
 </style>

@@ -45,11 +45,11 @@
 </template>
 
 <script setup lang="ts">
-import { vMaska } from 'maska/vue'
-import { useAuthStore } from '@/stores/auth.ts'
-import { reactive, watch, computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { reactive, watch, computed, ref } from 'vue'
 import api from '@/api.ts'
+import { useAuthStore } from '@/stores/auth.ts'
+import { vMaska } from 'maska/vue'
 import ConfirmModal from '@/components/details/ConfirmModal.vue'
 
 const authStore = useAuthStore()
@@ -230,12 +230,18 @@ const isChanged = computed(() => {
 .input:focus {
   outline: none;
   border: 2px solid #be7f19;
-  box-shadow: 0 0 5px rgba(190, 127, 25, 0.5);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .buttons-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+@media screen and (max-width: 768px) {
+  .buttons-wrapper {
+    flex-direction: column;
+  }
 }
 </style>

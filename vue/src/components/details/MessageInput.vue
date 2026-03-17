@@ -45,6 +45,7 @@ import 'vue3-emoji-picker/css'
 const props = defineProps({
   modelValue: { type: String, default: '' },
   placeholder: { type: String, default: 'Введите текст...' },
+  allowEmpty: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue', 'send'])
@@ -78,7 +79,7 @@ const onSelectEmoji = (emoji: any) => {
 }
 
 const handleSend = () => {
-  if (props.modelValue.trim()) {
+  if (props.modelValue.trim() || props.allowEmpty) {
     emit('send', props.modelValue)
   }
 }
@@ -134,11 +135,12 @@ watch(
   &::-webkit-scrollbar {
     display: none;
   }
-  background: transparent;
+  background: #f9f2e7;
   width: 100%;
   max-height: 300px;
-  padding: 10px 40px 10px 40px;
+  padding: 10px 40px;
   border: #6e2c11 1px solid;
+  box-shadow: var(--main-box-shadow);
   border-radius: 8px;
   color: #6e2c11;
   line-height: 22px;
@@ -149,12 +151,13 @@ watch(
 
 .input:focus {
   border-color: #be7f19;
+  box-shadow: var(--input-focus-shadow);
 }
 
 .send {
   position: absolute;
   width: 30px;
-  left: 89%;
+  right: 5px;
   bottom: 2px;
 }
 
@@ -185,8 +188,26 @@ watch(
   border: none;
   background: transparent;
   font-size: 20px;
-  right: 89%;
+  left: 5px;
   bottom: 8px;
   cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .input {
+    font-size: 10px;
+    line-height: 18px;
+    padding: 9px 30px;
+  }
+
+  .send {
+    width: 20px;
+    bottom: 5px;
+  }
+
+  .emoji__button {
+    font-size: 16px;
+    margin-bottom: 2px;
+  }
 }
 </style>

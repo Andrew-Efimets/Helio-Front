@@ -13,7 +13,7 @@
         <button
           v-if="!user.contact_status"
           class="button"
-          @click="toggleContact"
+          @click="handleToggle"
           :disabled="isAddition"
         >
           Добавить в контакты
@@ -22,24 +22,29 @@
         <template v-else>
           <button
             v-if="user.contact_status.type === 'accepted'"
-            class="button"
-            @click="toggleContact"
+            class="button button--danger"
+            @click="isConfirmOpen = true"
             :disabled="isAddition"
           >
             Удалить из контактов
           </button>
 
           <template v-else-if="user.contact_status.type === 'pending'">
-            <template v-if="!user.contact_status.is_sender">
-              <button class="button" @click="acceptContact" :disabled="isAddition">
+            <template v-if="user.contact_status.is_sender">
+              <button class="button" @click="handleAccept" :disabled="isAddition">
                 Принять заявку
               </button>
-              <button class="button danger" @click="toggleContact" :disabled="isAddition">
+              <button class="button button--danger" @click="handleToggle" :disabled="isAddition">
                 Отклонить заявку
               </button>
             </template>
 
-            <button v-else class="button secondary" @click="toggleContact" :disabled="isAddition">
+            <button
+              v-else
+              class="button button--danger"
+              @click="handleToggle"
+              :disabled="isAddition"
+            >
               Отменить запрос
             </button>
           </template>
@@ -56,15 +61,19 @@
         </RouterLink>
       </div>
     </div>
+    <ConfirmModal :is-open="isConfirmOpen" @close="isConfirmOpen = false" @confirm="handleToggle">
+      <p>Вы действительно хотите удалить контакт?</p>
+      <template #button__text>Да, удалить</template>
+    </ConfirmModal>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useUserStore } from '@/stores/user'
 import { useAuthStore } from '@/stores/auth.ts'
-import { useRoute, RouterLink } from 'vue-router'
-import { ref } from 'vue'
-import api from '@/api'
-import { useNotificationStore } from '@/stores/notifications.ts'
+import { useContacts } from '@/composables/useContacts'
+import ConfirmModal from '@/components/details/ConfirmModal.vue'
 
 const menuLinks = [
   { name: 'photos', label: 'Фотографии', count: 'photos_count' },
@@ -77,65 +86,43 @@ const props = defineProps<{
   isLoading: boolean
 }>()
 
-const emit = defineEmits(['update-user'])
-
-const notify = useNotificationStore()
+const isConfirmOpen = ref(false)
+const emit = defineEmits(['update-user', 'refresh-account'])
 const authStore = useAuthStore()
-const route = useRoute()
-const isAddition = ref(false)
+const userStore = useUserStore()
 
-const toggleContact = async () => {
-  try {
-    isAddition.value = true
-    const response = await api.post(`/user/${route.params.id}/contact`)
-
-    const updatedUser = {
+const { isAddition, toggleContact, acceptContact } = useContacts()
+const handleToggle = async () => {
+  isConfirmOpen.value = false
+  const data = await toggleContact(props.user.id)
+  if (data) {
+    emit('update-user', {
       ...props.user,
-      contact_status: response.data.contact_status,
-      contacts_count: response.data.contacts_count,
-    }
-    emit('update-user', updatedUser)
-
-    if (response.data.pending_contacts_count !== undefined) {
-      authStore.setUser({
-        pending_contacts_count: response.data.pending_contacts_count,
-      })
-    }
-
-    if (response.data.message) {
-      notify.show(response.data.message, 'info')
-    }
-    isAddition.value = false
-  } catch (err) {
-    console.error('Ошибка при работе с контактами', err)
+      contact_status: data.contact_status,
+      contacts_count: data.contacts_count,
+    })
+    userStore.triggerRefresh()
   }
 }
 
-const acceptContact = async () => {
-  try {
-    isAddition.value = true
-    const response = await api.post(`/user/${route.params.id}/contact/accept`)
-
-    const updatedData = response.data
-
-    const updatedUser = {
+const handleAccept = async () => {
+  const data = await acceptContact(props.user.id)
+  if (data) {
+    emit('update-user', {
       ...props.user,
-      contact_status: updatedData.contact_status,
-      contacts_count: updatedData.contacts_count,
-    }
-    emit('update-user', updatedUser)
-
-    if (updatedData.pending_contacts_count !== undefined) {
-      authStore.setUser({ pending_contacts_count: updatedData.pending_contacts_count })
-    }
-    isAddition.value = false
-  } catch (err) {
-    console.error('Ошибка при работе с контактами', err)
+      contact_status: data.contact_status,
+      contacts_count: data.contacts_count,
+    })
+    userStore.triggerRefresh()
   }
 }
 </script>
 
 <style scoped>
+.avatar {
+  flex-shrink: 0;
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -160,7 +147,7 @@ const acceptContact = async () => {
   height: 100%;
   object-fit: cover;
   border: #6e2c11 2px solid;
-  box-shadow: 0 0 15px 5px rgba(190, 127, 25, 0.5);
+  box-shadow: var(--avatar-box-shadow);
 }
 
 .menu {

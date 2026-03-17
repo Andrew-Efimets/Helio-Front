@@ -1,72 +1,114 @@
 <template>
   <nav v-if="authStore.user?.id" class="menu">
-    <ul class="wrapper">
-      <li v-for="item in menuItems" :key="item.name" class="item">
-        <RouterLink class="link" :to="{ name: item.name, params: { id: myId } }">
-          <div class="link-content">
-            {{ item.label }}
+    <div class="menu__wrapper">
+      <div class="burger__wrapper" @click="openMenu">
+        <img src="@/assets/burger.png" alt="burger" class="burger" />
+      </div>
+      <ul
+        class="links__wrapper"
+        :class="{ 'links__wrapper--open': isOpen }"
+        @click="isOpen = false"
+      >
+        <li v-for="item in menuItems" :key="item.name" class="item">
+          <RouterLink class="link" :to="{ name: item.name, params: { id: myId } }">
+            <div class="link-content">
+              {{ item.label }}
 
-            <span v-if="item.countKey && (authStore.user as any)?.[item.countKey]" class="badge">
-              {{ item.countKey === 'pending_contacts_count' ? '+' : '' }}
-              {{ (authStore.user as any)[item.countKey] }}
-            </span>
-          </div>
-        </RouterLink>
-      </li>
+              <span v-if="item.countKey && (authStore.user as any)?.[item.countKey]" class="badge">
+                {{ item.countKey === 'pending_contacts_count' ? '+' : '' }}
+                {{ (authStore.user as any)[item.countKey] }}
+              </span>
+            </div>
+          </RouterLink>
+        </li>
 
-      <li class="separator"></li>
+        <li class="item">
+          <RouterLink class="link" :to="{ name: 'chats' }">
+            <div class="link-content">
+              Чаты
+              <span v-if="chatStore.totalUnreadCount" class="badge">
+                + {{ chatStore.totalUnreadCount }}
+              </span>
+            </div>
+          </RouterLink>
+        </li>
 
-      <li class="settings">
-        <RouterLink class="link" :to="{ name: 'settings', params: { id: myId } }">
-          Настройки профиля
-        </RouterLink>
-      </li>
-    </ul>
+        <li class="separator"></li>
+
+        <li class="settings">
+          <RouterLink class="link" :to="{ name: 'settings', params: { id: myId } }">
+            Настройки профиля
+          </RouterLink>
+        </li>
+      </ul>
+    </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useChatStore } from '@/stores/chats.ts'
+import { RouterLink } from 'vue-router'
 
 const authStore = useAuthStore()
+const chatStore = useChatStore()
 
 const myId = computed(() => authStore.user?.id)
 
 const menuItems = [
   { name: 'wall', label: 'Мой аккаунт' },
-  { name: 'chats', label: 'Чаты', countKey: 'unread_messages_count' },
-  { name: 'contacts', label: 'Контакты', countKey: 'pending_contacts_count' },
   { name: 'photos', label: 'Мои фотографии' },
   { name: 'videos', label: 'Мои видеозаписи' },
+  { name: 'contacts', label: 'Контакты', countKey: 'pending_contacts_count' },
 ]
+
+const isOpen = ref(false)
+const openMenu = () => {
+  isOpen.value = !isOpen.value
+}
 </script>
 
 <style scoped>
 .menu {
-  min-width: 300px;
-  padding: 40px;
+  white-space: nowrap;
+  padding: 40px 0 0 40px;
 }
 
-.wrapper {
+.menu__wrapper {
+  display: flex;
+}
+
+.burger__wrapper {
+  display: none;
+}
+
+.burger {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.links__wrapper {
   width: 100%;
   list-style: none;
+  display: flex;
+  flex-direction: column;
 }
 
-.wrapper .item:has(.router-link-exact-active) {
+.links__wrapper .item:has(.router-link-exact-active) {
   background-color: #f0ccaa;
 }
 
-.wrapper .item:hover:not(:has(.router-link-exact-active)) {
+.links__wrapper .item:hover:not(:has(.router-link-exact-active)) {
   background-color: #ead7c3;
 }
 
-.wrapper .settings:has(.router-link-active) {
+.links__wrapper .settings:has(.router-link-active) {
   background-color: #f0ccaa;
 }
 
-.wrapper .settings:hover:not(:has(.router-link-active)) {
+.links__wrapper .settings:hover:not(:has(.router-link-active)) {
   background-color: #ead7c3;
 }
 
@@ -97,11 +139,59 @@ const menuItems = [
   border-radius: 5px;
 }
 
-.badge {
-  font-size: 14px;
-  color: #6e2c11;
-  padding: 3px;
-  border-radius: 5px;
-  background-color: #e99a9a;
+@media screen and (max-width: 1024px) {
+  .menu {
+    margin: 20px 20px 40px 40px;
+    width: fit-content;
+    padding: 0;
+  }
+
+  .burger__wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    background-color: #f5ddc5;
+    border-radius: 10px;
+    z-index: 100;
+    box-shadow: var(--main-box-shadow);
+  }
+
+  .links__wrapper {
+    display: none;
+    flex-direction: column;
+    width: fit-content;
+    position: fixed;
+    padding: 10px;
+    border-radius: 10px;
+    left: 100px;
+    z-index: 80;
+    background-color: #f5ddc5;
+    box-shadow: var(--main-box-shadow);
+  }
+
+  .links__wrapper--open {
+    display: flex;
+  }
+
+  .link {
+    font-size: 18px;
+  }
+
+  .separator {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .menu {
+    margin-left: 20px;
+  }
+
+  .links__wrapper {
+    left: 80px;
+  }
 }
 </style>

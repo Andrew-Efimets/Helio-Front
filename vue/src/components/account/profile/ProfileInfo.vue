@@ -8,16 +8,17 @@
         <RouterLink :to="{ name: 'wall', params: { id: user?.id } }" class="name">
           {{ user?.name }}
         </RouterLink>
+        <OnlineStatusPointer v-if="user?.id && userStore.isUserOnline(user.id)" />
       </div>
 
       <div v-for="item in displayInfo" :key="item.title" class="list">
         <p class="item-title">{{ item.title }}</p>
-        <p class="item">{{ item.value || 'не указан' }}</p>
+        <p class="item">{{ item.value || 'нет даных' }}</p>
       </div>
 
       <div v-if="authStore.canSee(user, 'show_phone')" class="list">
         <p class="item-title">Телефон:</p>
-        <p class="item">{{ user?.phone ? `+ ${user.phone}` : 'не указан' }}</p>
+        <p class="item">{{ user?.phone ? `+ ${user.phone}` : 'нет даных' }}</p>
       </div>
     </div>
   </div>
@@ -25,8 +26,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.ts'
+import { useUserStore } from '@/stores/user.ts'
+import { RouterLink } from 'vue-router'
+import OnlineStatusPointer from '@/components/details/OnlineStatusPointer.vue'
 
 const props = defineProps<{
   user: any
@@ -34,6 +37,7 @@ const props = defineProps<{
 }>()
 
 const authStore = useAuthStore()
+const userStore = useUserStore()
 
 const formatDate = (dateString: string | null) => {
   if (!dateString) return null
@@ -45,9 +49,9 @@ const displayInfo = computed(() => {
   const profile = props.user?.profile
   if (!profile) return []
   return [
-    { title: 'Страна:', value: props.user?.profile?.country },
-    { title: 'Город:', value: props.user?.profile?.city },
-    { title: 'День рождения:', value: formatDate(props.user?.profile?.birthday) },
+    { title: 'Страна:', value: props.user?.profile.country },
+    { title: 'Город:', value: props.user?.profile.city },
+    { title: 'День рождения:', value: formatDate(props.user?.profile.birthday) },
   ]
 })
 </script>
@@ -55,14 +59,15 @@ const displayInfo = computed(() => {
 <style scoped>
 .info {
   padding: 40px 0 20px;
+  width: 100%;
 }
 
 .wrapper {
   display: flex;
   flex-direction: column;
   background-color: #f5ddc5;
-  min-width: 600px;
   min-height: 200px;
+  box-shadow: var(--main-box-shadow);
 }
 
 .name-wrapper {
@@ -80,13 +85,13 @@ const displayInfo = computed(() => {
 }
 
 .item {
-  padding: 20px 0 10px 20px;
+  margin: 20px 0 10px 20px;
   color: #6e2c11;
-  width: 30%;
 }
 
 .list {
   display: flex;
+  column-gap: 20px;
 }
 
 .item-title {
@@ -94,5 +99,11 @@ const displayInfo = computed(() => {
   padding: 20px 0 10px 20px;
   color: #6e2c11;
   width: 30%;
+}
+
+@media screen and (min-width: 768px) {
+  .wrapper {
+    min-width: 400px;
+  }
 }
 </style>
